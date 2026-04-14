@@ -695,10 +695,21 @@ import { getFirestore,collection,doc,addDoc,getDoc,setDoc,updateDoc,query,orderB
 import { getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { getStorage,ref as sRef,uploadBytes,getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
-// 🔥 REMPLACEZ PAR VOTRE CONFIG FIREBASE
-const firebaseConfig={apiKey:"AIzaSyD-0mZgJGbDc7d-mk0rs_nqLPYrRJ8xsU",authDomain:"maqabir-tunisie.firebaseapp.com",projectId:"maqabir-tunisie",storageBucket:"maqabir-tunisie.firebasestorage.app",messagingSenderId:"876209874847",appId:"1:876209874847:web:ad49be512e0280e202c84b0d2a",measurementId:"G-15TC7JAP60"};
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app),auth=getAuth(app),storage=getStorage(app);
+// ✅ CONFIGURATION FIREBASE CORRIGÉE (depuis ta capture)
+const firebaseConfig = {
+  apiKey: "AIzaSyD-6mZsgjG5dC76-mkWrx_nqL9YrRJSxxU",
+  authDomain: "maqabir-tunisie.firebaseapp.com",
+  projectId: "maqabir-tunisie",
+  storageBucket: "maqabir-tunisie.firebasestorage.app",
+  messagingSenderId: "876259874847",
+  appId: "1:876259874847:web:aa5490e520b202c84b9d2a",
+  measurementId: "G-15TC7J6P60"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
 
 // ═══ TRANSLATIONS ═══
 const T={
