@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Tajawal:wght@300;400;500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Tesseract.js pour la reconnaissance de texte sur photos -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LdE9LgsAAAAAFN8T2rYcqNpB_5UzaHxlVxeD_-K"></script>
 <style>
 :root {
   --cream: #f5f0e8;
@@ -135,7 +135,6 @@ body {
 .mft { padding: 15px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--sand); }
 .bcancel { padding: 8px 15px; background: transparent; border: 1.5px solid var(--sand); border-radius: 8px; cursor: pointer; font-family: var(--ff); }
 .bsave { padding: 8px 19px; background: var(--olive); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: var(--ff); }
-.bsave:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Auth Modal */
 .auth-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; }
@@ -180,14 +179,49 @@ body {
 .detection-result { background: var(--olive-dim); border-radius: 8px; padding: 12px; margin: 10px 0; }
 .detected-field { margin: 5px 0; }
 .detected-label { font-weight: bold; color: var(--olive); }
-
-/* Loading spinner */
 .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .lang-toggle { display: flex; align-items: center; background: rgba(255,255,255,0.12); border: 1px solid rgba(212,197,169,0.25); border-radius: 20px; overflow: hidden; }
 .lang-btn { padding: 5px 13px; font-size: 0.8rem; font-family: var(--ff); font-weight: 700; cursor: pointer; border: none; background: transparent; color: var(--sand); transition: all 0.2s; }
 .lang-btn.active { background: var(--gold); color: var(--brown); }
+
+/* Services Screen */
+.svc-screen { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 700; overflow-y: auto; padding-bottom: 80px; }
+.svc-header { background: linear-gradient(135deg, var(--brown), var(--olive)); padding: 14px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
+.svc-back { background: rgba(255,255,255,0.15); border: none; color: var(--cream); width: 34px; height: 34px; border-radius: 50%; font-size: 18px; cursor: pointer; }
+.svc-title { flex: 1; font-family: var(--ffd); color: var(--cream); font-size: 1.15rem; }
+.svc-tabs { background: var(--white); border-bottom: 1px solid var(--sand); display: flex; overflow-x: auto; }
+.svc-tab { flex: 1; padding: 11px 10px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; font-family: var(--ff); }
+.svc-tab.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: bold; }
+.svc-search { padding: 10px 12px; background: var(--white); border-bottom: 1px solid var(--sand); }
+.svc-search input { width: 100%; padding: 8px 11px 8px 33px; border: 1.5px solid var(--sand); border-radius: 8px; background: var(--cream); outline: none; font-family: var(--ff); }
+.svc-chips { padding: 10px 12px; background: var(--cream); border-bottom: 1px solid var(--sand); overflow-x: auto; white-space: nowrap; }
+.chip { display: inline-block; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--sand); background: var(--white); font-size: 0.76rem; cursor: pointer; margin-right: 6px; font-family: var(--ff); }
+.chip.active { background: var(--olive); color: white; border-color: var(--olive); }
+.svc-grid { padding: 12px; }
+.svc-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand); margin-bottom: 11px; overflow: hidden; }
+.svc-card-hd { display: flex; gap: 12px; padding: 13px 14px 8px; }
+.svc-icon { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
+.svc-info { flex: 1; }
+.svc-info h3 { font-family: var(--ffd); font-size: 0.95rem; margin-bottom: 2px; }
+.svc-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; padding: 2px 7px; border-radius: 20px; margin-bottom: 3px; background: rgba(61,43,31,0.08); color: var(--brown-mid); }
+.svc-gov { font-size: 0.71rem; color: var(--olive); }
+.svc-price-block { text-align: end; flex-shrink: 0; }
+.svc-price-block strong { display: block; font-family: var(--ffd); font-size: 0.95rem; }
+.svc-card-body { padding: 0 14px 11px; }
+.svc-desc { font-size: 0.81rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 8px; }
+.svc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.svc-avail { font-size: 0.68rem; padding: 2px 8px; border-radius: 20px; background: rgba(39,174,96,0.1); color: var(--success); }
+.svc-btns { display: flex; gap: 7px; padding: 9px 14px 13px; border-top: 1px solid var(--sand); }
+.svc-btn-call { flex: 1; padding: 9px; background: var(--olive); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: var(--ff); }
+.svc-btn-wa { flex: 1; padding: 9px; background: #25d366; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: var(--ff); }
+.svc-btn-req { flex: 1; padding: 9px; background: transparent; color: var(--brown-mid); border: 1.5px solid var(--sand); border-radius: 6px; font-weight: 600; cursor: pointer; font-family: var(--ff); }
+.svc-section-title { font-family: var(--ffd); font-size: 1rem; color: var(--brown); padding: 4px 0 10px; border-bottom: 2px solid var(--sand); margin-bottom: 12px; }
+.svc-empty { text-align: center; padding: 38px 20px; color: var(--text-mid); }
+.svc-banner { padding: 14px 16px; margin: 12px 12px 0; border-radius: var(--radius); border: 1px solid var(--sand); }
+.svc-pack1 { background: rgba(61,43,31,0.06); border-color: rgba(107,76,56,0.2); }
+.svc-pack2 { background: rgba(90,107,60,0.06); border-color: rgba(90,107,60,0.2); }
+.svc-pack-full { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.35); }
 
 @media (max-width: 860px) {
   .app-body { grid-template-columns: 1fr; }
@@ -223,7 +257,6 @@ body {
         <div class="field"><label id="regNameLabel">Nom complet</label><input type="text" id="regName" placeholder="Mohamed Ben Ali"></div>
         <div class="field"><label id="regEmailLabel">Email</label><input type="email" id="regEmail" placeholder="exemple@email.com"></div>
         <div class="field"><label id="regPwdLabel">Mot de passe (min 6)</label><input type="password" id="regPwd" placeholder="••••••"></div>
-        <!-- reCAPTCHA v3 (invisible) - sera ajouté dynamiquement -->
         <button class="btn-primary" id="regBtn" onclick="handleRegisterWithCaptcha()">Créer mon compte</button>
       </div>
     </div>
@@ -273,66 +306,48 @@ body {
   <button class="fab" onclick="openQuickAddModal()" id="fabBtn">📸</button>
 </div>
 
-<!-- QUICK ADD MODAL (Caméra + Détection) -->
+<!-- QUICK ADD MODAL -->
 <div class="movl" id="quickAddModal">
   <div class="modal" style="max-width: 600px;">
     <div class="mhd"><h3 id="quickAddTitle">📸 Ajout rapide par photo</h3><button class="cbt" onclick="closeQuickAddModal()">✕</button></div>
     <div class="mbd">
       <div id="cameraSection">
-        <div class="camera-container">
-          <video id="cameraVideo" autoplay playsinline></video>
-          <canvas id="cameraCanvas"></canvas>
-        </div>
-        <div class="camera-controls">
-          <button class="camera-btn btn-capture" id="captureBtn" onclick="capturePhoto()">📸 Prendre une photo</button>
-          <input type="file" id="uploadInput" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
-          <button class="camera-btn btn-upload" onclick="document.getElementById('uploadInput').click()">📁 Choisir une photo</button>
-        </div>
+        <div class="camera-container"><video id="cameraVideo" autoplay playsinline></video><canvas id="cameraCanvas"></canvas></div>
+        <div class="camera-controls"><button class="camera-btn btn-capture" onclick="capturePhoto()">📸 Prendre une photo</button><input type="file" id="uploadInput" accept="image/*" style="display:none" onchange="uploadPhoto(this)"><button class="camera-btn btn-upload" onclick="document.getElementById('uploadInput').click()">📁 Choisir une photo</button></div>
       </div>
       <div id="detectionSection" style="display:none;">
-        <div class="detection-loading" id="detectionLoading">
-          <div class="spinner"></div> <span id="detectionLoadingText">Analyse de la photo en cours...</span>
-        </div>
+        <div class="detection-loading" id="detectionLoading"><div class="spinner"></div> <span id="detectionLoadingText">Analyse de la photo en cours...</span></div>
         <div id="detectionResult" style="display:none;"></div>
-        <div class="frow" style="margin-top: 15px;">
-          <div class="fgrp"><label id="quickFirstnameLabel">Prénom détecté</label><input type="text" id="quickFirstname" placeholder="Prénom"></div>
-          <div class="fgrp"><label id="quickLastnameLabel">Nom détecté</label><input type="text" id="quickLastname" placeholder="Nom"></div>
-        </div>
-        <div class="frow">
-          <div class="fgrp"><label id="quickBirthLabel">Date naissance</label><input type="text" id="quickBirth" placeholder="jj/mm/aaaa"></div>
-          <div class="fgrp"><label id="quickDeathLabel">Date décès</label><input type="text" id="quickDeath" placeholder="jj/mm/aaaa"></div>
-        </div>
-        <div class="fgrp"><label id="quickLocationLabel">📍 Position GPS</label>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="text" id="quickGps" readonly placeholder="En attente du GPS...">
-            <button class="btn-status" onclick="getCurrentLocation()" style="background: var(--info); color: white; padding: 8px 12px;">📍 Obtenir position</button>
-          </div>
-        </div>
-        <div class="fgrp"><label id="quickCemLabel">Cimetière / Gouvernorat</label>
-          <select id="quickGov"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select>
-          <input type="text" id="quickCem" placeholder="Nom du cimetière" style="margin-top: 8px;">
-        </div>
+        <div class="frow" style="margin-top:15px;"><div class="fgrp"><label id="quickFirstnameLabel">Prénom détecté</label><input type="text" id="quickFirstname" placeholder="Prénom"></div><div class="fgrp"><label id="quickLastnameLabel">Nom détecté</label><input type="text" id="quickLastname" placeholder="Nom"></div></div>
+        <div class="frow"><div class="fgrp"><label id="quickBirthLabel">Date naissance</label><input type="text" id="quickBirth" placeholder="jj/mm/aaaa"></div><div class="fgrp"><label id="quickDeathLabel">Date décès</label><input type="text" id="quickDeath" placeholder="jj/mm/aaaa"></div></div>
+        <div class="fgrp"><label id="quickLocationLabel">📍 Position GPS</label><div style="display:flex;gap:10px;align-items:center;"><input type="text" id="quickGps" readonly placeholder="En attente du GPS..."><button class="btn-status" onclick="getCurrentLocation()" style="background:var(--info);color:white;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;">📍 Obtenir position</button></div></div>
+        <div class="fgrp"><label id="quickCemLabel">Cimetière / Gouvernorat</label><select id="quickGov"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select><input type="text" id="quickCem" placeholder="Nom du cimetière" style="margin-top:8px;"></div>
       </div>
     </div>
-    <div class="mft">
-      <button class="bcancel" id="quickCancelBtn" onclick="closeQuickAddModal()">Annuler</button>
-      <button class="bsave" id="quickSaveBtn" onclick="saveQuickTomb()" style="display:none;">💾 Enregistrer le tombeau</button>
-    </div>
+    <div class="mft"><button class="bcancel" onclick="closeQuickAddModal()">Annuler</button><button class="bsave" id="quickSaveBtn" onclick="saveQuickTomb()" style="display:none;">💾 Enregistrer</button></div>
   </div>
 </div>
 
-<!-- SERVICES SCREEN (simplifié) -->
+<!-- SERVICES SCREEN COMPLET -->
 <div id="servicesScreen" class="svc-screen">
   <div class="svc-header"><button class="svc-back" onclick="hideServicesScreen()">←</button><div class="svc-title" id="svcScreenTitle">Services Funéraires</div></div>
-  <div class="svc-tabs"><button class="svc-tab active" onclick="switchSvcPack('all')"><span id="svcTabAllText">🌟 Tous</span></button><button class="svc-tab" onclick="switchSvcPack('part1')"><span id="svcTabPart1Text">🕊 Avant l'enterrement</span></button><button class="svc-tab" onclick="switchSvcPack('part2')"><span id="svcTabPart2Text">🪦 Entretien</span></button></div>
+  <div class="svc-tabs"><button class="svc-tab active" onclick="switchSvcPack('all')"><span id="svcTabAllText">🌟 Tous</span></button><button class="svc-tab" onclick="switchSvcPack('part1')"><span id="svcTabPart1Text">🕊 Avant l'enterrement</span></button><button class="svc-tab" onclick="switchSvcPack('part2')"><span id="svcTabPart2Text">🪦 Entretien</span></button><button class="svc-tab" onclick="switchSvcPack('full')"><span id="svcTabFullText">⭐ Pack complet</span></button></div>
+  <div id="svcBanner" style="display:none;" class="svc-banner"></div>
   <div class="svc-search"><input type="text" id="svcSearch" placeholder="Rechercher un service..." oninput="renderServices()"></div>
+  <div id="svcChips1" class="svc-chips" style="display:none;"><button class="chip active" onclick="filterSvcChip(this, 'all1')"><span id="chipAll1Text">✨ Tous</span></button><button class="chip" onclick="filterSvcChip(this, 'docs')"><span id="chipDocsText">📋 Documentation</span></button><button class="chip" onclick="filterSvcChip(this, 'transport')"><span id="chipTransportText">🚗 Transport</span></button><button class="chip" onclick="filterSvcChip(this, 'kafan')"><span id="chipKafanText">🤍 Kafan</span></button><button class="chip" onclick="filterSvcChip(this, 'quran')"><span id="chipQuranText">📖 Lecture Coran</span></button><button class="chip" onclick="filterSvcChip(this, 'construction')"><span id="chipConstructionText">🏗 Construction</span></button><button class="chip" onclick="filterSvcChip(this, 'dua')"><span id="chipDuaText">🤲 Doua</span></button></div>
+  <div id="svcChips2" class="svc-chips" style="display:none;"><button class="chip active" onclick="filterSvcChip(this, 'all2')"><span id="chipAll2Text">✨ Tous</span></button><button class="chip" onclick="filterSvcChip(this, 'cleaning')"><span id="chipCleaningText">🧹 Nettoyage</span></button><button class="chip" onclick="filterSvcChip(this, 'painting')"><span id="chipPaintingText">🎨 Peinture</span></button><button class="chip" onclick="filterSvcChip(this, 'marble')"><span id="chipMarbleText">🪨 Marbre</span></button><button class="chip" onclick="filterSvcChip(this, 'flowers')"><span id="chipFlowersText">🌹 Fleurs</span></button><button class="chip" onclick="filterSvcChip(this, 'findtomb')"><span id="chipFindTombText">🔍 Trouver tombeau</span></button></div>
   <div id="svcGrid" class="svc-grid"></div>
+</div>
+
+<!-- SERVICE REQUEST MODAL -->
+<div class="movl" id="svcReqModal">
+  <div class="modal"><div class="mhd"><h3 id="svcReqTitle">📋 Demander ce service</h3><button class="cbt" onclick="closeSvcReqModal()">✕</button></div><div class="mbd"><div id="reqSvcInfo" style="background:var(--olive-dim);border-radius:8px;padding:11px;margin-bottom:14px;"></div><div class="fgrp"><label id="reqNameLabel">Votre nom</label><input type="text" id="reqName" placeholder="Mohamed Ben Ali"></div><div class="fgrp"><label id="reqPhoneLabel">Téléphone</label><input type="tel" id="reqPhone" placeholder="+216 XX XXX XXX"></div><div class="fgrp"><label id="reqLocLabel">Gouvernorat / Cimetière</label><input type="text" id="reqLoc" placeholder="Ex: Djellaz, Tunis"></div><div class="fgrp"><label id="reqDateLabel">Date souhaitée</label><input type="date" id="reqDate"></div><div class="fgrp"><label id="reqMsgLabel">Message</label><textarea id="reqMsg" rows="3" placeholder="Précisions sur votre demande..."></textarea></div></div><div class="mft"><button class="bcancel" onclick="closeSvcReqModal()">Annuler</button><button class="bsave" onclick="submitServiceRequest()">📨 Envoyer</button></div></div>
 </div>
 
 <div class="toast" id="toastMsg"></div>
 
 <script>
-// ==================== TRADUCTIONS SIMPLIFIÉES ====================
+// ==================== TRADUCTIONS ====================
 const translations = {
   fr: {
     authTitle: "Maqabir", authSubtitle: "Connectez-vous pour ajouter un tombeau",
@@ -344,12 +359,13 @@ const translations = {
     statTombsLabel: "Tombeaux", statCemsLabel: "Cimetières", statPhotosLabel: "Photos",
     filterTitle: "Filtres", cemFilterLabel: "Cimetière", allCems: "Tous", privFilterLabel: "Visibilité", allVis: "Tous", publicOpt: "Publics", privateOpt: "Privés", applyBtn: "Appliquer", resultsTitle: "Résultats",
     gpsLabel: "Coordonnées GPS", copyGpsBtn: "Copier", dirText: "Itinéraire Google Maps",
-    svcScreenTitle: "Services Funéraires", svcTabAllText: "🌟 Tous", svcTabPart1Text: "🕊 Avant l'enterrement", svcTabPart2Text: "🪦 Entretien",
-    bnMap: "Carte", bnList: "Liste", bnServices: "Services", bnQuickAdd: "Rapide", bnAdd: "Ajouter",
-    quickAddTitle: "📸 Ajout rapide par photo", quickFirstnameLabel: "Prénom", quickLastnameLabel: "Nom",
-    quickBirthLabel: "Date naissance", quickDeathLabel: "Date décès", quickLocationLabel: "📍 Position GPS",
-    quickCemLabel: "Cimetière / Gouvernorat", quickCancelBtn: "Annuler", quickSaveBtn: "💾 Enregistrer",
-    detectionLoadingText: "Analyse de la photo en cours...", gpsWaiting: "En attente du GPS..."
+    svcScreenTitle: "Services Funéraires", svcTabAllText: "🌟 Tous", svcTabPart1Text: "🕊 Avant l'enterrement", svcTabPart2Text: "🪦 Entretien", svcTabFullText: "⭐ Pack complet",
+    chipAll1Text: "✨ Tous", chipDocsText: "📋 Documentation", chipTransportText: "🚗 Transport", chipKafanText: "🤍 Kafan", chipQuranText: "📖 Lecture Coran", chipConstructionText: "🏗 Construction", chipDuaText: "🤲 Doua",
+    chipAll2Text: "✨ Tous", chipCleaningText: "🧹 Nettoyage", chipPaintingText: "🎨 Peinture", chipMarbleText: "🪨 Marbre", chipFlowersText: "🌹 Fleurs", chipFindTombText: "🔍 Trouver tombeau",
+    svcReqTitle: "📋 Demander ce service", reqNameLabel: "Votre nom", reqPhoneLabel: "Téléphone", reqLocLabel: "Gouvernorat / Cimetière", reqDateLabel: "Date souhaitée", reqMsgLabel: "Message", reqCancelBtn: "Annuler", reqSendBtn: "📨 Envoyer",
+    quickAddTitle: "📸 Ajout rapide par photo", quickFirstnameLabel: "Prénom", quickLastnameLabel: "Nom", quickBirthLabel: "Date naissance", quickDeathLabel: "Date décès", quickLocationLabel: "📍 Position GPS", quickCemLabel: "Cimetière / Gouvernorat", quickCancelBtn: "Annuler", quickSaveBtn: "💾 Enregistrer",
+    detectionLoadingText: "Analyse de la photo en cours...",
+    bnMap: "Carte", bnList: "Liste", bnServices: "Services", bnQuickAdd: "Rapide", bnAdd: "Ajouter"
   },
   ar: {
     authTitle: "مقابر", authSubtitle: "سجل الدخول لإضافة قبر",
@@ -361,46 +377,54 @@ const translations = {
     statTombsLabel: "قبور", statCemsLabel: "مقابر", statPhotosLabel: "صور",
     filterTitle: "تصفية", cemFilterLabel: "المقبرة", allCems: "الكل", privFilterLabel: "الخصوصية", allVis: "الكل", publicOpt: "عامة", privateOpt: "خاصة", applyBtn: "تطبيق", resultsTitle: "النتائج",
     gpsLabel: "الإحداثيات الجغرافية", copyGpsBtn: "نسخ", dirText: "الاتجاهات على خرائط جوجل",
-    svcScreenTitle: "الخدمات الجنائزية", svcTabAllText: "🌟 الكل", svcTabPart1Text: "🕊 قبل الدفن", svcTabPart2Text: "🪦 صيانة القبر",
-    bnMap: "خريطة", bnList: "قائمة", bnServices: "خدمات", bnQuickAdd: "سريع", bnAdd: "إضافة",
-    quickAddTitle: "📸 إضافة سريعة بالصورة", quickFirstnameLabel: "الاسم الأول", quickLastnameLabel: "اسم العائلة",
-    quickBirthLabel: "تاريخ الميلاد", quickDeathLabel: "تاريخ الوفاة", quickLocationLabel: "📍 الموقع الجغرافي",
-    quickCemLabel: "المقبرة / الولاية", quickCancelBtn: "إلغاء", quickSaveBtn: "💾 حفظ",
-    detectionLoadingText: "جاري تحليل الصورة...", gpsWaiting: "بانتظار الموقع..."
+    svcScreenTitle: "الخدمات الجنائزية", svcTabAllText: "🌟 الكل", svcTabPart1Text: "🕊 قبل الدفن", svcTabPart2Text: "🪦 صيانة القبر", svcTabFullText: "⭐ حزمة كاملة",
+    chipAll1Text: "✨ الكل", chipDocsText: "📋 توثيق", chipTransportText: "🚗 نقل", chipKafanText: "🤍 كفن", chipQuranText: "📖 تلاوة قرآن", chipConstructionText: "🏗 بناء", chipDuaText: "🤲 دعاء",
+    chipAll2Text: "✨ الكل", chipCleaningText: "🧹 تنظيف", chipPaintingText: "🎨 طلاء", chipMarbleText: "🪨 رخام", chipFlowersText: "🌹 زهور", chipFindTombText: "🔍 بحث عن قبر",
+    svcReqTitle: "📋 طلب هذه الخدمة", reqNameLabel: "اسمك", reqPhoneLabel: "رقم الهاتف", reqLocLabel: "الولاية / المقبرة", reqDateLabel: "التاريخ المطلوب", reqMsgLabel: "رسالة", reqCancelBtn: "إلغاء", reqSendBtn: "📨 إرسال",
+    quickAddTitle: "📸 إضافة سريعة بالصورة", quickFirstnameLabel: "الاسم الأول", quickLastnameLabel: "اسم العائلة", quickBirthLabel: "تاريخ الميلاد", quickDeathLabel: "تاريخ الوفاة", quickLocationLabel: "📍 الموقع الجغرافي", quickCemLabel: "المقبرة / الولاية", quickCancelBtn: "إلغاء", quickSaveBtn: "💾 حفظ",
+    detectionLoadingText: "جاري تحليل الصورة...",
+    bnMap: "خريطة", bnList: "قائمة", bnServices: "خدمات", bnQuickAdd: "سريع", bnAdd: "إضافة"
   }
 };
 
-// ==================== DONNÉES ====================
+// ==================== DONNÉES TOMBEAUX ====================
 let tombs = [
   { id: "t1", name: "Mohamed Ben Salah", firstname: "Mohamed", lastname: "Ben Salah", birth: "15 mars 1928", death: "2 novembre 1995", cem: "Djellaz", gov: "Tunis", location: "Section B, Rangée 14", lat: 36.8212, lng: 10.1732, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
   { id: "t2", name: "Fatma Bouzid", firstname: "Fatma", lastname: "Bouzid", birth: "8 juin 1935", death: "14 avril 2010", cem: "Sidi Bou Saïd", gov: "Tunis", location: "Section A, Tombe 7", lat: 36.87005, lng: 10.34105, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
   { id: "t3", name: "Ali Haddad", firstname: "Ali", lastname: "Haddad", birth: "3 janvier 1950", death: "27 septembre 2018", cem: "El Gorjani", gov: "Tunis", location: "Allée C, Tombe 22", lat: 36.7914, lng: 10.1748, photos: [], privacy: "public", owner: null, ownerName: "Admin" }
 ];
 
-// Services simplifiés
-let services = [
-  { id: "s1", part: "part1", cat: "docs", name: "Documentation administrative", price: "150", desc: "Aide complète pour les démarches.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s2", part: "part1", cat: "transport", name: "Transport du défunt", price: "300", desc: "Transport 24h/24.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s3", part: "part1", cat: "kafan", name: "Kafan & préparation", price: "200", desc: "Préparation complète.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s4", part: "part1", cat: "quran", name: "Lecture du Coran", price: "Gratuit", desc: "Lecture du Saint Coran.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s5", part: "part1", cat: "construction", name: "Construction tombeau", price: "1500", desc: "Construction sur mesure.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s6", part: "part2", cat: "cleaning", name: "Nettoyage de tombe", price: "80", desc: "Nettoyage complet.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s7", part: "part2", cat: "painting", name: "Peinture & rénovation", price: "200", desc: "Rénovation complète.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s8", part: "part2", cat: "marble", name: "Rénovation marbre", price: "500", desc: "Rénovation dalle marbre.", gov: "Tunis", phone: "+21692639366", type: "pro" },
-  { id: "s9", part: "part2", cat: "flowers", name: "Fleurs & entretien", price: "50", desc: "Compositions florales.", gov: "Tunis", phone: "+21692639366", type: "pro" }
-];
-
-const CATS = {
-  docs: { fr: 'Documentation', ar: 'توثيق', icon: '📋' },
-  transport: { fr: 'Transport', ar: 'نقل', icon: '🚗' },
-  kafan: { fr: 'Kafan', ar: 'كفن', icon: '🤍' },
-  quran: { fr: 'Coran', ar: 'قرآن', icon: '📖' },
-  construction: { fr: 'Construction', ar: 'بناء', icon: '🏗' },
-  cleaning: { fr: 'Nettoyage', ar: 'تنظيف', icon: '🧹' },
-  painting: { fr: 'Peinture', ar: 'طلاء', icon: '🎨' },
-  marble: { fr: 'Marbre', ar: 'رخام', icon: '🪨' },
-  flowers: { fr: 'Fleurs', ar: 'زهور', icon: '🌹' }
+// ==================== DONNÉES SERVICES (COMPLÈTES) ====================
+const CATS_P1 = {
+  docs: { fr: 'Documentation & démarches', ar: 'التوثيق والإجراءات', icon: '📋', bg: '#e3f2fd' },
+  transport: { fr: 'Transport du défunt', ar: 'نقل الجثمان', icon: '🚗', bg: '#fce4ec' },
+  kafan: { fr: 'Kafan & préparation', ar: 'الكفن والتجهيز', icon: '🤍', bg: '#f5f5f5' },
+  quran: { fr: 'Lecture du Coran & doua', ar: 'تلاوة القرآن والدعاء', icon: '📖', bg: '#f3e5f5' },
+  construction: { fr: 'Construction du tombeau', ar: 'بناء القبر', icon: '🏗', bg: '#fff3e0' },
+  dua: { fr: "Doua durant l'enterrement", ar: 'الدعاء أثناء الدفن', icon: '🤲', bg: '#e8f5e9' }
 };
+
+const CATS_P2 = {
+  cleaning: { fr: 'Nettoyage de tombe', ar: 'تنظيف القبر', icon: '🧹', bg: '#e8f5e9' },
+  painting: { fr: 'Peinture & rénovation', ar: 'طلاء وتجديد', icon: '🎨', bg: '#e3f2fd' },
+  marble: { fr: 'Refaire le marbre', ar: 'تجديد الرخام', icon: '🪨', bg: '#fafafa' },
+  flowers: { fr: 'Fleurs & entretien', ar: 'زهور وزينة', icon: '🌹', bg: '#fff0f3' },
+  findtomb: { fr: 'Trouver un tombeau', ar: 'البحث عن قبر', icon: '🔍', bg: '#fffde7' }
+};
+
+let services = [
+  { id: 's1', part: 'part1', cat: 'docs', type: 'pro', name: 'Bureau Administratif Baraka', gov: 'Tunis', price: '150–300', phone: '+21692639366', desc: "Aide complète pour les démarches : acte de décès, autorisation d'inhumation, coordination avec la municipalité et le cimetière.", avail: 'weekdays', rating: 4.8, reviews: 34 },
+  { id: 's2', part: 'part1', cat: 'transport', type: 'pro', name: 'Transport Funèbre El Rahma', gov: 'Tunis', price: '200–500', phone: '+21692639366', desc: "Transport du défunt de l'hôpital ou domicile jusqu'au cimetière. Véhicule adapté, discret et respectueux. Disponible 24h/24.", avail: 'always', rating: 4.9, reviews: 87 },
+  { id: 's3', part: 'part1', cat: 'kafan', type: 'pro', name: 'Maison du Kafan', gov: 'Tunis', price: '80–200', phone: '+21692639366', desc: 'Vente et pose du kafan selon les règles islamiques. Préparation complète du défunt (ghusul, kafan). Personnel féminin disponible.', avail: 'always', rating: 4.7, reviews: 52 },
+  { id: 's4', part: 'part1', cat: 'quran', type: 'volunteer', name: 'Sheikh Karim El Hafidh', gov: 'Sfax', price: 'Gratuit / Don', phone: '+21692639366', desc: 'Lecture du Saint Coran, Sourate Yassin, Fatiha. Bénévole disponible pour accompagner les familles lors des enterrements.', avail: 'oncall', rating: 5.0, reviews: 141 },
+  { id: 's5', part: 'part1', cat: 'construction', type: 'pro', name: 'Entreprise Bâti-Maqbara', gov: 'Sousse', price: '800–3000', phone: '+21692639366', desc: 'Construction de tombeaux en béton ou marbre. Devis gratuit. Travail soigné avec matériaux de qualité. Plans personnalisés.', avail: 'weekdays', rating: 4.6, reviews: 29 },
+  { id: 's6', part: 'part1', cat: 'dua', type: 'volunteer', name: 'Association El Rahma', gov: 'Bizerte', price: 'Gratuit', phone: '+21692639366', desc: "Groupe de bénévoles assurant prières et doua durant l'enterrement. Présence spirituelle et soutien aux familles en deuil.", avail: 'oncall', rating: 4.9, reviews: 63 },
+  { id: 's7', part: 'part2', cat: 'cleaning', type: 'pro', name: 'Ahmed Nettoyage Pro', gov: 'Tunis', price: '50–80', phone: '+21692639366', desc: 'Nettoyage complet : mauvaises herbes, lavage de la pierre tombale, remise en état. Photos avant/après envoyées à la famille.', avail: 'always', rating: 4.8, reviews: 23 },
+  { id: 's8', part: 'part2', cat: 'painting', type: 'pro', name: 'Rénovation Tombeaux Tunis', gov: 'Tunis', price: '120–250', phone: '+21692639366', desc: 'Peinture complète, rejointoiement, remplacement carrelage cassé. Matériaux résistants aux intempéries. Devis gratuit.', avail: 'weekdays', rating: 4.6, reviews: 18 },
+  { id: 's9', part: 'part2', cat: 'marble', type: 'pro', name: 'Marbre & Granit Élite', gov: 'Sfax', price: '300–900', phone: '+21692639366', desc: 'Remplacement ou rénovation de la dalle en marbre ou granit. Large choix de matériaux et couleurs. Gravure de l\'épitaphe incluse.', avail: 'weekdays', rating: 4.9, reviews: 37 },
+  { id: 's10', part: 'part2', cat: 'flowers', type: 'pro', name: 'Jardin du Souvenir', gov: 'Sousse', price: '20–60', phone: '+21692639366', desc: 'Compositions florales naturelles et artificielles, couronnes. Entretien périodique mensuel ou trimestriel. Livraison au cimetière.', avail: 'always', rating: 4.7, reviews: 19 },
+  { id: 's11', part: 'part2', cat: 'findtomb', type: 'pro', name: 'Service Localisation Maqabir', gov: 'Tunis', price: 'Gratuit', phone: '+21692639366', desc: 'Aide pour retrouver un tombeau perdu dans les grands cimetières. Consultation des registres et accompagnement sur place.', avail: 'weekdays', rating: 4.5, reviews: 11 }
+];
 
 // ==================== ÉTAT GLOBAL ====================
 let currentUser = null;
@@ -410,8 +434,11 @@ let markers = {};
 let localUsers = JSON.parse(localStorage.getItem('maqabir_users') || '[]');
 let currentLang = localStorage.getItem('maqabir_lang') || 'fr';
 let currentStream = null;
-let detectedData = { firstname: "", lastname: "", birth: "", death: "", lat: null, lng: null };
 let currentLocation = null;
+let svcPackFilter = 'all';
+let svcChipFilter = 'all1';
+let currentServiceForRequest = null;
+let requests = JSON.parse(localStorage.getItem('maqabir_requests') || '[]');
 
 // ==================== FONCTIONS LANGUE ====================
 function setLanguage(lang) {
@@ -428,19 +455,13 @@ function setLanguage(lang) {
   for (let key in t) {
     let el = document.getElementById(key);
     if (el) el.textContent = t[key];
-    else {
-      el = document.querySelector(`[data-i18n="${key}"]`);
-      if (el) el.textContent = t[key];
-    }
   }
   renderServices();
   renderTombList();
   updateMarkers();
 }
 
-function getText(key) { return translations[currentLang][key] || translations['fr'][key]; }
-
-// ==================== FONCTIONS AUTH avec reCAPTCHA ====================
+// ==================== FONCTIONS AUTH ====================
 function showToast(msg) {
   const toast = document.getElementById('toastMsg');
   toast.textContent = msg;
@@ -488,21 +509,16 @@ function handleLogin() {
   updateMarkers();
 }
 
-// Version avec reCAPTCHA (simulation - à remplacer par votre clé reCAPTCHA réelle)
 async function handleRegisterWithCaptcha() {
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const pwd = document.getElementById('regPwd').value;
-  
   if (!name || !email || !pwd) { showToast('Tous les champs sont requis'); return; }
   if (pwd.length < 6) { showToast('Le mot de passe doit faire au moins 6 caractères'); return; }
   if (localUsers.find(u => u.email === email)) { showToast('Cet email est déjà utilisé'); return; }
-  
-  // Simuler la vérification reCAPTCHA (dans la vraie vie, utilisez grecaptcha.execute)
   showToast('Vérification anti-spam en cours...');
-  
-  // Simulation d'un délai reCAPTCHA
-  setTimeout(() => {
+  try {
+    await grecaptcha.execute('6LdE9LgsAAAAAFN8T2rYcqNpB_5UzaHxlVxeD_-K', { action: 'register' });
     const newUser = { uid: 'user_' + Date.now(), name: name, email: email };
     localUsers.push(newUser);
     localStorage.setItem('maqabir_users', JSON.stringify(localUsers));
@@ -510,20 +526,20 @@ async function handleRegisterWithCaptcha() {
     localStorage.setItem('maqabir_currentUser', JSON.stringify(currentUser));
     updateUserUI();
     closeAuthModal();
-    showToast(`Bienvenue ${name} ! Votre compte a été créé.`);
+    showToast(`Bienvenue ${name} !`);
     renderTombList();
     updateMarkers();
-  }, 500);
+  } catch (err) { showToast("Erreur de vérification"); }
 }
 
 function guestLogin() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); closeAuthModal(); showToast('Mode invité'); }
 function logout() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); closeMenu(); showToast('Déconnecté'); }
-function requireAuth() { if (currentUser) openAddModal(); else openAuthModal(); }
+function requireAuth() { if (currentUser) openQuickAddModal(); else openAuthModal(); }
 
 // ==================== FONCTIONS CARTE ====================
 function initMap() {
   map = L.map('map').setView([36.4, 9.8], 7);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
   updateMarkers();
 }
 
@@ -542,9 +558,8 @@ function updateMarkers() {
   tombs.forEach(tomb => {
     if (markers[tomb.id]) { map.removeLayer(markers[tomb.id]); delete markers[tomb.id]; }
     if (canSeeTomb(tomb)) {
-      const isPrivate = tomb.privacy === 'private';
-      const marker = L.marker([tomb.lat, tomb.lng], { icon: getMarkerIcon(isPrivate, selectedTombId === tomb.id) }).addTo(map);
-      marker.bindPopup(`<div style="padding:8px"><strong>${tomb.name}</strong><br>${tomb.cem}, ${tomb.gov}<br><button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">${currentLang === 'ar' ? 'عرض التفاصيل' : 'Voir détails'}</button></div>`);
+      const marker = L.marker([tomb.lat, tomb.lng], { icon: getMarkerIcon(tomb.privacy === 'private', selectedTombId === tomb.id) }).addTo(map);
+      marker.bindPopup(`<div style="padding:8px"><strong>${tomb.name}</strong><br>${tomb.cem}<br><button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">${currentLang === 'ar' ? 'عرض' : 'Voir'}</button></div>`);
       markers[tomb.id] = marker;
     }
   });
@@ -560,12 +575,12 @@ function selectTomb(id) {
   document.getElementById('detailMeta').textContent = `${tomb.birth} – ${tomb.death} · ${tomb.cem}, ${tomb.gov}`;
   document.getElementById('detailGPS').textContent = `${tomb.lat.toFixed(5)}°, ${tomb.lng.toFixed(5)}°`;
   document.getElementById('dirLink').href = `https://www.google.com/maps/dir/?api=1&destination=${tomb.lat},${tomb.lng}`;
-  document.getElementById('detailContent').innerHTML = `<div style="margin-top:10px"><p><strong>📍 Emplacement :</strong> ${tomb.location}</p><p><strong>🔒 Visibilité :</strong> ${tomb.privacy === 'public' ? 'Public' : 'Privé'}</p></div>`;
+  document.getElementById('detailContent').innerHTML = `<div><p>📍 ${tomb.location}</p><p>🔒 ${tomb.privacy === 'public' ? 'Public' : 'Privé'}</p></div>`;
   document.getElementById('detailPanel').classList.add('vis');
 }
 
 function closeDetail() { document.getElementById('detailPanel').classList.remove('vis'); selectedTombId = null; updateMarkers(); }
-function copyGPS() { const tomb = tombs.find(t => t.id === selectedTombId); if (tomb) { navigator.clipboard.writeText(`${tomb.lat}, ${tomb.lng}`); showToast('Coordonnées copiées !'); } }
+function copyGPS() { const tomb = tombs.find(t => t.id === selectedTombId); if (tomb) { navigator.clipboard.writeText(`${tomb.lat}, ${tomb.lng}`); showToast('Copié !'); } }
 
 // ==================== LISTE TOMBEAUX ====================
 function renderTombList(filteredList = null) {
@@ -604,67 +619,44 @@ function filterTombs() {
 function syncSearch() { const heroVal = document.getElementById('heroSearch').value; document.getElementById('searchInput').value = heroVal; filterTombs(); }
 function showTab(tab) { const sidebar = document.getElementById('sidebar'); if (tab === 'map') sidebar.style.display = 'none'; else if (tab === 'list') sidebar.style.display = 'none'; else if (tab === 'filter') sidebar.style.display = 'block'; document.querySelectorAll('.bbn').forEach(btn => btn.classList.remove('active')); if (event && event.target) event.target.closest('.bbn').classList.add('active'); }
 
-// ==================== MODAL AJOUT NORMAL ====================
-function openAddModal() {
-  if (!currentUser) { openAuthModal(); return; }
-  document.getElementById('addModal')?.classList.add('open');
-}
-function closeAddModal() { document.getElementById('addModal')?.classList.remove('open'); }
-
-// ==================== QUICK ADD (CAMÉRA + TESSERACT + GPS) ====================
+// ==================== QUICK ADD ====================
 async function openQuickAddModal() {
   if (!currentUser) { openAuthModal(); return; }
   document.getElementById('quickAddModal').classList.add('open');
   document.getElementById('cameraSection').style.display = 'block';
   document.getElementById('detectionSection').style.display = 'none';
   document.getElementById('quickSaveBtn').style.display = 'none';
-  detectedData = { firstname: "", lastname: "", birth: "", death: "", lat: null, lng: null };
   startCamera();
 }
 
-function closeQuickAddModal() {
-  document.getElementById('quickAddModal').classList.remove('open');
-  stopCamera();
-}
+function closeQuickAddModal() { document.getElementById('quickAddModal').classList.remove('open'); stopCamera(); }
 
 async function startCamera() {
   try {
-    if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); }
+    if (currentStream) currentStream.getTracks().forEach(track => track.stop());
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     currentStream = stream;
-    const video = document.getElementById('cameraVideo');
-    video.srcObject = stream;
-    await video.play();
-  } catch (err) { console.error("Erreur caméra:", err); showToast("Impossible d'accéder à la caméra. Utilisez l'upload de photo."); }
+    document.getElementById('cameraVideo').srcObject = stream;
+  } catch (err) { showToast("Caméra inaccessible, utilisez l'upload"); }
 }
 
-function stopCamera() {
-  if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); currentStream = null; }
-  const video = document.getElementById('cameraVideo');
-  if (video.srcObject) { video.srcObject = null; }
-}
+function stopCamera() { if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); currentStream = null; } }
 
 async function capturePhoto() {
   const video = document.getElementById('cameraVideo');
   const canvas = document.getElementById('cameraCanvas');
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const imageData = canvas.toDataURL('image/png');
+  canvas.getContext('2d').drawImage(video, 0, 0);
   stopCamera();
-  await analyzeImage(imageData);
+  await analyzeImage(canvas.toDataURL('image/png'));
 }
 
 async function uploadPhoto(input) {
   if (input.files && input.files[0]) {
-    const file = input.files[0];
     const reader = new FileReader();
-    reader.onload = async (e) => {
-      stopCamera();
-      await analyzeImage(e.target.result);
-    };
-    reader.readAsDataURL(file);
+    reader.onload = async (e) => { stopCamera(); await analyzeImage(e.target.result); };
+    reader.readAsDataURL(input.files[0]);
   }
 }
 
@@ -674,200 +666,149 @@ async function analyzeImage(imageDataUrl) {
   document.getElementById('detectionLoading').style.display = 'block';
   document.getElementById('detectionResult').style.display = 'none';
   document.getElementById('quickSaveBtn').style.display = 'none';
-  
   try {
-    // Convertir dataURL en Blob pour Tesseract
     const response = await fetch(imageDataUrl);
     const blob = await response.blob();
-    
-    // Tesseract.js pour la reconnaissance de texte
     const worker = await Tesseract.createWorker('fra');
     const ret = await worker.recognize(blob);
     await worker.terminate();
-    
     const text = ret.data.text;
-    console.log("Texte détecté:", text);
-    
-    // Extraire les informations du texte
     const extracted = extractInfoFromText(text);
-    detectedData = { ...detectedData, ...extracted };
-    
-    // Afficher les résultats
     document.getElementById('detectionLoading').style.display = 'none';
     document.getElementById('detectionResult').style.display = 'block';
-    document.getElementById('detectionResult').innerHTML = `
-      <div class="detection-result">
-        <div class="detected-field"><span class="detected-label">🔍 Texte détecté :</span><br>${text.substring(0, 200)}${text.length > 200 ? '...' : ''}</div>
-        <div class="detected-field"><span class="detected-label">👤 Nom détecté :</span> ${detectedData.firstname || '?'} ${detectedData.lastname || '?'}</div>
-        <div class="detected-field"><span class="detected-label">📅 Dates détectées :</span> Naissance: ${detectedData.birth || '?'} / Décès: ${detectedData.death || '?'}</div>
-      </div>
-    `;
-    
-    // Remplir les champs
-    document.getElementById('quickFirstname').value = detectedData.firstname || '';
-    document.getElementById('quickLastname').value = detectedData.lastname || '';
-    document.getElementById('quickBirth').value = detectedData.birth || '';
-    document.getElementById('quickDeath').value = detectedData.death || '';
-    
+    document.getElementById('detectionResult').innerHTML = `<div class="detection-result"><div class="detected-field">🔍 ${text.substring(0, 200)}${text.length > 200 ? '...' : ''}</div><div class="detected-field">👤 ${extracted.firstname || '?'} ${extracted.lastname || '?'}</div><div class="detected-field">📅 Naissance: ${extracted.birth || '?'} / Décès: ${extracted.death || '?'}</div></div>`;
+    document.getElementById('quickFirstname').value = extracted.firstname || '';
+    document.getElementById('quickLastname').value = extracted.lastname || '';
+    document.getElementById('quickBirth').value = extracted.birth || '';
+    document.getElementById('quickDeath').value = extracted.death || '';
     document.getElementById('quickSaveBtn').style.display = 'block';
-    
-    // Obtenir la position GPS automatiquement
     getCurrentLocation();
-    
-  } catch (err) {
-    console.error("Erreur analyse:", err);
-    document.getElementById('detectionLoading').style.display = 'none';
-    document.getElementById('detectionResult').style.display = 'block';
-    document.getElementById('detectionResult').innerHTML = `<div class="detection-result" style="color:var(--danger)">❌ Erreur lors de l'analyse: ${err.message}</div>`;
-    document.getElementById('quickSaveBtn').style.display = 'block';
-  }
+  } catch (err) { document.getElementById('detectionLoading').style.display = 'none'; document.getElementById('detectionResult').style.display = 'block'; document.getElementById('detectionResult').innerHTML = `<div class="detection-result" style="color:var(--danger)">❌ Erreur: ${err.message}</div>`; document.getElementById('quickSaveBtn').style.display = 'block'; }
 }
 
 function extractInfoFromText(text) {
   const result = { firstname: "", lastname: "", birth: "", death: "" };
-  
-  // Patterns pour les noms (cherche des mots avec majuscule)
   const namePattern = /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/g;
   const names = text.match(namePattern) || [];
   if (names.length >= 1) result.firstname = names[0];
   if (names.length >= 2) result.lastname = names[1];
-  
-  // Patterns pour les dates (formats français/arabe)
-  const datePatterns = [
-    /(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/gi,
-    /(\d{1,2})\/(\d{1,2})\/(\d{4})/g,
-    /(\d{4})-(\d{2})-(\d{2})/g
-  ];
-  
+  const datePatterns = [/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/gi, /(\d{1,2})\/(\d{1,2})\/(\d{4})/g, /(\d{4})-(\d{2})-(\d{2})/g];
   let dates = [];
-  for (const pattern of datePatterns) {
-    const matches = [...text.matchAll(pattern)];
-    for (const match of matches) {
-      if (match[0].match(/\d{4}/)) dates.push(match[0]);
-    }
-  }
-  
-  // Trier les dates (la plus ancienne = naissance, la plus récente = décès)
+  for (const pattern of datePatterns) { const matches = [...text.matchAll(pattern)]; for (const match of matches) { if (match[0].match(/\d{4}/)) dates.push(match[0]); } }
   if (dates.length >= 1) result.birth = dates[0];
   if (dates.length >= 2) result.death = dates[1];
   else if (dates.length === 1) result.death = dates[0];
-  
   return result;
 }
 
 function getCurrentLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        currentLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-        document.getElementById('quickGps').value = `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`;
-        showToast("📍 Position GPS obtenue !");
-      },
-      (error) => {
-        console.error("Erreur GPS:", error);
-        document.getElementById('quickGps').value = "Position non disponible";
-        showToast("⚠️ Activez la localisation pour la position GPS");
-      }
-    );
-  } else {
-    document.getElementById('quickGps').value = "GPS non supporté";
-  }
+    navigator.geolocation.getCurrentPosition(pos => { currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; document.getElementById('quickGps').value = `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`; showToast("📍 GPS obtenu !"); }, err => { document.getElementById('quickGps').value = "Non disponible"; showToast("⚠️ Activez la localisation"); });
+  } else { document.getElementById('quickGps').value = "Non supporté"; }
 }
 
 function saveQuickTomb() {
   const firstname = document.getElementById('quickFirstname').value.trim();
   const lastname = document.getElementById('quickLastname').value.trim();
-  const birth = document.getElementById('quickBirth').value.trim();
-  const death = document.getElementById('quickDeath').value.trim();
-  const gov = document.getElementById('quickGov').value;
-  const cem = document.getElementById('quickCem').value.trim() || "Cimetière non spécifié";
-  
-  if (!firstname || !lastname) {
-    showToast(currentLang === 'ar' ? 'الرجاء إدخال الاسم الأول واسم العائلة' : 'Veuillez entrer le prénom et le nom');
-    return;
-  }
-  
-  if (!currentLocation) {
-    showToast(currentLang === 'ar' ? 'الرجاء الانتظار للحصول على الموقع الجغرافي' : 'Veuillez attendre la position GPS');
-    return;
-  }
-  
-  const newTomb = {
-    id: 't_' + Date.now(),
-    name: firstname + ' ' + lastname,
-    firstname: firstname,
-    lastname: lastname,
-    birth: birth || 'Date inconnue',
-    death: death || 'Date inconnue',
-    cem: cem,
-    gov: gov,
-    location: 'Ajouté par photo',
-    lat: currentLocation.lat,
-    lng: currentLocation.lng,
-    photos: [],
-    privacy: 'public',
-    owner: currentUser.uid,
-    ownerName: currentUser.name,
-    createdAt: new Date().toISOString()
-  };
-  
+  if (!firstname || !lastname) { showToast('Prénom et nom requis'); return; }
+  if (!currentLocation) { showToast('Position GPS requise'); return; }
+  const newTomb = { id: 't_' + Date.now(), name: firstname + ' ' + lastname, firstname, lastname, birth: document.getElementById('quickBirth').value.trim() || 'Date inconnue', death: document.getElementById('quickDeath').value.trim() || 'Date inconnue', cem: document.getElementById('quickCem').value.trim() || 'Cimetière inconnu', gov: document.getElementById('quickGov').value, location: 'Ajouté par photo', lat: currentLocation.lat, lng: currentLocation.lng, photos: [], privacy: 'public', owner: currentUser.uid, ownerName: currentUser.name };
   tombs.push(newTomb);
   localStorage.setItem('maqabir_tombs', JSON.stringify(tombs));
   renderTombList();
   updateMarkers();
   closeQuickAddModal();
-  showToast(currentLang === 'ar' ? 'تمت إضافة القبر بنجاح !' : 'Tombeau ajouté avec succès !');
-  
-  // Optionnel : envoyer un message WhatsApp avec les infos
-  const msg = `📸 Nouveau tombeau ajouté par photo!\n👤 ${firstname} ${lastname}\n📅 ${birth} - ${death}\n📍 ${gov}, ${cem}\n🗺️ GPS: ${currentLocation.lat}, ${currentLocation.lng}`;
-  // window.open('https://wa.me/21692639366?text=' + encodeURIComponent(msg));
+  showToast('Tombeau ajouté !');
 }
 
-// ==================== SERVICES ====================
+// ==================== SERVICES COMPLETS ====================
 function showServicesScreen() { document.getElementById('servicesScreen').style.display = 'block'; renderServices(); }
 function hideServicesScreen() { document.getElementById('servicesScreen').style.display = 'none'; }
-let svcPackFilter = 'all';
+
 function switchSvcPack(pack) {
   svcPackFilter = pack;
+  svcChipFilter = pack === 'part2' ? 'all2' : 'all1';
   document.querySelectorAll('.svc-tab').forEach(tab => tab.classList.remove('active'));
   event.target.classList.add('active');
+  document.getElementById('svcChips1').style.display = (pack === 'part1' || pack === 'all') ? 'block' : 'none';
+  document.getElementById('svcChips2').style.display = (pack === 'part2' || pack === 'all') ? 'block' : 'none';
+  const banner = document.getElementById('svcBanner');
+  if (pack === 'part1') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack1'; banner.innerHTML = `<div style="font-weight:bold;">🕊 ${currentLang === 'ar' ? 'قبل الدفن' : 'Avant l\'enterrement'}</div><div>Documentation · Transport · Kafan · Coran · Construction · Doua</div>`; }
+  else if (pack === 'part2') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack2'; banner.innerHTML = `<div style="font-weight:bold;">🪦 ${currentLang === 'ar' ? 'صيانة القبر' : 'Entretien'}</div><div>Nettoyage · Peinture · Marbre · Fleurs · Localisation</div>`; }
+  else if (pack === 'full') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack-full'; banner.innerHTML = `<div style="font-weight:bold;">⭐ ${currentLang === 'ar' ? 'حزمة كاملة' : 'Pack complet'}</div><div>Tous les services réunis</div>`; }
+  else banner.style.display = 'none';
   renderServices();
 }
+
+function filterSvcChip(el, cat) {
+  el.closest('.svc-chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  svcChipFilter = cat;
+  renderServices();
+}
+
 function renderServices() {
   const q = document.getElementById('svcSearch')?.value.toLowerCase() || '';
   let list = services.filter(s => {
-    const matchPack = svcPackFilter === 'all' || s.part === svcPackFilter;
-    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q);
-    return matchPack && matchSearch;
+    const matchPack = svcPackFilter === 'all' || svcPackFilter === 'full' || s.part === svcPackFilter;
+    const matchChip = svcChipFilter === 'all1' || svcChipFilter === 'all2' || s.cat === svcChipFilter;
+    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q) || s.gov.toLowerCase().includes(q);
+    return matchPack && matchChip && matchSearch;
   });
   const grid = document.getElementById('svcGrid');
   if (!grid) return;
   if (list.length === 0) { grid.innerHTML = '<div class="svc-empty">🔍 Aucun service trouvé</div>'; return; }
   let html = '';
-  if (svcPackFilter === 'all') {
+  if (svcPackFilter === 'all' || svcPackFilter === 'full') {
     const p1 = list.filter(s => s.part === 'part1');
     const p2 = list.filter(s => s.part === 'part2');
-    if (p1.length) html += `<div class="svc-section-title">🕊 Avant l'enterrement</div>` + p1.map(s => svcCardHTML(s)).join('');
-    if (p2.length) html += `<div class="svc-section-title">🪦 Entretien du tombeau</div>` + p2.map(s => svcCardHTML(s)).join('');
+    if (p1.length) html += `<div class="svc-section-title">🕊 ${currentLang === 'ar' ? 'قبل الدفن' : 'Avant l\'enterrement'}</div>` + p1.map(s => svcCardHTML(s)).join('');
+    if (p2.length) html += `<div class="svc-section-title">🪦 ${currentLang === 'ar' ? 'صيانة القبر' : 'Entretien du tombeau'}</div>` + p2.map(s => svcCardHTML(s)).join('');
   } else { html = list.map(s => svcCardHTML(s)).join(''); }
   grid.innerHTML = html;
 }
+
 function svcCardHTML(s) {
-  const cat = CATS[s.cat] || { fr: s.cat, ar: s.cat, icon: '🛠' };
-  const catName = currentLang === 'ar' ? cat.ar : cat.fr;
-  return `
-    <div class="svc-card">
-      <div class="svc-card-hd">
-        <div class="svc-icon" style="background:#f5f0e8">${cat.icon}</div>
-        <div class="svc-info"><h3>${s.name}</h3><div class="svc-gov">📍 ${s.gov} · ${catName}</div></div>
-        <div class="svc-price-block"><strong>${s.price}</strong><span>TND</span></div>
-      </div>
-      <div class="svc-card-body"><div class="svc-desc">${s.desc}</div></div>
-      <div class="svc-btns">
-        <button class="svc-btn-call" onclick="window.open('tel:+21692639366')">📞 Appeler</button>
-        <button class="svc-btn-wa" onclick="window.open('https://wa.me/21692639366?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20le%20service%20${encodeURIComponent(s.name)}')">💬 WhatsApp</button>
-      </div>
-    </div>`;
+  const allCats = { ...CATS_P1, ...CATS_P2 };
+  const cat = allCats[s.cat];
+  const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : s.cat;
+  const stars = '★'.repeat(Math.floor(s.rating)) + '☆'.repeat(5 - Math.ceil(s.rating));
+  const pBadge = s.part === 'part1' ? `<span class="svc-badge badge-p1">🕊 ${currentLang === 'ar' ? 'قبل الدفن' : 'Av. enterrement'}</span>` : `<span class="svc-badge badge-p2">🪦 ${currentLang === 'ar' ? 'صيانة' : 'Entretien'}</span>`;
+  const tBadge = s.type === 'pro' ? `<span class="svc-badge badge-pro">💼 ${currentLang === 'ar' ? 'محترف' : 'Professionnel'}</span>` : `<span class="svc-badge badge-vol">🤝 ${currentLang === 'ar' ? 'متطوع' : 'Bénévole'}</span>`;
+  const availText = { always: '24h/24', weekdays: 'Jours ouvrables', weekend: 'Week-end', oncall: 'Sur appel' }[s.avail] || s.avail;
+  return `<div class="svc-card"><div class="svc-card-hd"><div class="svc-icon" style="background:${cat?.bg || '#f5f0e8'}">${cat?.icon || '🛠'}</div><div class="svc-info"><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px;">${pBadge}${tBadge}</div><h3>${s.name}</h3><div class="svc-gov">📍 ${s.gov} · ${catName}</div></div><div class="svc-price-block"><strong>${s.price}</strong><span>TND</span></div></div><div class="svc-card-body"><div class="svc-desc">${s.desc}</div><div class="svc-tags"><span class="svc-avail">🟢 ${availText}</span><span class="svc-rating">${stars} ${s.rating} (${s.reviews})</span></div></div><div class="svc-btns"><button class="svc-btn-call" onclick="callProvider('${s.phone}')">📞 ${currentLang === 'ar' ? 'اتصال' : 'Appeler'}</button><button class="svc-btn-wa" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button><button class="svc-btn-req" onclick="openSvcReqModal('${s.id}')">📋 ${currentLang === 'ar' ? 'طلب' : 'Demander'}</button></div></div>`;
+}
+
+function callProvider(phone) { window.open('tel:' + phone.replace(/\s/g, '')); }
+function whatsappProvider(phone, name) { const msg = currentLang === 'ar' ? `مرحباً، أود الاستفسار عن خدمة "${name}"` : `Bonjour, je souhaite des informations sur "${name}"`; window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + `?text=${encodeURIComponent(msg)}`); }
+
+function openSvcReqModal(id) {
+  currentServiceForRequest = services.find(s => s.id === id);
+  if (!currentServiceForRequest) return;
+  const allCats = { ...CATS_P1, ...CATS_P2 };
+  const cat = allCats[currentServiceForRequest.cat];
+  const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : currentServiceForRequest.cat;
+  document.getElementById('reqSvcInfo').innerHTML = `<span style="font-size:24px;">${cat?.icon || '🛠'}</span> <strong>${catName}</strong><br><small>${currentServiceForRequest.name} · ${currentServiceForRequest.price} TND</small>`;
+  document.getElementById('svcReqModal').classList.add('open');
+}
+function closeSvcReqModal() { document.getElementById('svcReqModal').classList.remove('open'); currentServiceForRequest = null; }
+function submitServiceRequest() {
+  const name = document.getElementById('reqName').value.trim();
+  const phone = document.getElementById('reqPhone').value.trim();
+  if (!name || !phone) { showToast('Nom et téléphone requis'); return; }
+  if (currentServiceForRequest) {
+    const loc = document.getElementById('reqLoc').value;
+    const date = document.getElementById('reqDate').value;
+    const msg = document.getElementById('reqMsg').value;
+    const txt = `Nouvelle demande:\nService: ${currentServiceForRequest.name}\nClient: ${name}\nTél: ${phone}\nLieu: ${loc || '—'}\nDate: ${date || '—'}\nMessage: ${msg || '—'}`;
+    const request = { id: Date.now(), service: currentServiceForRequest.name, price: currentServiceForRequest.price, clientName: name, clientPhone: phone, location: loc || '—', date: date || '—', message: msg || '', status: 'pending', createdAt: new Date().toISOString() };
+    requests.unshift(request);
+    localStorage.setItem('maqabir_requests', JSON.stringify(requests));
+    window.open('https://wa.me/21692639366?text=' + encodeURIComponent(txt));
+  }
+  closeSvcReqModal();
+  showToast('Demande envoyée !');
+  ['reqName', 'reqPhone', 'reqLoc', 'reqDate', 'reqMsg'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
 }
 
 // ==================== INITIALISATION ====================
@@ -884,18 +825,17 @@ renderTombList();
 updateMarkers();
 setLanguage(currentLang);
 
-// Expose global functions
 window.selectTomb = selectTomb; window.closeDetail = closeDetail; window.copyGPS = copyGPS;
 window.filterTombs = filterTombs; window.syncSearch = syncSearch; window.requireAuth = requireAuth;
-window.openAddModal = openAddModal; window.closeAddModal = closeAddModal;
 window.handleLogin = handleLogin; window.handleRegisterWithCaptcha = handleRegisterWithCaptcha;
 window.guestLogin = guestLogin; window.logout = logout; window.toggleMenu = toggleMenu;
 window.closeAuthModal = closeAuthModal; window.switchAuthTab = switchAuthTab; window.showTab = showTab;
 window.showServicesScreen = showServicesScreen; window.hideServicesScreen = hideServicesScreen;
-window.switchSvcPack = switchSvcPack; window.renderServices = renderServices;
+window.switchSvcPack = switchSvcPack; window.filterSvcChip = filterSvcChip; window.renderServices = renderServices;
+window.callProvider = callProvider; window.whatsappProvider = whatsappProvider;
+window.openSvcReqModal = openSvcReqModal; window.closeSvcReqModal = closeSvcReqModal; window.submitServiceRequest = submitServiceRequest;
 window.openQuickAddModal = openQuickAddModal; window.closeQuickAddModal = closeQuickAddModal;
-window.capturePhoto = capturePhoto; window.uploadPhoto = uploadPhoto;
-window.getCurrentLocation = getCurrentLocation; window.saveQuickTomb = saveQuickTomb;
+window.capturePhoto = capturePhoto; window.uploadPhoto = uploadPhoto; window.getCurrentLocation = getCurrentLocation; window.saveQuickTomb = saveQuickTomb;
 window.setLanguage = setLanguage;
 </script>
 </body>
