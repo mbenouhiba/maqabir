@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr" dir="ltr" id="htmlRoot">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>مقابر — Maqabir Tunisie</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Tajawal:wght@300;400;500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -23,17 +23,19 @@
   --text-mid: #5c4a3a;
   --danger: #c0392b;
   --success: #27ae60;
+  --warning: #f39c12;
+  --info: #3498db;
   --radius: 12px;
   --radius-sm: 8px;
   --ff: 'Tajawal', sans-serif;
   --ffd: 'Playfair Display', serif;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+[dir="rtl"] {
+  --ffd: 'Amiri', serif;
 }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: var(--ff);
@@ -56,941 +58,183 @@ body {
   gap: 10px;
 }
 
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.nav-logo-i {
-  width: 34px;
-  height: 34px;
-  background: var(--gold);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-logo h1 {
-  font-family: var(--ffd);
-  color: var(--cream);
-  font-size: 1.2rem;
-}
-
-.nav-srch {
-  flex: 1;
-  max-width: 300px;
-}
-
-.nav-srch input {
-  width: 100%;
-  padding: 8px 14px;
-  border-radius: 20px;
-  border: none;
-  background: rgba(255,255,255,0.12);
-  color: var(--cream);
-  outline: none;
-}
-
-.nav-act {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.nav-btn {
-  background: transparent;
-  border: 1px solid var(--sand);
-  color: var(--sand);
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.nav-btn:hover {
-  background: var(--gold);
-  color: var(--brown);
-}
-
-.uchip {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 4px 11px;
-  cursor: pointer;
-}
-
-.uav {
-  width: 25px;
-  height: 25px;
-  background: var(--gold);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.uname {
-  font-size: 0.78rem;
-  color: var(--cream);
-}
-
-.pmenu {
-  position: absolute;
-  top: 60px;
-  right: 16px;
-  background: var(--white);
-  border-radius: var(--radius);
-  min-width: 180px;
-  display: none;
-  z-index: 600;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.pmenu.open {
-  display: block;
-}
-
-.pm-u {
-  padding: 12px;
-  border-bottom: 1px solid var(--sand);
-}
-
-.pm-i {
-  padding: 10px 12px;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  font-family: var(--ff);
-}
-
-.pm-i:hover {
-  background: var(--cream);
-}
-
-.pm-i.danger {
-  color: var(--danger);
-}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-i { width: 34px; height: 34px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.nav-logo h1 { font-family: var(--ffd); color: var(--cream); font-size: 1.2rem; }
+.nav-srch { flex: 1; max-width: 300px; }
+.nav-srch input { width: 100%; padding: 8px 14px; border-radius: 20px; border: none; background: rgba(255,255,255,0.12); color: var(--cream); outline: none; }
+.nav-act { display: flex; gap: 10px; align-items: center; }
+.nav-btn { background: transparent; border: 1px solid var(--sand); color: var(--sand); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+.nav-btn:hover { background: var(--gold); color: var(--brown); }
+.uchip { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 11px; cursor: pointer; }
+.uav { width: 25px; height: 25px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.uname { font-size: 0.78rem; color: var(--cream); }
+.pmenu { position: absolute; top: 60px; right: 16px; background: var(--white); border-radius: var(--radius); min-width: 180px; display: none; z-index: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.pmenu.open { display: block; }
+.pm-u { padding: 12px; border-bottom: 1px solid var(--sand); }
+.pm-i { padding: 10px 12px; cursor: pointer; width: 100%; text-align: left; background: none; border: none; font-family: var(--ff); }
+.pm-i:hover { background: var(--cream); }
+.pm-i.danger { color: var(--danger); }
 
 /* Hero */
-.hero {
-  background: linear-gradient(135deg, var(--brown), var(--olive));
-  padding: 30px 16px;
-  text-align: center;
-  color: var(--cream);
-}
-
-.hero h2 {
-  font-family: var(--ffd);
-  font-size: 1.7rem;
-  margin-bottom: 10px;
-}
-
-.hs {
-  display: flex;
-  background: var(--white);
-  border-radius: 8px;
-  overflow: hidden;
-  max-width: 500px;
-  margin: 15px auto 0;
-}
-
-.hs input {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  outline: none;
-}
-
-.hs select {
-  padding: 12px;
-  border: none;
-  background: var(--cream);
-}
-
-.hs button {
-  padding: 12px 20px;
-  background: var(--gold);
-  border: none;
-  cursor: pointer;
-}
+.hero { background: linear-gradient(135deg, var(--brown), var(--olive)); padding: 30px 16px; text-align: center; color: var(--cream); }
+.hero h2 { font-family: var(--ffd); font-size: 1.7rem; margin-bottom: 10px; }
+.hs { display: flex; background: var(--white); border-radius: 8px; overflow: hidden; max-width: 500px; margin: 15px auto 0; }
+.hs input { flex: 1; padding: 12px; border: none; outline: none; font-family: var(--ff); }
+.hs select { padding: 12px; border: none; background: var(--cream); font-family: var(--ff); }
+.hs button { padding: 12px 20px; background: var(--gold); border: none; cursor: pointer; }
 
 /* Stats */
-.stats-bar {
-  background: var(--white);
-  padding: 10px;
-  display: flex;
-  justify-content: space-around;
-  border-bottom: 1px solid var(--sand);
-}
-
-.stat {
-  text-align: center;
-}
-
-.stat strong {
-  font-size: 1.3rem;
-  color: var(--olive);
-}
-
-.stat span {
-  font-size: 0.7rem;
-  color: var(--text-mid);
-}
+.stats-bar { background: var(--white); padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid var(--sand); }
+.stat { text-align: center; }
+.stat strong { font-size: 1.3rem; color: var(--olive); }
+.stat span { font-size: 0.7rem; color: var(--text-mid); }
 
 /* Layout */
-.app-body {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 15px;
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 15px;
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.panel {
-  background: var(--white);
-  border-radius: var(--radius);
-  border: 1px solid var(--sand);
-  overflow: hidden;
-}
-
-.panel-hd {
-  background: var(--brown);
-  padding: 10px 14px;
-  color: var(--cream);
-}
-
-.panel-bd {
-  padding: 12px;
-}
-
-.fg {
-  margin-bottom: 12px;
-}
-
-.fg label {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.fg select {
-  width: 100%;
-  padding: 7px;
-  border: 1px solid var(--sand);
-  border-radius: 6px;
-  background: var(--cream);
-}
-
-.btn-apply {
-  width: 100%;
-  padding: 8px;
-  background: var(--olive);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
+.app-body { max-width: 1300px; margin: 0 auto; padding: 15px; display: grid; grid-template-columns: 280px 1fr; gap: 15px; }
+.sidebar { display: flex; flex-direction: column; gap: 12px; }
+.panel { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand); overflow: hidden; }
+.panel-hd { background: var(--brown); padding: 10px 14px; color: var(--cream); display: flex; justify-content: space-between; align-items: center; }
+.panel-bd { padding: 12px; }
+.fg { margin-bottom: 12px; }
+.fg label { display: block; font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; }
+.fg select { width: 100%; padding: 7px; border: 1px solid var(--sand); border-radius: 6px; background: var(--cream); font-family: var(--ff); }
+.btn-apply { width: 100%; padding: 8px; background: var(--olive); color: white; border: none; border-radius: 6px; cursor: pointer; font-family: var(--ff); }
 
 /* Tomb Cards */
-.tc {
-  background: var(--cream);
-  border: 1px solid var(--sand);
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-
-.tc:hover {
-  border-color: var(--gold);
-}
-
-.tc h4 {
-  font-family: var(--ffd);
-  margin-bottom: 4px;
-}
-
-.tc .dt {
-  font-size: 0.7rem;
-  color: var(--text-mid);
-}
+.tc { background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; padding: 10px; margin-bottom: 8px; cursor: pointer; }
+.tc:hover { border-color: var(--gold); }
+.tc h4 { font-family: var(--ffd); margin-bottom: 4px; }
+.tc .dt { font-size: 0.7rem; color: var(--text-mid); }
 
 /* Map */
-#map {
-  height: 400px;
-  border-radius: var(--radius);
-  border: 1px solid var(--sand);
-}
+#map { height: 400px; border-radius: var(--radius); border: 1px solid var(--sand); }
 
 /* Detail Panel */
-.dp {
-  background: var(--white);
-  border-radius: var(--radius);
-  border: 1px solid var(--sand);
-  display: none;
-}
+.dp { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand); display: none; }
+.dp.vis { display: block; }
+.dhd { background: var(--brown); padding: 12px; color: var(--cream); position: relative; }
+.cbt { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
+.dbd { padding: 15px; }
+.gpsbdg { display: flex; align-items: center; gap: 10px; background: var(--olive-dim); padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+.gpscpy { background: var(--gold); border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-family: var(--ff); }
+.dirbtn { display: block; background: var(--brown); color: var(--cream); padding: 10px; text-align: center; border-radius: 8px; text-decoration: none; margin-bottom: 12px; font-family: var(--ff); }
 
-.dp.vis {
-  display: block;
-}
-
-.dhd {
-  background: var(--brown);
-  padding: 12px;
-  color: var(--cream);
-  position: relative;
-}
-
-.cbt {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.dbd {
-  padding: 15px;
-}
-
-.gpsbdg {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--olive-dim);
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
-
-.gpscpy {
-  background: var(--gold);
-  border: none;
-  padding: 4px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.dirbtn {
-  display: block;
-  background: var(--brown);
-  color: var(--cream);
-  padding: 10px;
-  text-align: center;
-  border-radius: 8px;
-  text-decoration: none;
-  margin-bottom: 12px;
-}
-
-/* Modal */
-.movl {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(4px);
-  z-index: 800;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.movl.open {
-  display: flex;
-}
-
-.modal {
-  background: var(--white);
-  border-radius: 20px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.mhd {
-  background: var(--brown);
-  padding: 15px;
-  color: var(--cream);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mbd {
-  padding: 20px;
-}
-
-.fgrp {
-  margin-bottom: 12px;
-}
-
-.fgrp label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.fgrp input, .fgrp select, .fgrp textarea {
-  width: 100%;
-  padding: 8px 11px;
-  border: 1.5px solid var(--sand);
-  border-radius: 8px;
-  background: var(--cream);
-}
-
-.frow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.mft {
-  padding: 15px;
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  border-top: 1px solid var(--sand);
-}
-
-.bcancel {
-  padding: 8px 15px;
-  background: transparent;
-  border: 1.5px solid var(--sand);
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.bsave {
-  padding: 8px 19px;
-  background: var(--olive);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+/* Modals */
+.movl { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 800; display: none; align-items: center; justify-content: center; }
+.movl.open { display: flex; }
+.modal { background: var(--white); border-radius: 20px; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
+.mhd { background: var(--brown); padding: 15px; color: var(--cream); display: flex; justify-content: space-between; align-items: center; }
+.mbd { padding: 20px; }
+.fgrp { margin-bottom: 12px; }
+.fgrp label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; }
+.fgrp input, .fgrp select, .fgrp textarea { width: 100%; padding: 8px 11px; border: 1.5px solid var(--sand); border-radius: 8px; background: var(--cream); font-family: var(--ff); }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mft { padding: 15px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--sand); }
+.bcancel { padding: 8px 15px; background: transparent; border: 1.5px solid var(--sand); border-radius: 8px; cursor: pointer; font-family: var(--ff); }
+.bsave { padding: 8px 19px; background: var(--olive); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: var(--ff); }
 
 /* Auth Modal */
-.auth-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(5px);
-  z-index: 1000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-modal.open {
-  display: flex;
-}
-
-.auth-card {
-  background: var(--white);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 400px;
-  overflow: hidden;
-}
-
-.auth-brand {
-  background: var(--brown);
-  padding: 25px;
-  text-align: center;
-  color: var(--cream);
-}
-
-.auth-tabs {
-  display: flex;
-  border-bottom: 2px solid var(--sand);
-}
-
-.auth-tab {
-  flex: 1;
-  padding: 12px;
-  text-align: center;
-  cursor: pointer;
-  background: none;
-  border: none;
-}
-
-.auth-tab.active {
-  color: var(--olive);
-  border-bottom: 2px solid var(--olive);
-}
-
-.auth-body {
-  padding: 22px;
-}
-
-.field {
-  margin-bottom: 15px;
-}
-
-.field input {
-  width: 100%;
-  padding: 10px;
-  border: 1.5px solid var(--sand);
-  border-radius: 8px;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 12px;
-  background: var(--olive);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.auth-div {
-  text-align: center;
-  margin: 12px 0;
-}
-
-.btn-guest {
-  width: 100%;
-  padding: 10px;
-  background: transparent;
-  border: 1.5px dashed var(--sand);
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.auth-err {
-  background: rgba(192,57,43,0.1);
-  border: 1px solid var(--danger);
-  border-radius: 6px;
-  padding: 8px;
-  font-size: 0.8rem;
-  color: var(--danger);
-  margin-bottom: 12px;
-  display: none;
-}
-
-.auth-err.show {
-  display: block;
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(0,0,0,0.3);
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: white;
-}
+.auth-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+.auth-modal.open { display: flex; }
+.auth-card { background: var(--white); border-radius: 20px; width: 100%; max-width: 400px; overflow: hidden; }
+.auth-brand { background: var(--brown); padding: 25px; text-align: center; color: var(--cream); }
+.auth-tabs { display: flex; border-bottom: 2px solid var(--sand); }
+.auth-tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; background: none; border: none; font-family: var(--ff); }
+.auth-tab.active { color: var(--olive); border-bottom: 2px solid var(--olive); }
+.auth-body { padding: 22px; }
+.field { margin-bottom: 15px; }
+.field input { width: 100%; padding: 10px; border: 1.5px solid var(--sand); border-radius: 8px; font-family: var(--ff); }
+.btn-primary { width: 100%; padding: 12px; background: var(--olive); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: var(--ff); }
+.auth-div { text-align: center; margin: 12px 0; }
+.btn-guest { width: 100%; padding: 10px; background: transparent; border: 1.5px dashed var(--sand); border-radius: 8px; cursor: pointer; font-family: var(--ff); }
+.auth-err { background: rgba(192,57,43,0.1); border: 1px solid var(--danger); border-radius: 6px; padding: 8px; font-size: 0.8rem; color: var(--danger); margin-bottom: 12px; display: none; }
+.auth-err.show { display: block; }
+.modal-close { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.3); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; }
 
 /* Toast */
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--brown);
-  color: var(--cream);
-  padding: 10px 20px;
-  border-radius: 30px;
-  display: none;
-  z-index: 900;
-}
-
-.toast.show {
-  display: block;
-}
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--brown); color: var(--cream); padding: 10px 20px; border-radius: 30px; display: none; z-index: 900; font-family: var(--ff); }
+.toast.show { display: block; }
 
 /* Fab Button */
-.fab {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--gold);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  cursor: pointer;
-  border: none;
-  z-index: 400;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
+.fab { position: fixed; bottom: 20px; right: 20px; background: var(--gold); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; border: none; z-index: 400; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
 /* Bottom Nav */
-.bnav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--brown);
-  padding: 8px;
-  z-index: 500;
-}
-
-.bnav-in {
-  display: flex;
-  justify-content: space-around;
-}
-
-.bbn {
-  background: none;
-  border: none;
-  color: var(--sand);
-  text-align: center;
-  cursor: pointer;
-  flex: 1;
-  padding: 5px;
-}
-
-.bbn.active {
-  color: var(--gold);
-}
+.bnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--brown); padding: 8px; z-index: 500; }
+.bnav-in { display: flex; justify-content: space-around; }
+.bbn { background: none; border: none; color: var(--sand); text-align: center; cursor: pointer; flex: 1; padding: 5px; font-family: var(--ff); }
+.bbn.active { color: var(--gold); }
 
 /* ==================== STYLES SERVICES ==================== */
-.svc-screen {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--cream);
-  z-index: 700;
-  overflow-y: auto;
-  padding-bottom: 80px;
-}
-
-.svc-header {
-  background: linear-gradient(135deg, var(--brown), var(--olive));
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.svc-back {
-  background: rgba(255,255,255,0.15);
-  border: none;
-  color: var(--cream);
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.svc-title {
-  flex: 1;
-  font-family: var(--ffd);
-  color: var(--cream);
-  font-size: 1.15rem;
-}
-
-.svc-add-btn {
-  background: var(--gold);
-  border: none;
-  color: var(--brown);
-  padding: 7px 13px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.svc-tabs {
-  background: var(--white);
-  border-bottom: 1px solid var(--sand);
-  display: flex;
-  overflow-x: auto;
-}
-
-.svc-tab {
-  flex: 1;
-  padding: 11px 10px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.svc-tab.active {
-  color: var(--olive);
-  border-bottom-color: var(--olive);
-  font-weight: bold;
-}
-
-.svc-search {
-  padding: 10px 12px;
-  background: var(--white);
-  border-bottom: 1px solid var(--sand);
-}
-
-.svc-search input {
-  width: 100%;
-  padding: 8px 11px 8px 33px;
-  border: 1.5px solid var(--sand);
-  border-radius: 8px;
-  background: var(--cream);
-  outline: none;
-}
-
-.svc-chips {
-  padding: 10px 12px;
-  background: var(--cream);
-  border-bottom: 1px solid var(--sand);
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-.chip {
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--sand);
-  background: var(--white);
-  font-size: 0.76rem;
-  cursor: pointer;
-  margin-right: 6px;
-}
-
-.chip.active {
-  background: var(--olive);
-  color: white;
-  border-color: var(--olive);
-}
-
-.svc-grid {
-  padding: 12px;
-}
-
-.svc-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  border: 1px solid var(--sand);
-  margin-bottom: 11px;
-  overflow: hidden;
-}
-
-.svc-card-hd {
-  display: flex;
-  gap: 12px;
-  padding: 13px 14px 8px;
-}
-
-.svc-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 21px;
-  flex-shrink: 0;
-}
-
-.svc-info {
-  flex: 1;
-}
-
-.svc-info h3 {
-  font-family: var(--ffd);
-  font-size: 0.95rem;
-  margin-bottom: 2px;
-}
-
-.svc-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.68rem;
-  padding: 2px 7px;
-  border-radius: 20px;
-  margin-bottom: 3px;
-}
-
-.badge-pro {
-  background: rgba(61,43,31,0.08);
-  color: var(--brown-mid);
-}
-
-.badge-vol {
-  background: rgba(39,174,96,0.1);
-  color: var(--success);
-}
-
-.badge-p1 {
-  background: rgba(107,76,56,0.08);
-  color: var(--brown-mid);
-}
-
-.badge-p2 {
-  background: rgba(90,107,60,0.1);
-  color: var(--olive);
-}
-
-.svc-gov {
-  font-size: 0.71rem;
-  color: var(--olive);
-}
-
-.svc-price-block {
-  text-align: end;
-  flex-shrink: 0;
-}
-
-.svc-price-block strong {
-  display: block;
-  font-family: var(--ffd);
-  font-size: 0.95rem;
-}
-
-.svc-card-body {
-  padding: 0 14px 11px;
-}
-
-.svc-desc {
-  font-size: 0.81rem;
-  color: var(--text-mid);
-  line-height: 1.6;
-  margin-bottom: 8px;
-}
-
-.svc-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.svc-avail {
-  font-size: 0.68rem;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: rgba(39,174,96,0.1);
-  color: var(--success);
-}
-
-.svc-rating {
-  font-size: 0.68rem;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: rgba(201,168,76,0.15);
-  color: var(--brown-mid);
-}
-
-.svc-btns {
-  display: flex;
-  gap: 7px;
-  padding: 9px 14px 13px;
-  border-top: 1px solid var(--sand);
-}
-
-.svc-btn-call {
-  flex: 1;
-  padding: 9px;
-  background: var(--olive);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.svc-btn-wa {
-  flex: 1;
-  padding: 9px;
-  background: #25d366;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.svc-btn-req {
-  flex: 1;
-  padding: 9px;
-  background: transparent;
-  color: var(--brown-mid);
-  border: 1.5px solid var(--sand);
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.svc-section-title {
-  font-family: var(--ffd);
-  font-size: 1rem;
-  color: var(--brown);
-  padding: 4px 0 10px;
-  border-bottom: 2px solid var(--sand);
-  margin-bottom: 12px;
-}
-
-.svc-empty {
-  text-align: center;
-  padding: 38px 20px;
-  color: var(--text-mid);
-}
-
-.svc-banner {
-  padding: 14px 16px;
-  margin: 12px 12px 0;
-  border-radius: var(--radius);
-  border: 1px solid var(--sand);
-}
-
+.svc-screen { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 700; overflow-y: auto; padding-bottom: 80px; }
+.svc-header { background: linear-gradient(135deg, var(--brown), var(--olive)); padding: 14px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
+.svc-back { background: rgba(255,255,255,0.15); border: none; color: var(--cream); width: 34px; height: 34px; border-radius: 50%; font-size: 18px; cursor: pointer; }
+.svc-title { flex: 1; font-family: var(--ffd); color: var(--cream); font-size: 1.15rem; }
+.svc-tabs { background: var(--white); border-bottom: 1px solid var(--sand); display: flex; overflow-x: auto; }
+.svc-tab { flex: 1; padding: 11px 10px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; font-family: var(--ff); }
+.svc-tab.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: bold; }
+.svc-search { padding: 10px 12px; background: var(--white); border-bottom: 1px solid var(--sand); }
+.svc-search input { width: 100%; padding: 8px 11px 8px 33px; border: 1.5px solid var(--sand); border-radius: 8px; background: var(--cream); outline: none; font-family: var(--ff); }
+.svc-chips { padding: 10px 12px; background: var(--cream); border-bottom: 1px solid var(--sand); overflow-x: auto; white-space: nowrap; }
+.chip { display: inline-block; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--sand); background: var(--white); font-size: 0.76rem; cursor: pointer; margin-right: 6px; font-family: var(--ff); }
+.chip.active { background: var(--olive); color: white; border-color: var(--olive); }
+.svc-grid { padding: 12px; }
+.svc-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand); margin-bottom: 11px; overflow: hidden; }
+.svc-card-hd { display: flex; gap: 12px; padding: 13px 14px 8px; }
+.svc-icon { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
+.svc-info { flex: 1; }
+.svc-info h3 { font-family: var(--ffd); font-size: 0.95rem; margin-bottom: 2px; }
+.svc-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; padding: 2px 7px; border-radius: 20px; margin-bottom: 3px; background: rgba(61,43,31,0.08); color: var(--brown-mid); }
+.svc-gov { font-size: 0.71rem; color: var(--olive); }
+.svc-price-block { text-align: end; flex-shrink: 0; }
+.svc-price-block strong { display: block; font-family: var(--ffd); font-size: 0.95rem; }
+.svc-card-body { padding: 0 14px 11px; }
+.svc-desc { font-size: 0.81rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 8px; }
+.svc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.svc-avail { font-size: 0.68rem; padding: 2px 8px; border-radius: 20px; background: rgba(39,174,96,0.1); color: var(--success); }
+.svc-btns { display: flex; gap: 7px; padding: 9px 14px 13px; border-top: 1px solid var(--sand); }
+.svc-btn-call { flex: 1; padding: 9px; background: var(--olive); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: var(--ff); }
+.svc-btn-wa { flex: 1; padding: 9px; background: #25d366; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: var(--ff); }
+.svc-btn-req { flex: 1; padding: 9px; background: transparent; color: var(--brown-mid); border: 1.5px solid var(--sand); border-radius: 6px; font-weight: 600; cursor: pointer; font-family: var(--ff); }
+.svc-section-title { font-family: var(--ffd); font-size: 1rem; color: var(--brown); padding: 4px 0 10px; border-bottom: 2px solid var(--sand); margin-bottom: 12px; }
+.svc-empty { text-align: center; padding: 38px 20px; color: var(--text-mid); }
+.svc-banner { padding: 14px 16px; margin: 12px 12px 0; border-radius: var(--radius); border: 1px solid var(--sand); }
 .svc-pack1 { background: rgba(61,43,31,0.06); border-color: rgba(107,76,56,0.2); }
 .svc-pack2 { background: rgba(90,107,60,0.06); border-color: rgba(90,107,60,0.2); }
 .svc-pack-full { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.35); }
 
+/* Dashboard Styles */
+.dashboard-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--white); border-radius: var(--radius); padding: 15px; text-align: center; border: 1px solid var(--sand); }
+.stat-card .number { font-size: 2rem; font-weight: bold; color: var(--olive); }
+.stat-card .label { font-size: 0.75rem; color: var(--text-mid); }
+.request-item { background: var(--white); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px; border: 1px solid var(--sand); }
+.request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+.request-service { font-weight: bold; color: var(--brown); }
+.request-date { font-size: 0.7rem; color: var(--text-mid); }
+.request-client { font-size: 0.85rem; margin-bottom: 8px; }
+.request-details { font-size: 0.75rem; color: var(--text-mid); margin-bottom: 10px; }
+.status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
+.status-pending { background: #fef3c7; color: #d97706; }
+.status-progress { background: #dbeafe; color: #2563eb; }
+.status-done { background: #d1fae5; color: #059669; }
+.request-actions { display: flex; gap: 8px; margin-top: 10px; }
+.btn-status { padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-family: var(--ff); }
+.btn-progress { background: var(--info); color: white; }
+.btn-done { background: var(--success); color: white; }
+.btn-delete { background: var(--danger); color: white; }
+
+.lang-toggle { display: flex; align-items: center; background: rgba(255,255,255,0.12); border: 1px solid rgba(212,197,169,0.25); border-radius: 20px; overflow: hidden; }
+.lang-btn { padding: 5px 13px; font-size: 0.8rem; font-family: var(--ff); font-weight: 700; cursor: pointer; border: none; background: transparent; color: var(--sand); transition: all 0.2s; }
+.lang-btn.active { background: var(--gold); color: var(--brown); }
+
 @media (max-width: 860px) {
-  .app-body {
-    grid-template-columns: 1fr;
-  }
-  .sidebar {
-    display: none;
-  }
-  .bnav {
-    display: flex;
-  }
-  .nav-srch {
-    display: none;
-  }
-  .fab {
-    bottom: 70px;
-  }
+  .app-body { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .bnav { display: flex; }
+  .nav-srch { display: none; }
+  .fab { bottom: 70px; }
+  .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -1000,32 +244,24 @@ body {
 <div id="authModal" class="auth-modal">
   <div class="auth-card">
     <div class="modal-close" onclick="closeAuthModal()">✕</div>
-    <div class="auth-brand">
-      <div class="lc">🕌</div>
-      <h1>Maqabir</h1>
-      <p>Connectez-vous pour ajouter un tombeau</p>
-    </div>
+    <div class="auth-brand"><div class="lc">🕌</div><h1 id="authTitle">Maqabir</h1><p id="authSubtitle">Connectez-vous pour accéder au tableau de bord</p></div>
     <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login')">Connexion</button>
-      <button class="auth-tab" onclick="switchAuthTab('register')">Inscription</button>
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" id="authTabReg" onclick="switchAuthTab('register')">Inscription</button>
     </div>
     <div class="auth-body">
       <div id="loginForm">
         <div class="auth-err" id="loginErr"></div>
-        <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="exemple@email.com"></div>
-        <div class="field"><label>Mot de passe</label><input type="password" id="loginPwd" placeholder="••••••"></div>
-        <button class="btn-primary" onclick="handleLogin()">Se connecter</button>
-        <div class="auth-div">ou</div>
-        <button class="btn-guest" onclick="guestLogin()">Continuer sans compte</button>
+        <div class="field"><label id="loginEmailLabel">Email</label><input type="email" id="loginEmail" placeholder="admin@maqabir.com"></div>
+        <div class="field"><label id="loginPwdLabel">Mot de passe</label><input type="password" id="loginPwd" placeholder="••••••"></div>
+        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">Se connecter</button>
       </div>
       <div id="registerForm" style="display:none;">
         <div class="auth-err" id="regErr"></div>
-        <div class="field"><label>Nom complet</label><input type="text" id="regName" placeholder="Mohamed Ben Ali"></div>
-        <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="exemple@email.com"></div>
-        <div class="field"><label>Mot de passe (min 6 caractères)</label><input type="password" id="regPwd" placeholder="••••••"></div>
-        <button class="btn-primary" onclick="handleRegister()">Créer mon compte</button>
-        <div class="auth-div">ou</div>
-        <button class="btn-guest" onclick="guestLogin()">Continuer sans compte</button>
+        <div class="field"><label id="regNameLabel">Nom complet</label><input type="text" id="regName" placeholder="Admin Maqabir"></div>
+        <div class="field"><label id="regEmailLabel">Email</label><input type="email" id="regEmail" placeholder="admin@maqabir.com"></div>
+        <div class="field"><label id="regPwdLabel">Mot de passe (min 6)</label><input type="password" id="regPwd" placeholder="••••••"></div>
+        <button class="btn-primary" id="regBtn" onclick="handleRegister()">Créer mon compte</button>
       </div>
     </div>
   </div>
@@ -1034,230 +270,171 @@ body {
 <!-- APP MAIN -->
 <div id="appScreen">
   <nav class="topnav">
-    <div class="nav-logo">
-      <div class="nav-logo-i">🕌</div>
-      <h1>Maqabir</h1>
-    </div>
-    <div class="nav-srch">
-      <input type="text" id="searchInput" placeholder="Rechercher un défunt..." oninput="filterTombs()">
-    </div>
+    <div class="nav-logo"><div class="nav-logo-i">🕌</div><h1 id="navTitle">Maqabir</h1></div>
+    <div class="nav-srch"><input type="text" id="searchInput" placeholder="Rechercher un défunt..." oninput="filterTombs()"></div>
     <div class="nav-act">
-      <button class="nav-btn" onclick="showServicesScreen()">🛠 Services</button>
-      <button class="nav-btn" onclick="requireAuth()">➕ Ajouter</button>
-      <div class="uchip" onclick="toggleMenu()">
-        <div class="uav" id="userAvatar">👤</div>
-        <span class="uname" id="userName">Invité</span>
-      </div>
-      <div class="pmenu" id="userMenu">
-        <div class="pm-u"><strong id="menuName">Invité</strong><span id="menuEmail">Mode visite</span></div>
-        <button class="pm-i danger" onclick="logout()">🚪 Déconnexion</button>
-      </div>
+      <div class="lang-toggle"><button class="lang-btn active" onclick="setLanguage('fr')">FR</button><button class="lang-btn" onclick="setLanguage('ar')">ع</button></div>
+      <button class="nav-btn" id="servicesBtn" onclick="showServicesScreen()">🛠 Services</button>
+      <button class="nav-btn" id="dashboardBtn" onclick="showDashboardScreen()">📊 Dashboard</button>
+      <button class="nav-btn" id="addNavBtn" onclick="requireAuth()">➕ Ajouter</button>
+      <div class="uchip" onclick="toggleMenu()"><div class="uav" id="userAvatar">👤</div><span class="uname" id="userName">Invité</span></div>
+      <div class="pmenu" id="userMenu"><div class="pm-u"><strong id="menuName">Invité</strong><span id="menuEmail">Mode visite</span></div><button class="pm-i danger" id="logoutBtn" onclick="logout()">🚪 Déconnexion</button></div>
     </div>
   </nav>
 
   <div class="hero">
-    <h2>Retrouvez vos proches,<br>préservez la mémoire</h2>
-    <p>Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p>
+    <h2 id="heroTitle">Retrouvez vos proches,<br>préservez la mémoire</h2>
+    <p id="heroSubtitle">Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p>
     <div class="hs">
       <input type="text" id="heroSearch" placeholder="Nom du défunt..." oninput="syncSearch()">
-      <select id="govFilter" onchange="filterTombs()">
-        <option value="">Tous les gouvernorats</option>
-        <option>Tunis</option><option>Sfax</option><option>Sousse</option>
-        <option>Nabeul</option><option>Bizerte</option><option>Kairouan</option>
-      </select>
+      <select id="govFilter" onchange="filterTombs()"><option value="" id="allGovs">Tous les gouvernorats</option><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select>
       <button onclick="filterTombs()">🔍</button>
     </div>
   </div>
 
   <div class="stats-bar">
-    <div class="stat"><strong id="statCount">4</strong><span>Tombeaux</span></div>
-    <div class="stat"><strong>4</strong><span>Cimetières</span></div>
-    <div class="stat"><strong id="statPhotos">9</strong><span>Photos</span></div>
+    <div class="stat"><strong id="statCount">4</strong><span id="statTombsLabel">Tombeaux</span></div>
+    <div class="stat"><strong>4</strong><span id="statCemsLabel">Cimetières</span></div>
+    <div class="stat"><strong id="statPhotos">9</strong><span id="statPhotosLabel">Photos</span></div>
   </div>
 
   <div class="app-body">
     <aside class="sidebar" id="sidebar">
-      <div class="panel">
-        <div class="panel-hd"><h3>Filtres</h3></div>
-        <div class="panel-bd">
-          <div class="fg"><label>Cimetière</label><select id="cemFilter" onchange="filterTombs()"><option value="">Tous</option><option>Djellaz</option><option>Sidi Bou Saïd</option><option>El Gorjani</option></select></div>
-          <div class="fg"><label>Visibilité</label><select id="privFilter" onchange="filterTombs()"><option value="">Tous</option><option value="public">Publics</option><option value="private">Privés</option></select></div>
-          <button class="btn-apply" onclick="filterTombs()">Appliquer</button>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-hd"><h3>Résultats</h3><span class="badge" id="resultCount">4</span></div>
-        <div class="panel-bd" id="tombList"></div>
-      </div>
+      <div class="panel"><div class="panel-hd"><h3 id="filterTitle">Filtres</h3></div><div class="panel-bd"><div class="fg"><label id="cemFilterLabel">Cimetière</label><select id="cemFilter" onchange="filterTombs()"><option value="" id="allCems">Tous</option><option>Djellaz</option><option>Sidi Bou Saïd</option><option>El Gorjani</option></select></div><div class="fg"><label id="privFilterLabel">Visibilité</label><select id="privFilter" onchange="filterTombs()"><option value="" id="allVis">Tous</option><option value="public" id="publicOpt">Publics</option><option value="private" id="privateOpt">Privés</option></select></div><button class="btn-apply" id="applyBtn" onclick="filterTombs()">Appliquer</button></div></div>
+      <div class="panel"><div class="panel-hd"><h3 id="resultsTitle">Résultats</h3><span class="badge" id="resultCount">4</span></div><div class="panel-bd" id="tombList"></div></div>
     </aside>
-
-    <div class="rcol">
-      <div id="map"></div>
-      <div class="dp" id="detailPanel">
-        <div class="dhd">
-          <h2 id="detailName">—</h2>
-          <div class="dm" id="detailMeta">—</div>
-          <button class="cbt" onclick="closeDetail()">✕</button>
-        </div>
-        <div class="dbd">
-          <div class="gpsbdg">
-            <div class="gpsinf"><div class="gpslb">Coordonnées GPS</div><div class="gpsc" id="detailGPS">—</div></div>
-            <button class="gpscpy" onclick="copyGPS()">Copier</button>
-          </div>
-          <a id="dirLink" class="dirbtn" href="#" target="_blank">🧭 Itinéraire Google Maps</a>
-          <div id="detailContent"></div>
-        </div>
-      </div>
-    </div>
+    <div class="rcol"><div id="map"></div><div class="dp" id="detailPanel"><div class="dhd"><h2 id="detailName">—</h2><div class="dm" id="detailMeta">—</div><button class="cbt" onclick="closeDetail()">✕</button></div><div class="dbd"><div class="gpsbdg"><div class="gpsinf"><div class="gpslb" id="gpsLabel">Coordonnées GPS</div><div class="gpsc" id="detailGPS">—</div></div><button class="gpscpy" id="copyGpsBtn" onclick="copyGPS()">Copier</button></div><a id="dirLink" class="dirbtn" href="#" target="_blank"><span id="dirIcon">🧭</span> <span id="dirText">Itinéraire Google Maps</span></a><div id="detailContent"></div></div></div></div>
   </div>
 
-  <nav class="bnav">
-    <div class="bnav-in">
-      <button class="bbn active" onclick="showTab('map')"><span>🗺</span><span>Carte</span></button>
-      <button class="bbn" onclick="showTab('list')"><span>📋</span><span>Liste</span></button>
-      <button class="bbn" onclick="showServicesScreen()"><span>🛠</span><span>Services</span></button>
-      <button class="bbn" onclick="requireAuth()"><span>➕</span><span>Ajouter</span></button>
-    </div>
-  </nav>
-  <button class="fab" onclick="requireAuth()">➕</button>
+  <nav class="bnav"><div class="bnav-in"><button class="bbn active" onclick="showTab('map')"><span>🗺</span><span id="bnMap">Carte</span></button><button class="bbn" onclick="showTab('list')"><span>📋</span><span id="bnList">Liste</span></button><button class="bbn" onclick="showServicesScreen()"><span>🛠</span><span id="bnServices">Services</span></button><button class="bbn" onclick="showDashboardScreen()"><span>📊</span><span id="bnDashboard">Dashboard</span></button><button class="bbn" onclick="requireAuth()"><span>➕</span><span id="bnAdd">Ajouter</span></button></div></nav>
+  <button class="fab" onclick="requireAuth()" id="fabBtn">➕</button>
 </div>
 
-<!-- ==================== SERVICES SCREEN ==================== -->
+<!-- SERVICES SCREEN -->
 <div id="servicesScreen" class="svc-screen">
-  <div class="svc-header">
-    <button class="svc-back" onclick="hideServicesScreen()">←</button>
-    <div class="svc-title">Services Funéraires</div>
-    <button class="svc-add-btn" onclick="openSvcAddModal()">➕ Proposer</button>
-  </div>
-
-  <div class="svc-tabs">
-    <button class="svc-tab active" onclick="switchSvcPack('all')">🌟 Tous</button>
-    <button class="svc-tab" onclick="switchSvcPack('part1')">🕊 Avant l'enterrement</button>
-    <button class="svc-tab" onclick="switchSvcPack('part2')">🪦 Entretien</button>
-    <button class="svc-tab" onclick="switchSvcPack('full')">⭐ Pack complet</button>
-  </div>
-
+  <div class="svc-header"><button class="svc-back" onclick="hideServicesScreen()">←</button><div class="svc-title" id="svcScreenTitle">Services Funéraires</div></div>
+  <div class="svc-tabs"><button class="svc-tab active" onclick="switchSvcPack('all')"><span id="svcTabAllText">🌟 Tous</span></button><button class="svc-tab" onclick="switchSvcPack('part1')"><span id="svcTabPart1Text">🕊 Avant l'enterrement</span></button><button class="svc-tab" onclick="switchSvcPack('part2')"><span id="svcTabPart2Text">🪦 Entretien</span></button><button class="svc-tab" onclick="switchSvcPack('full')"><span id="svcTabFullText">⭐ Pack complet</span></button></div>
   <div id="svcBanner" style="display:none;" class="svc-banner"></div>
-
-  <div class="svc-search">
-    <input type="text" id="svcSearch" placeholder="Rechercher un prestataire..." oninput="renderServices()">
-  </div>
-
-  <div id="svcChips1" class="svc-chips" style="display:none;">
-    <button class="chip active" onclick="filterSvcChip(this, 'all1')">✨ Tous</button>
-    <button class="chip" onclick="filterSvcChip(this, 'docs')">📋 Documentation</button>
-    <button class="chip" onclick="filterSvcChip(this, 'transport')">🚗 Transport</button>
-    <button class="chip" onclick="filterSvcChip(this, 'kafan')">🤍 Kafan</button>
-    <button class="chip" onclick="filterSvcChip(this, 'quran')">📖 Lecture Coran</button>
-    <button class="chip" onclick="filterSvcChip(this, 'construction')">🏗 Construction</button>
-    <button class="chip" onclick="filterSvcChip(this, 'dua')">🤲 Doua</button>
-  </div>
-
-  <div id="svcChips2" class="svc-chips" style="display:none;">
-    <button class="chip active" onclick="filterSvcChip(this, 'all2')">✨ Tous</button>
-    <button class="chip" onclick="filterSvcChip(this, 'cleaning')">🧹 Nettoyage</button>
-    <button class="chip" onclick="filterSvcChip(this, 'painting')">🎨 Peinture</button>
-    <button class="chip" onclick="filterSvcChip(this, 'marble')">🪨 Marbre</button>
-    <button class="chip" onclick="filterSvcChip(this, 'flowers')">🌹 Fleurs</button>
-    <button class="chip" onclick="filterSvcChip(this, 'findtomb')">🔍 Trouver tombeau</button>
-  </div>
-
+  <div class="svc-search"><input type="text" id="svcSearch" placeholder="Rechercher un service..." oninput="renderServices()"></div>
+  <div id="svcChips1" class="svc-chips" style="display:none;"><button class="chip active" onclick="filterSvcChip(this, 'all1')"><span id="chipAll1Text">✨ Tous</span></button><button class="chip" onclick="filterSvcChip(this, 'docs')"><span id="chipDocsText">📋 Documentation</span></button><button class="chip" onclick="filterSvcChip(this, 'transport')"><span id="chipTransportText">🚗 Transport</span></button><button class="chip" onclick="filterSvcChip(this, 'kafan')"><span id="chipKafanText">🤍 Kafan</span></button><button class="chip" onclick="filterSvcChip(this, 'quran')"><span id="chipQuranText">📖 Lecture Coran</span></button><button class="chip" onclick="filterSvcChip(this, 'construction')"><span id="chipConstructionText">🏗 Construction</span></button><button class="chip" onclick="filterSvcChip(this, 'dua')"><span id="chipDuaText">🤲 Doua</span></button></div>
+  <div id="svcChips2" class="svc-chips" style="display:none;"><button class="chip active" onclick="filterSvcChip(this, 'all2')"><span id="chipAll2Text">✨ Tous</span></button><button class="chip" onclick="filterSvcChip(this, 'cleaning')"><span id="chipCleaningText">🧹 Nettoyage</span></button><button class="chip" onclick="filterSvcChip(this, 'painting')"><span id="chipPaintingText">🎨 Peinture</span></button><button class="chip" onclick="filterSvcChip(this, 'marble')"><span id="chipMarbleText">🪨 Marbre</span></button><button class="chip" onclick="filterSvcChip(this, 'flowers')"><span id="chipFlowersText">🌹 Fleurs</span></button><button class="chip" onclick="filterSvcChip(this, 'findtomb')"><span id="chipFindTombText">🔍 Trouver tombeau</span></button></div>
   <div id="svcGrid" class="svc-grid"></div>
 </div>
 
-<!-- SERVICE REQUEST MODAL -->
-<div class="movl" id="svcReqModal">
-  <div class="modal">
-    <div class="mhd"><h3>📋 Demander ce service</h3><button class="cbt" onclick="closeSvcReqModal()">✕</button></div>
-    <div class="mbd">
-      <div id="reqSvcInfo" style="background:var(--olive-dim);border-radius:8px;padding:11px;margin-bottom:14px;"></div>
-      <div class="fgrp"><label>Votre nom</label><input type="text" id="reqName" placeholder="Mohamed Ben Ali"></div>
-      <div class="fgrp"><label>Téléphone</label><input type="tel" id="reqPhone" placeholder="+216 XX XXX XXX"></div>
-      <div class="fgrp"><label>Gouvernorat / Cimetière</label><input type="text" id="reqLoc" placeholder="Ex: Djellaz, Tunis"></div>
-      <div class="fgrp"><label>Date souhaitée</label><input type="date" id="reqDate"></div>
-      <div class="fgrp"><label>Message</label><textarea id="reqMsg" rows="3" placeholder="Précisions sur votre demande..."></textarea></div>
-    </div>
-    <div class="mft"><button class="bcancel" onclick="closeSvcReqModal()">Annuler</button><button class="bsave" onclick="submitServiceRequest()">📨 Envoyer</button></div>
+<!-- DASHBOARD SCREEN -->
+<div id="dashboardScreen" class="svc-screen">
+  <div class="svc-header"><button class="svc-back" onclick="hideDashboardScreen()">←</button><div class="svc-title" id="dashboardTitle">📊 Tableau de bord</div></div>
+  <div style="padding: 16px;">
+    <div class="dashboard-stats" id="dashboardStats"></div>
+    <div class="panel"><div class="panel-hd"><h3 id="requestsTitle">📋 Demandes des clients</h3></div><div class="panel-bd" id="requestsList"></div></div>
   </div>
 </div>
 
-<!-- SERVICE ADD MODAL -->
-<div class="movl" id="svcAddModal">
-  <div class="modal">
-    <div class="mhd"><h3>🛠 Proposer un service</h3><button class="cbt" onclick="closeSvcAddModal()">✕</button></div>
-    <div class="mbd">
-      <div class="fgrp"><label>Type</label><div style="display:flex;gap:8px;"><button class="po public active" onclick="setProvType('pro')">💼 Professionnel</button><button class="po private" onclick="setProvType('volunteer')">🤝 Bénévole</button></div><input type="hidden" id="svcProvType" value="pro"></div>
-      <div class="fgrp"><label>Partie</label><select id="svcPart" onchange="updateSvcCatOptions()"><option value="part1">🕊 Avant l'enterrement</option><option value="part2">🪦 Entretien du tombeau</option></select></div>
-      <div class="fgrp"><label>Catégorie</label><select id="svcCat"></select></div>
-      <div class="fgrp"><label>Nom / Structure</label><input type="text" id="svcName" placeholder="Ex: Ahmed Ben Salah"></div>
-      <div class="frow"><div class="fgrp"><label>Gouvernorat</label><select id="svcGov"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select></div><div class="fgrp"><label>Tarif (TND)</label><input type="text" id="svcPrice" placeholder="Ex: 80–150 ou Gratuit"></div></div>
-      <div class="fgrp"><label>Téléphone</label><input type="tel" id="svcPhone" placeholder="+216 XX XXX XXX"></div>
-      <div class="fgrp"><label>Description</label><textarea id="svcDesc" rows="3" placeholder="Décrivez votre service..."></textarea></div>
-      <div class="fgrp"><label>Disponibilité</label><select id="svcAvail"><option value="always">24h/24 — 7j/7</option><option value="weekdays">Jours ouvrables</option><option value="weekend">Week-end</option><option value="oncall">Sur appel</option></select></div>
-    </div>
-    <div class="mft"><button class="bcancel" onclick="closeSvcAddModal()">Annuler</button><button class="bsave" onclick="submitNewService()">Publier</button></div>
-  </div>
-</div>
+<!-- SERVICE REQUEST MODAL -->
+<div class="movl" id="svcReqModal"><div class="modal"><div class="mhd"><h3 id="svcReqTitle">📋 Demander ce service</h3><button class="cbt" onclick="closeSvcReqModal()">✕</button></div><div class="mbd"><div id="reqSvcInfo" style="background:var(--olive-dim);border-radius:8px;padding:11px;margin-bottom:14px;"></div><div class="fgrp"><label id="reqNameLabel">Votre nom</label><input type="text" id="reqName" placeholder="Mohamed Ben Ali"></div><div class="fgrp"><label id="reqPhoneLabel">Téléphone</label><input type="tel" id="reqPhone" placeholder="+216 XX XXX XXX"></div><div class="fgrp"><label id="reqLocLabel">Gouvernorat / Cimetière</label><input type="text" id="reqLoc" placeholder="Ex: Djellaz, Tunis"></div><div class="fgrp"><label id="reqDateLabel">Date souhaitée</label><input type="date" id="reqDate"></div><div class="fgrp"><label id="reqMsgLabel">Message</label><textarea id="reqMsg" rows="3" placeholder="Précisions sur votre demande..."></textarea></div></div><div class="mft"><button class="bcancel" id="reqCancelBtn" onclick="closeSvcReqModal()">Annuler</button><button class="bsave" id="reqSendBtn" onclick="submitServiceRequest()">📨 Envoyer</button></div></div></div>
 
 <!-- ADD TOMB MODAL -->
-<div class="movl" id="addModal">
-  <div class="modal">
-    <div class="mhd"><h3>➕ Ajouter un tombeau</h3><button class="cbt" onclick="closeAddModal()">✕</button></div>
-    <div class="mbd">
-      <div class="fgrp"><label>Visibilité</label><select id="tombPrivacy"><option value="public">🌐 Public (visible par tous)</option><option value="private">🔒 Privé (famille uniquement)</option></select></div>
-      <div class="frow"><div class="fgrp"><label>Prénom</label><input type="text" id="tombFirstname"></div><div class="fgrp"><label>Nom</label><input type="text" id="tombLastname"></div></div>
-      <div class="frow"><div class="fgrp"><label>Date naissance</label><input type="date" id="tombBirth"></div><div class="fgrp"><label>Date décès</label><input type="date" id="tombDeath"></div></div>
-      <div class="frow"><div class="fgrp"><label>Gouvernorat</label><select id="tombGov"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option></select></div><div class="fgrp"><label>Cimetière</label><input type="text" id="tombCem" placeholder="Nom du cimetière"></div></div>
-      <div class="frow"><div class="fgrp"><label>Rangée/Secteur</label><input type="text" id="tombRow"></div><div class="fgrp"><label>Numéro</label><input type="text" id="tombNum"></div></div>
-      <div class="fgrp"><label>📍 Position GPS (cliquez sur la carte)</label><div id="pickerMap" style="height:200px; border-radius:8px; margin-top:5px;"></div></div>
-      <div class="frow"><div class="fgrp"><label>Latitude</label><input type="number" id="tombLat" step="0.000001"></div><div class="fgrp"><label>Longitude</label><input type="number" id="tombLng" step="0.000001"></div></div>
-      <div class="fgrp"><label>Notes / Épitaphe</label><textarea id="tombNotes" rows="3"></textarea></div>
-    </div>
-    <div class="mft"><button class="bcancel" onclick="closeAddModal()">Annuler</button><button class="bsave" onclick="saveTomb()">Enregistrer</button></div>
-  </div>
-</div>
+<div class="movl" id="addModal"><div class="modal"><div class="mhd"><h3 id="addTombTitle">➕ Ajouter un tombeau</h3><button class="cbt" onclick="closeAddModal()">✕</button></div><div class="mbd"><div class="fgrp"><label id="tombPrivacyLabel">Visibilité</label><select id="tombPrivacy"><option value="public" id="tombPublicOpt">🌐 Public (visible par tous)</option><option value="private" id="tombPrivateOpt">🔒 Privé (famille uniquement)</option></select></div><div class="frow"><div class="fgrp"><label id="tombFirstnameLabel">Prénom</label><input type="text" id="tombFirstname"></div><div class="fgrp"><label id="tombLastnameLabel">Nom</label><input type="text" id="tombLastname"></div></div><div class="frow"><div class="fgrp"><label id="tombBirthLabel">Date naissance</label><input type="date" id="tombBirth"></div><div class="fgrp"><label id="tombDeathLabel">Date décès</label><input type="date" id="tombDeath"></div></div><div class="frow"><div class="fgrp"><label id="tombGovLabel">Gouvernorat</label><select id="tombGov"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option></select></div><div class="fgrp"><label id="tombCemLabel">Cimetière</label><input type="text" id="tombCem" placeholder="Nom du cimetière"></div></div><div class="frow"><div class="fgrp"><label id="tombRowLabel">Rangée/Secteur</label><input type="text" id="tombRow"></div><div class="fgrp"><label id="tombNumLabel">Numéro</label><input type="text" id="tombNum"></div></div><div class="fgrp"><label id="tombGpsLabel">📍 Position GPS (cliquez sur la carte)</label><div id="pickerMap" style="height:200px; border-radius:8px; margin-top:5px;"></div></div><div class="frow"><div class="fgrp"><label id="tombLatLabel">Latitude</label><input type="number" id="tombLat" step="0.000001"></div><div class="fgrp"><label id="tombLngLabel">Longitude</label><input type="number" id="tombLng" step="0.000001"></div></div><div class="fgrp"><label id="tombNotesLabel">Notes / Épitaphe</label><textarea id="tombNotes" rows="3"></textarea></div></div><div class="mft"><button class="bcancel" id="addTombCancelBtn" onclick="closeAddModal()">Annuler</button><button class="bsave" id="addTombSaveBtn" onclick="saveTomb()">Enregistrer</button></div></div></div>
 
 <div class="toast" id="toastMsg"></div>
 
 <script>
-// ==================== DONNÉES TOMBEAUX ====================
+// ==================== TRADUCTIONS ====================
+const translations = {
+  fr: {
+    authTitle: "Maqabir", authSubtitle: "Connectez-vous pour accéder au tableau de bord",
+    authTabLogin: "Connexion", authTabReg: "Inscription",
+    loginEmailLabel: "Email", loginPwdLabel: "Mot de passe", loginBtn: "Se connecter",
+    regNameLabel: "Nom complet", regEmailLabel: "Email", regPwdLabel: "Mot de passe (min 6)", regBtn: "Créer mon compte",
+    navTitle: "Maqabir", servicesBtn: "🛠 Services", dashboardBtn: "📊 Dashboard", addNavBtn: "➕ Ajouter", logoutBtn: "🚪 Déconnexion",
+    heroTitle: "Retrouvez vos proches,<br>préservez la mémoire", heroSubtitle: "Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.", allGovs: "Tous les gouvernorats",
+    statTombsLabel: "Tombeaux", statCemsLabel: "Cimetières", statPhotosLabel: "Photos",
+    filterTitle: "Filtres", cemFilterLabel: "Cimetière", allCems: "Tous", privFilterLabel: "Visibilité", allVis: "Tous", publicOpt: "Publics", privateOpt: "Privés", applyBtn: "Appliquer", resultsTitle: "Résultats",
+    gpsLabel: "Coordonnées GPS", copyGpsBtn: "Copier", dirText: "Itinéraire Google Maps",
+    svcScreenTitle: "Services Funéraires", svcTabAllText: "🌟 Tous", svcTabPart1Text: "🕊 Avant l'enterrement", svcTabPart2Text: "🪦 Entretien", svcTabFullText: "⭐ Pack complet",
+    chipAll1Text: "✨ Tous", chipDocsText: "📋 Documentation", chipTransportText: "🚗 Transport", chipKafanText: "🤍 Kafan", chipQuranText: "📖 Lecture Coran", chipConstructionText: "🏗 Construction", chipDuaText: "🤲 Doua",
+    chipAll2Text: "✨ Tous", chipCleaningText: "🧹 Nettoyage", chipPaintingText: "🎨 Peinture", chipMarbleText: "🪨 Marbre", chipFlowersText: "🌹 Fleurs", chipFindTombText: "🔍 Trouver tombeau",
+    svcReqTitle: "📋 Demander ce service", reqNameLabel: "Votre nom", reqPhoneLabel: "Téléphone", reqLocLabel: "Gouvernorat / Cimetière", reqDateLabel: "Date souhaitée", reqMsgLabel: "Message", reqCancelBtn: "Annuler", reqSendBtn: "📨 Envoyer",
+    addTombTitle: "➕ Ajouter un tombeau", tombPrivacyLabel: "Visibilité", tombPublicOpt: "🌐 Public (visible par tous)", tombPrivateOpt: "🔒 Privé (famille uniquement)",
+    tombFirstnameLabel: "Prénom", tombLastnameLabel: "Nom", tombBirthLabel: "Date naissance", tombDeathLabel: "Date décès", tombGovLabel: "Gouvernorat", tombCemLabel: "Cimetière", tombRowLabel: "Rangée/Secteur", tombNumLabel: "Numéro",
+    tombGpsLabel: "📍 Position GPS (cliquez sur la carte)", tombLatLabel: "Latitude", tombLngLabel: "Longitude", tombNotesLabel: "Notes / Épitaphe", addTombCancelBtn: "Annuler", addTombSaveBtn: "Enregistrer",
+    bnMap: "Carte", bnList: "Liste", bnServices: "Services", bnDashboard: "Dashboard", bnAdd: "Ajouter",
+    dashboardTitle: "📊 Tableau de bord", requestsTitle: "📋 Demandes des clients", statusPending: "En attente", statusProgress: "En cours", statusDone: "Terminé",
+    btnProgress: "En cours", btnDone: "Terminé", btnDelete: "Supprimer"
+  },
+  ar: {
+    authTitle: "مقابر", authSubtitle: "سجل الدخول للوصول إلى لوحة التحكم",
+    authTabLogin: "تسجيل الدخول", authTabReg: "إنشاء حساب",
+    loginEmailLabel: "البريد الإلكتروني", loginPwdLabel: "كلمة المرور", loginBtn: "تسجيل الدخول",
+    regNameLabel: "الاسم الكامل", regEmailLabel: "البريد الإلكتروني", regPwdLabel: "كلمة المرور (6 أحرف)", regBtn: "إنشاء حساب",
+    navTitle: "مقابر", servicesBtn: "🛠 الخدمات", dashboardBtn: "📊 لوحة التحكم", addNavBtn: "➕ إضافة", logoutBtn: "🚪 تسجيل خروج",
+    heroTitle: "ابحث عن أحبائك،<br>احفظ ذكراهم", heroSubtitle: "حدّد موقع القبر، أضف الصور، واحتفظ بمعلومات المتوفى في تونس.", allGovs: "كل الولايات",
+    statTombsLabel: "قبور", statCemsLabel: "مقابر", statPhotosLabel: "صور",
+    filterTitle: "تصفية", cemFilterLabel: "المقبرة", allCems: "الكل", privFilterLabel: "الخصوصية", allVis: "الكل", publicOpt: "عامة", privateOpt: "خاصة", applyBtn: "تطبيق", resultsTitle: "النتائج",
+    gpsLabel: "الإحداثيات الجغرافية", copyGpsBtn: "نسخ", dirText: "الاتجاهات على خرائط جوجل",
+    svcScreenTitle: "الخدمات الجنائزية", svcTabAllText: "🌟 الكل", svcTabPart1Text: "🕊 قبل الدفن", svcTabPart2Text: "🪦 صيانة القبر", svcTabFullText: "⭐ حزمة كاملة",
+    chipAll1Text: "✨ الكل", chipDocsText: "📋 توثيق", chipTransportText: "🚗 نقل", chipKafanText: "🤍 كفن", chipQuranText: "📖 تلاوة قرآن", chipConstructionText: "🏗 بناء", chipDuaText: "🤲 دعاء",
+    chipAll2Text: "✨ الكل", chipCleaningText: "🧹 تنظيف", chipPaintingText: "🎨 طلاء", chipMarbleText: "🪨 رخام", chipFlowersText: "🌹 زهور", chipFindTombText: "🔍 بحث عن قبر",
+    svcReqTitle: "📋 طلب هذه الخدمة", reqNameLabel: "اسمك", reqPhoneLabel: "رقم الهاتف", reqLocLabel: "الولاية / المقبرة", reqDateLabel: "التاريخ المطلوب", reqMsgLabel: "رسالة", reqCancelBtn: "إلغاء", reqSendBtn: "📨 إرسال",
+    addTombTitle: "➕ إضافة قبر جديد", tombPrivacyLabel: "الخصوصية", tombPublicOpt: "🌐 عام (مرئي للجميع)", tombPrivateOpt: "🔒 خاص (العائلة فقط)",
+    tombFirstnameLabel: "الاسم الأول", tombLastnameLabel: "اسم العائلة", tombBirthLabel: "تاريخ الميلاد", tombDeathLabel: "تاريخ الوفاة", tombGovLabel: "الولاية", tombCemLabel: "المقبرة", tombRowLabel: "الصف / القطاع", tombNumLabel: "الرقم",
+    tombGpsLabel: "📍 الموقع الجغرافي (انقر على الخريطة)", tombLatLabel: "خط العرض", tombLngLabel: "خط الطول", tombNotesLabel: "ملاحظات / نقش", addTombCancelBtn: "إلغاء", addTombSaveBtn: "حفظ",
+    bnMap: "خريطة", bnList: "قائمة", bnServices: "خدمات", bnDashboard: "لوحة التحكم", bnAdd: "إضافة",
+    dashboardTitle: "📊 لوحة التحكم", requestsTitle: "📋 طلبات العملاء", statusPending: "قيد الانتظار", statusProgress: "قيد التنفيذ", statusDone: "مكتمل",
+    btnProgress: "قيد التنفيذ", btnDone: "مكتمل", btnDelete: "حذف"
+  }
+};
+
+// ==================== DONNÉES ====================
 let tombs = [
   { id: "t1", name: "Mohamed Ben Salah", firstname: "Mohamed", lastname: "Ben Salah", birth: "15 mars 1928", death: "2 novembre 1995", cem: "Djellaz", gov: "Tunis", location: "Section B, Rangée 14", lat: 36.8212, lng: 10.1732, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
   { id: "t2", name: "Fatma Bouzid", firstname: "Fatma", lastname: "Bouzid", birth: "8 juin 1935", death: "14 avril 2010", cem: "Sidi Bou Saïd", gov: "Tunis", location: "Section A, Tombe 7", lat: 36.87005, lng: 10.34105, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
   { id: "t3", name: "Ali Haddad", firstname: "Ali", lastname: "Haddad", birth: "3 janvier 1950", death: "27 septembre 2018", cem: "El Gorjani", gov: "Tunis", location: "Allée C, Tombe 22", lat: 36.7914, lng: 10.1748, photos: [], privacy: "public", owner: null, ownerName: "Admin" }
 ];
 
-// ==================== DONNÉES SERVICES ====================
+// Services avec un seul contact (toi)
+const SERVICES_DATA = {
+  part1: [
+    { id: "s1", cat: "docs", name: "Documentation administrative", price: "150", desc: "Aide complète pour les démarches : acte de décès, autorisation d'inhumation, coordination avec la municipalité." },
+    { id: "s2", cat: "transport", name: "Transport du défunt", price: "300", desc: "Transport du défunt de l'hôpital ou domicile jusqu'au cimetière. Service disponible 24h/24." },
+    { id: "s3", cat: "kafan", name: "Kafan & préparation", price: "200", desc: "Vente et pose du kafan selon les règles islamiques. Préparation complète du défunt." },
+    { id: "s4", cat: "quran", name: "Lecture du Coran", price: "Gratuit", desc: "Lecture du Saint Coran, Sourate Yassin, Fatiha. Sur donation." },
+    { id: "s5", cat: "construction", name: "Construction de tombeau", price: "1500", desc: "Construction de tombeau en béton ou marbre. Devis gratuit sur place." },
+    { id: "s6", cat: "dua", name: "Doua & prières", price: "Gratuit", desc: "Prières et doua durant l'enterrement. Présence spirituelle et soutien." }
+  ],
+  part2: [
+    { id: "s7", cat: "cleaning", name: "Nettoyage de tombe", price: "80", desc: "Nettoyage complet : mauvaises herbes, lavage de la pierre tombale, remise en état." },
+    { id: "s8", cat: "painting", name: "Peinture & rénovation", price: "200", desc: "Peinture complète, rejointoiement, remplacement carrelage cassé." },
+    { id: "s9", cat: "marble", name: "Rénovation marbre", price: "500", desc: "Remplacement ou rénovation de la dalle en marbre. Gravure incluse." },
+    { id: "s10", cat: "flowers", name: "Fleurs & entretien", price: "50", desc: "Compositions florales naturelles et artificielles. Entretien périodique." },
+    { id: "s11", cat: "findtomb", name: "Localisation de tombeau", price: "100", desc: "Aide pour retrouver un tombeau perdu dans les grands cimetières." }
+  ]
+};
+
 const CATS_P1 = {
-  docs: { fr: 'Documentation & démarches', icon: '📋', bg: '#e3f2fd' },
-  transport: { fr: 'Transport du défunt', icon: '🚗', bg: '#fce4ec' },
-  kafan: { fr: 'Kafan & préparation', icon: '🤍', bg: '#f5f5f5' },
-  quran: { fr: 'Lecture du Coran & doua', icon: '📖', bg: '#f3e5f5' },
-  construction: { fr: 'Construction du tombeau', icon: '🏗', bg: '#fff3e0' },
-  dua: { fr: "Doua durant l'enterrement", icon: '🤲', bg: '#e8f5e9' }
+  docs: { fr: 'Documentation & démarches', ar: 'التوثيق والإجراءات', icon: '📋', bg: '#e3f2fd' },
+  transport: { fr: 'Transport du défunt', ar: 'نقل الجثمان', icon: '🚗', bg: '#fce4ec' },
+  kafan: { fr: 'Kafan & préparation', ar: 'الكفن والتجهيز', icon: '🤍', bg: '#f5f5f5' },
+  quran: { fr: 'Lecture du Coran', ar: 'تلاوة القرآن', icon: '📖', bg: '#f3e5f5' },
+  construction: { fr: 'Construction tombeau', ar: 'بناء القبر', icon: '🏗', bg: '#fff3e0' },
+  dua: { fr: 'Doua & prières', ar: 'الدعاء', icon: '🤲', bg: '#e8f5e9' }
 };
 
 const CATS_P2 = {
-  cleaning: { fr: 'Nettoyage de tombe', icon: '🧹', bg: '#e8f5e9' },
-  painting: { fr: 'Peinture & rénovation', icon: '🎨', bg: '#e3f2fd' },
-  marble: { fr: 'Refaire le marbre', icon: '🪨', bg: '#fafafa' },
-  flowers: { fr: 'Fleurs & entretien', icon: '🌹', bg: '#fff0f3' },
-  findtomb: { fr: 'Trouver un tombeau', icon: '🔍', bg: '#fffde7' }
+  cleaning: { fr: 'Nettoyage de tombe', ar: 'تنظيف القبر', icon: '🧹', bg: '#e8f5e9' },
+  painting: { fr: 'Peinture & rénovation', ar: 'طلاء وتجديد', icon: '🎨', bg: '#e3f2fd' },
+  marble: { fr: 'Rénovation marbre', ar: 'تجديد الرخام', icon: '🪨', bg: '#fafafa' },
+  flowers: { fr: 'Fleurs & entretien', ar: 'زهور وزينة', icon: '🌹', bg: '#fff0f3' },
+  findtomb: { fr: 'Localisation', ar: 'البحث عن قبر', icon: '🔍', bg: '#fffde7' }
 };
 
-let services = [
-  { id: 's1', part: 'part1', cat: 'docs', type: 'pro', name: 'Bureau Administratif Baraka', gov: 'Tunis', price: '150–300', phone: '+216 71 100 200', desc: "Aide complète pour les démarches administratives.", avail: 'weekdays', rating: 4.8, reviews: 34 },
-  { id: 's2', part: 'part1', cat: 'transport', type: 'pro', name: 'Transport Funèbre El Rahma', gov: 'Tunis', price: '200–500', phone: '+216 98 111 222', desc: "Transport du défunt 24h/24.", avail: 'always', rating: 4.9, reviews: 87 },
-  { id: 's3', part: 'part1', cat: 'kafan', type: 'pro', name: 'Maison du Kafan', gov: 'Tunis', price: '80–200', phone: '+216 97 333 444', desc: 'Vente et pose du kafan.', avail: 'always', rating: 4.7, reviews: 52 },
-  { id: 's4', part: 'part1', cat: 'quran', type: 'volunteer', name: 'Sheikh Karim El Hafidh', gov: 'Sfax', price: 'Gratuit', phone: '+216 74 555 666', desc: 'Lecture du Saint Coran.', avail: 'oncall', rating: 5.0, reviews: 141 },
-  { id: 's5', part: 'part1', cat: 'construction', type: 'pro', name: 'Entreprise Bâti-Maqbara', gov: 'Sousse', price: '800–3000', phone: '+216 73 777 888', desc: 'Construction de tombeaux.', avail: 'weekdays', rating: 4.6, reviews: 29 },
-  { id: 's6', part: 'part1', cat: 'dua', type: 'volunteer', name: 'Association El Rahma', gov: 'Bizerte', price: 'Gratuit', phone: '+216 72 999 000', desc: "Prière et doua durant l'enterrement.", avail: 'oncall', rating: 4.9, reviews: 63 },
-  { id: 's7', part: 'part2', cat: 'cleaning', type: 'pro', name: 'Ahmed Nettoyage Pro', gov: 'Tunis', price: '50–80', phone: '+216 98 444 555', desc: 'Nettoyage complet de tombe.', avail: 'always', rating: 4.8, reviews: 23 },
-  { id: 's8', part: 'part2', cat: 'painting', type: 'pro', name: 'Rénovation Tombeaux Tunis', gov: 'Tunis', price: '120–250', phone: '+216 97 666 777', desc: 'Peinture et rénovation.', avail: 'weekdays', rating: 4.6, reviews: 18 },
-  { id: 's9', part: 'part2', cat: 'marble', type: 'pro', name: 'Marbre & Granit Élite', gov: 'Sfax', price: '300–900', phone: '+216 74 888 999', desc: 'Rénovation de la dalle en marbre.', avail: 'weekdays', rating: 4.9, reviews: 37 },
-  { id: 's10', part: 'part2', cat: 'flowers', type: 'pro', name: 'Jardin du Souvenir', gov: 'Sousse', price: '20–60', phone: '+216 73 100 200', desc: 'Compositions florales.', avail: 'always', rating: 4.7, reviews: 19 },
-  { id: 's11', part: 'part2', cat: 'findtomb', type: 'pro', name: 'Service Localisation', gov: 'Tunis', price: 'Gratuit', phone: '+216 71 200 300', desc: 'Aide pour retrouver un tombeau.', avail: 'weekdays', rating: 4.5, reviews: 11 }
-];
+// Construction de la liste des services
+let services = [];
+SERVICES_DATA.part1.forEach(s => services.push({ ...s, part: 'part1', type: 'pro', gov: 'Tunis', phone: '+21692639366', avail: 'always', rating: 5, reviews: 0 }));
+SERVICES_DATA.part2.forEach(s => services.push({ ...s, part: 'part2', type: 'pro', gov: 'Tunis', phone: '+21692639366', avail: 'always', rating: 5, reviews: 0 }));
+
+// Demandes clients
+let requests = JSON.parse(localStorage.getItem('maqabir_requests') || '[]');
 
 // ==================== ÉTAT GLOBAL ====================
 let currentUser = null;
@@ -1267,11 +444,120 @@ let pickerMap = null;
 let pickerMarker = null;
 let markers = {};
 let localUsers = JSON.parse(localStorage.getItem('maqabir_users') || '[]');
+let currentLang = localStorage.getItem('maqabir_lang') || 'fr';
 
 // Variables Services
 let svcPackFilter = 'all';
 let svcChipFilter = 'all1';
 let currentServiceForRequest = null;
+
+// ==================== FONCTIONS LANGUE ====================
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('maqabir_lang', lang);
+  const htmlRoot = document.getElementById('htmlRoot');
+  if (lang === 'ar') { htmlRoot.dir = 'rtl'; htmlRoot.lang = 'ar'; }
+  else { htmlRoot.dir = 'ltr'; htmlRoot.lang = 'fr'; }
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if ((lang === 'fr' && btn.textContent === 'FR') || (lang === 'ar' && btn.textContent === 'ع')) btn.classList.add('active');
+  });
+  const t = translations[lang];
+  document.getElementById('authTitle').textContent = t.authTitle;
+  document.getElementById('authSubtitle').textContent = t.authSubtitle;
+  document.getElementById('authTabLogin').textContent = t.authTabLogin;
+  document.getElementById('authTabReg').textContent = t.authTabReg;
+  document.getElementById('loginEmailLabel').textContent = t.loginEmailLabel;
+  document.getElementById('loginPwdLabel').textContent = t.loginPwdLabel;
+  document.getElementById('loginBtn').textContent = t.loginBtn;
+  document.getElementById('regNameLabel').textContent = t.regNameLabel;
+  document.getElementById('regEmailLabel').textContent = t.regEmailLabel;
+  document.getElementById('regPwdLabel').textContent = t.regPwdLabel;
+  document.getElementById('regBtn').textContent = t.regBtn;
+  document.getElementById('navTitle').textContent = t.navTitle;
+  document.getElementById('servicesBtn').innerHTML = t.servicesBtn;
+  document.getElementById('dashboardBtn').innerHTML = t.dashboardBtn;
+  document.getElementById('addNavBtn').innerHTML = t.addNavBtn;
+  document.getElementById('logoutBtn').innerHTML = t.logoutBtn;
+  document.getElementById('heroTitle').innerHTML = t.heroTitle;
+  document.getElementById('heroSubtitle').textContent = t.heroSubtitle;
+  document.getElementById('allGovs').textContent = t.allGovs;
+  document.getElementById('heroSearch').placeholder = lang === 'ar' ? 'اسم المتوفى...' : 'Nom du défunt...';
+  document.getElementById('searchInput').placeholder = lang === 'ar' ? 'ابحث عن متوفى...' : 'Rechercher un défunt...';
+  document.getElementById('statTombsLabel').textContent = t.statTombsLabel;
+  document.getElementById('statCemsLabel').textContent = t.statCemsLabel;
+  document.getElementById('statPhotosLabel').textContent = t.statPhotosLabel;
+  document.getElementById('filterTitle').textContent = t.filterTitle;
+  document.getElementById('cemFilterLabel').textContent = t.cemFilterLabel;
+  document.getElementById('allCems').textContent = t.allCems;
+  document.getElementById('privFilterLabel').textContent = t.privFilterLabel;
+  document.getElementById('allVis').textContent = t.allVis;
+  document.getElementById('publicOpt').textContent = t.publicOpt;
+  document.getElementById('privateOpt').textContent = t.privateOpt;
+  document.getElementById('applyBtn').textContent = t.applyBtn;
+  document.getElementById('resultsTitle').textContent = t.resultsTitle;
+  document.getElementById('gpsLabel').textContent = t.gpsLabel;
+  document.getElementById('copyGpsBtn').textContent = t.copyGpsBtn;
+  document.getElementById('dirText').textContent = t.dirText;
+  document.getElementById('svcScreenTitle').textContent = t.svcScreenTitle;
+  document.getElementById('svcTabAllText').innerHTML = t.svcTabAllText;
+  document.getElementById('svcTabPart1Text').innerHTML = t.svcTabPart1Text;
+  document.getElementById('svcTabPart2Text').innerHTML = t.svcTabPart2Text;
+  document.getElementById('svcTabFullText').innerHTML = t.svcTabFullText;
+  document.getElementById('chipAll1Text').textContent = t.chipAll1Text;
+  document.getElementById('chipDocsText').textContent = t.chipDocsText;
+  document.getElementById('chipTransportText').textContent = t.chipTransportText;
+  document.getElementById('chipKafanText').textContent = t.chipKafanText;
+  document.getElementById('chipQuranText').textContent = t.chipQuranText;
+  document.getElementById('chipConstructionText').textContent = t.chipConstructionText;
+  document.getElementById('chipDuaText').textContent = t.chipDuaText;
+  document.getElementById('chipAll2Text').textContent = t.chipAll2Text;
+  document.getElementById('chipCleaningText').textContent = t.chipCleaningText;
+  document.getElementById('chipPaintingText').textContent = t.chipPaintingText;
+  document.getElementById('chipMarbleText').textContent = t.chipMarbleText;
+  document.getElementById('chipFlowersText').textContent = t.chipFlowersText;
+  document.getElementById('chipFindTombText').textContent = t.chipFindTombText;
+  document.getElementById('svcSearch').placeholder = lang === 'ar' ? 'ابحث عن خدمة...' : 'Rechercher un service...';
+  document.getElementById('svcReqTitle').textContent = t.svcReqTitle;
+  document.getElementById('reqNameLabel').textContent = t.reqNameLabel;
+  document.getElementById('reqPhoneLabel').textContent = t.reqPhoneLabel;
+  document.getElementById('reqLocLabel').textContent = t.reqLocLabel;
+  document.getElementById('reqDateLabel').textContent = t.reqDateLabel;
+  document.getElementById('reqMsgLabel').textContent = t.reqMsgLabel;
+  document.getElementById('reqCancelBtn').textContent = t.reqCancelBtn;
+  document.getElementById('reqSendBtn').innerHTML = t.reqSendBtn;
+  document.getElementById('addTombTitle').textContent = t.addTombTitle;
+  document.getElementById('tombPrivacyLabel').textContent = t.tombPrivacyLabel;
+  document.getElementById('tombPublicOpt').textContent = t.tombPublicOpt;
+  document.getElementById('tombPrivateOpt').textContent = t.tombPrivateOpt;
+  document.getElementById('tombFirstnameLabel').textContent = t.tombFirstnameLabel;
+  document.getElementById('tombLastnameLabel').textContent = t.tombLastnameLabel;
+  document.getElementById('tombBirthLabel').textContent = t.tombBirthLabel;
+  document.getElementById('tombDeathLabel').textContent = t.tombDeathLabel;
+  document.getElementById('tombGovLabel').textContent = t.tombGovLabel;
+  document.getElementById('tombCemLabel').textContent = t.tombCemLabel;
+  document.getElementById('tombRowLabel').textContent = t.tombRowLabel;
+  document.getElementById('tombNumLabel').textContent = t.tombNumLabel;
+  document.getElementById('tombGpsLabel').textContent = t.tombGpsLabel;
+  document.getElementById('tombLatLabel').textContent = t.tombLatLabel;
+  document.getElementById('tombLngLabel').textContent = t.tombLngLabel;
+  document.getElementById('tombNotesLabel').textContent = t.tombNotesLabel;
+  document.getElementById('addTombCancelBtn').textContent = t.addTombCancelBtn;
+  document.getElementById('addTombSaveBtn').textContent = t.addTombSaveBtn;
+  document.getElementById('bnMap').textContent = t.bnMap;
+  document.getElementById('bnList').textContent = t.bnList;
+  document.getElementById('bnServices').textContent = t.bnServices;
+  document.getElementById('bnDashboard').textContent = t.bnDashboard;
+  document.getElementById('bnAdd').textContent = t.bnAdd;
+  document.getElementById('dashboardTitle').innerHTML = t.dashboardTitle;
+  document.getElementById('requestsTitle').innerHTML = t.requestsTitle;
+  renderServices();
+  renderTombList();
+  updateMarkers();
+  if (document.getElementById('dashboardScreen').style.display === 'block') renderDashboard();
+}
+
+function getText(key) { return translations[currentLang][key] || translations['fr'][key]; }
 
 // ==================== FONCTIONS AUTH ====================
 function showToast(msg) {
@@ -1288,10 +574,10 @@ function updateUserUI() {
     document.getElementById('menuName').textContent = currentUser.name;
     document.getElementById('menuEmail').textContent = currentUser.email;
   } else {
-    document.getElementById('userName').textContent = 'Invité';
+    document.getElementById('userName').textContent = currentLang === 'ar' ? 'زائر' : 'Invité';
     document.getElementById('userAvatar').textContent = '👤';
-    document.getElementById('menuName').textContent = 'Invité';
-    document.getElementById('menuEmail').textContent = 'Mode visite';
+    document.getElementById('menuName').textContent = currentLang === 'ar' ? 'زائر' : 'Invité';
+    document.getElementById('menuEmail').textContent = currentLang === 'ar' ? 'وضع الزائر' : 'Mode visite';
   }
 }
 
@@ -1304,26 +590,20 @@ function switchAuthTab(tab) {
   const isLogin = tab === 'login';
   document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
   document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
-  document.querySelectorAll('.auth-tab').forEach((btn, i) => {
-    btn.classList.toggle('active', (i === 0 && isLogin) || (i === 1 && !isLogin));
-  });
+  document.querySelectorAll('.auth-tab').forEach((btn, i) => { btn.classList.toggle('active', (i === 0 && isLogin) || (i === 1 && !isLogin)); });
 }
 
 function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pwd = document.getElementById('loginPwd').value;
   const user = localUsers.find(u => u.email === email);
-  if (!user) {
-    document.getElementById('loginErr').textContent = "Email ou mot de passe incorrect";
-    document.getElementById('loginErr').classList.add('show');
-    return;
-  }
+  if (!user) { document.getElementById('loginErr').textContent = getText('loginEmailLabel') + ' ou mot de passe incorrect'; document.getElementById('loginErr').classList.add('show'); return; }
   currentUser = { uid: user.uid, name: user.name, email: user.email };
   localStorage.setItem('maqabir_currentUser', JSON.stringify(currentUser));
   updateUserUI();
   closeAuthModal();
   showToast(`Bonjour ${user.name} !`);
-  renderTombList(tombs);
+  renderTombList();
   updateMarkers();
 }
 
@@ -1331,21 +611,9 @@ function handleRegister() {
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const pwd = document.getElementById('regPwd').value;
-  if (!name || !email || !pwd) {
-    document.getElementById('regErr').textContent = "Tous les champs sont requis";
-    document.getElementById('regErr').classList.add('show');
-    return;
-  }
-  if (pwd.length < 6) {
-    document.getElementById('regErr').textContent = "Le mot de passe doit faire au moins 6 caractères";
-    document.getElementById('regErr').classList.add('show');
-    return;
-  }
-  if (localUsers.find(u => u.email === email)) {
-    document.getElementById('regErr').textContent = "Cet email est déjà utilisé";
-    document.getElementById('regErr').classList.add('show');
-    return;
-  }
+  if (!name || !email || !pwd) { document.getElementById('regErr').textContent = 'Tous les champs sont requis'; document.getElementById('regErr').classList.add('show'); return; }
+  if (pwd.length < 6) { document.getElementById('regErr').textContent = 'Le mot de passe doit faire au moins 6 caractères'; document.getElementById('regErr').classList.add('show'); return; }
+  if (localUsers.find(u => u.email === email)) { document.getElementById('regErr').textContent = 'Cet email est déjà utilisé'; document.getElementById('regErr').classList.add('show'); return; }
   const newUser = { uid: 'user_' + Date.now(), name: name, email: email };
   localUsers.push(newUser);
   localStorage.setItem('maqabir_users', JSON.stringify(localUsers));
@@ -1354,37 +622,18 @@ function handleRegister() {
   updateUserUI();
   closeAuthModal();
   showToast(`Bienvenue ${name} !`);
-  renderTombList(tombs);
+  renderTombList();
   updateMarkers();
 }
 
-function guestLogin() {
-  currentUser = null;
-  localStorage.removeItem('maqabir_currentUser');
-  updateUserUI();
-  closeAuthModal();
-  showToast("Mode invité");
-}
-
-function logout() {
-  currentUser = null;
-  localStorage.removeItem('maqabir_currentUser');
-  updateUserUI();
-  closeMenu();
-  showToast("Déconnecté");
-}
-
-function requireAuth() {
-  if (currentUser) openAddModal();
-  else openAuthModal();
-}
+function guestLogin() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); closeAuthModal(); showToast('Mode invité'); }
+function logout() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); closeMenu(); showToast('Déconnecté'); }
+function requireAuth() { if (currentUser) openAddModal(); else openAuthModal(); }
 
 // ==================== FONCTIONS CARTE ====================
 function initMap() {
   map = L.map('map').setView([36.4, 9.8], 7);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
   updateMarkers();
 }
 
@@ -1396,32 +645,16 @@ function canSeeTomb(tomb) {
 
 function getMarkerIcon(isPrivate, isSelected) {
   const color = isSelected ? '#c9a84c' : (isPrivate ? '#8b3a2a' : '#5a6b3c');
-  return L.divIcon({
-    html: `<div style="width:28px;height:28px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:12px">${isPrivate ? '🔒' : '🪦'}</span></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 28],
-    popupAnchor: [0, -32]
-  });
+  return L.divIcon({ html: `<div style="width:28px;height:28px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:12px">${isPrivate ? '🔒' : '🪦'}</span></div>`, iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -32] });
 }
 
 function updateMarkers() {
   tombs.forEach(tomb => {
-    if (markers[tomb.id]) {
-      map.removeLayer(markers[tomb.id]);
-      delete markers[tomb.id];
-    }
+    if (markers[tomb.id]) { map.removeLayer(markers[tomb.id]); delete markers[tomb.id]; }
     if (canSeeTomb(tomb)) {
       const isPrivate = tomb.privacy === 'private';
-      const marker = L.marker([tomb.lat, tomb.lng], {
-        icon: getMarkerIcon(isPrivate, selectedTombId === tomb.id)
-      }).addTo(map);
-      marker.bindPopup(`
-        <div style="padding:8px">
-          <strong>${tomb.name}</strong><br>
-          ${tomb.cem}, ${tomb.gov}<br>
-          <button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">Voir détails</button>
-        </div>
-      `);
+      const marker = L.marker([tomb.lat, tomb.lng], { icon: getMarkerIcon(isPrivate, selectedTombId === tomb.id) }).addTo(map);
+      marker.bindPopup(`<div style="padding:8px"><strong>${tomb.name}</strong><br>${tomb.cem}, ${tomb.gov}<br><button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">${currentLang === 'ar' ? 'عرض التفاصيل' : 'Voir détails'}</button></div>`);
       markers[tomb.id] = marker;
     }
   });
@@ -1437,24 +670,12 @@ function selectTomb(id) {
   document.getElementById('detailMeta').textContent = `${tomb.birth} – ${tomb.death} · ${tomb.cem}, ${tomb.gov}`;
   document.getElementById('detailGPS').textContent = `${tomb.lat.toFixed(5)}°, ${tomb.lng.toFixed(5)}°`;
   document.getElementById('dirLink').href = `https://www.google.com/maps/dir/?api=1&destination=${tomb.lat},${tomb.lng}`;
-  document.getElementById('detailContent').innerHTML = `
-    <div style="margin-top:10px">
-      <p><strong>📍 Emplacement :</strong> ${tomb.location}</p>
-      <p><strong>🔒 Visibilité :</strong> ${tomb.privacy === 'public' ? 'Public' : 'Privé'}</p>
-    </div>`;
+  document.getElementById('detailContent').innerHTML = `<div style="margin-top:10px"><p><strong>📍 Emplacement :</strong> ${tomb.location}</p><p><strong>🔒 Visibilité :</strong> ${tomb.privacy === 'public' ? 'Public' : 'Privé'}</p></div>`;
   document.getElementById('detailPanel').classList.add('vis');
 }
 
-function closeDetail() {
-  document.getElementById('detailPanel').classList.remove('vis');
-  selectedTombId = null;
-  updateMarkers();
-}
-
-function copyGPS() {
-  const tomb = tombs.find(t => t.id === selectedTombId);
-  if (tomb) { navigator.clipboard.writeText(`${tomb.lat}, ${tomb.lng}`); showToast("Coordonnées copiées !"); }
-}
+function closeDetail() { document.getElementById('detailPanel').classList.remove('vis'); selectedTombId = null; updateMarkers(); }
+function copyGPS() { const tomb = tombs.find(t => t.id === selectedTombId); if (tomb) { navigator.clipboard.writeText(`${tomb.lat}, ${tomb.lng}`); showToast('Coordonnées copiées !'); } }
 
 // ==================== LISTE TOMBEAUX ====================
 function renderTombList(filteredList = null) {
@@ -1490,20 +711,8 @@ function filterTombs() {
   renderTombList(filtered);
 }
 
-function syncSearch() {
-  const heroVal = document.getElementById('heroSearch').value;
-  document.getElementById('searchInput').value = heroVal;
-  filterTombs();
-}
-
-function showTab(tab) {
-  const sidebar = document.getElementById('sidebar');
-  if (tab === 'map') sidebar.style.display = 'none';
-  else if (tab === 'list') sidebar.style.display = 'none';
-  else if (tab === 'filter') sidebar.style.display = 'block';
-  document.querySelectorAll('.bbn').forEach(btn => btn.classList.remove('active'));
-  if (event && event.target) event.target.closest('.bbn').classList.add('active');
-}
+function syncSearch() { const heroVal = document.getElementById('heroSearch').value; document.getElementById('searchInput').value = heroVal; filterTombs(); }
+function showTab(tab) { const sidebar = document.getElementById('sidebar'); if (tab === 'map') sidebar.style.display = 'none'; else if (tab === 'list') sidebar.style.display = 'none'; else if (tab === 'filter') sidebar.style.display = 'block'; document.querySelectorAll('.bbn').forEach(btn => btn.classList.remove('active')); if (event && event.target) event.target.closest('.bbn').classList.add('active'); }
 
 // ==================== MODAL AJOUT TOMBEAU ====================
 function initPickerMap() {
@@ -1516,7 +725,7 @@ function initPickerMap() {
       else pickerMarker = L.marker(e.latlng).addTo(pickerMap);
       document.getElementById('tombLat').value = e.latlng.lat.toFixed(6);
       document.getElementById('tombLng').value = e.latlng.lng.toFixed(6);
-      showToast("Position enregistrée !");
+      showToast('Position enregistrée !');
     });
   }, 100);
 }
@@ -1544,19 +753,18 @@ function saveTomb() {
   const lastname = document.getElementById('tombLastname').value.trim();
   const lat = parseFloat(document.getElementById('tombLat').value);
   const lng = parseFloat(document.getElementById('tombLng').value);
-  if (!firstname || !lastname) { showToast("Veuillez entrer le prénom et le nom"); return; }
-  if (isNaN(lat) || isNaN(lng)) { showToast("Veuillez cliquer sur la carte pour sélectionner la position GPS"); return; }
+  if (!firstname || !lastname) { showToast('Veuillez entrer le prénom et le nom'); return; }
+  if (isNaN(lat) || isNaN(lng)) { showToast('Veuillez cliquer sur la carte pour sélectionner la position GPS'); return; }
   const newTomb = {
     id: 't_' + Date.now(),
     name: firstname + ' ' + lastname,
-    firstname: firstname,
-    lastname: lastname,
+    firstname, lastname,
     birth: document.getElementById('tombBirth').value || 'Date inconnue',
     death: document.getElementById('tombDeath').value || 'Date inconnue',
     cem: document.getElementById('tombCem').value || 'Cimetière inconnu',
     gov: document.getElementById('tombGov').value,
     location: (document.getElementById('tombRow').value ? 'Rangée ' + document.getElementById('tombRow').value : '') + (document.getElementById('tombNum').value ? ', Tombe ' + document.getElementById('tombNum').value : ''),
-    lat: lat, lng: lng, photos: [], privacy: document.getElementById('tombPrivacy').value,
+    lat, lng, photos: [], privacy: document.getElementById('tombPrivacy').value,
     owner: currentUser.uid, ownerName: currentUser.name, notes: document.getElementById('tombNotes').value
   };
   tombs.push(newTomb);
@@ -1564,7 +772,7 @@ function saveTomb() {
   renderTombList();
   updateMarkers();
   closeAddModal();
-  showToast("Tombeau ajouté avec succès !");
+  showToast('Tombeau ajouté avec succès !');
 }
 
 // ==================== SERVICES ====================
@@ -1579,9 +787,9 @@ function switchSvcPack(pack) {
   document.getElementById('svcChips1').style.display = (pack === 'part1' || pack === 'all') ? 'block' : 'none';
   document.getElementById('svcChips2').style.display = (pack === 'part2' || pack === 'all') ? 'block' : 'none';
   const banner = document.getElementById('svcBanner');
-  if (pack === 'part1') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack1'; banner.innerHTML = '<div style="font-weight:bold;">🕊 Partie 1 — Avant l\'enterrement</div><div>Documentation · Transport · Kafan · Coran · Construction · Doua</div>'; }
-  else if (pack === 'part2') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack2'; banner.innerHTML = '<div style="font-weight:bold;">🪦 Partie 2 — Entretien du tombeau</div><div>Nettoyage · Peinture · Marbre · Fleurs · Localisation</div>'; }
-  else if (pack === 'full') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack-full'; banner.innerHTML = '<div style="font-weight:bold;">⭐ Pack complet — De la vie au repos</div><div>Tous les services réunis</div>'; }
+  if (pack === 'part1') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack1'; banner.innerHTML = `<div style="font-weight:bold;">🕊 ${currentLang === 'ar' ? 'الجزء الأول — قبل الدفن' : 'Partie 1 — Avant l\'enterrement'}</div><div>${currentLang === 'ar' ? 'التوثيق · النقل · الكفن · القرآن · البناء · الدعاء' : 'Documentation · Transport · Kafan · Coran · Construction · Doua'}</div>`; }
+  else if (pack === 'part2') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack2'; banner.innerHTML = `<div style="font-weight:bold;">🪦 ${currentLang === 'ar' ? 'الجزء الثاني — صيانة القبر' : 'Partie 2 — Entretien du tombeau'}</div><div>${currentLang === 'ar' ? 'تنظيف · طلاء · رخام · زهور · البحث عن قبر' : 'Nettoyage · Peinture · Marbre · Fleurs · Localisation'}</div>`; }
+  else if (pack === 'full') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack-full'; banner.innerHTML = `<div style="font-weight:bold;">⭐ ${currentLang === 'ar' ? 'الحزمة الكاملة' : 'Pack complet'}</div><div>${currentLang === 'ar' ? 'جميع خدمات الجزأين في مكان واحد' : 'Tous les services des 2 parties réunis'}</div>`; }
   else banner.style.display = 'none';
   renderServices();
 }
@@ -1598,7 +806,7 @@ function renderServices() {
   let list = services.filter(s => {
     const matchPack = svcPackFilter === 'all' || svcPackFilter === 'full' || s.part === svcPackFilter;
     const matchChip = svcChipFilter === 'all1' || svcChipFilter === 'all2' || s.cat === svcChipFilter;
-    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q) || s.gov.toLowerCase().includes(q);
+    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q);
     return matchPack && matchChip && matchSearch;
   });
   const grid = document.getElementById('svcGrid');
@@ -1608,8 +816,8 @@ function renderServices() {
   if (svcPackFilter === 'all' || svcPackFilter === 'full') {
     const p1 = list.filter(s => s.part === 'part1');
     const p2 = list.filter(s => s.part === 'part2');
-    if (p1.length) { html += '<div class="svc-section-title">🕊 Avant l\'enterrement</div>' + p1.map(s => svcCardHTML(s)).join(''); }
-    if (p2.length) { html += '<div class="svc-section-title">🪦 Entretien du tombeau</div>' + p2.map(s => svcCardHTML(s)).join(''); }
+    if (p1.length) { html += `<div class="svc-section-title">🕊 ${currentLang === 'ar' ? 'قبل الدفن' : 'Avant l\'enterrement'}</div>` + p1.map(s => svcCardHTML(s)).join(''); }
+    if (p2.length) { html += `<div class="svc-section-title">🪦 ${currentLang === 'ar' ? 'صيانة القبر' : 'Entretien du tombeau'}</div>` + p2.map(s => svcCardHTML(s)).join(''); }
   } else { html = list.map(s => svcCardHTML(s)).join(''); }
   grid.innerHTML = html;
 }
@@ -1617,36 +825,34 @@ function renderServices() {
 function svcCardHTML(s) {
   const allCats = { ...CATS_P1, ...CATS_P2 };
   const cat = allCats[s.cat];
-  const stars = '★'.repeat(Math.floor(s.rating)) + '☆'.repeat(5 - Math.ceil(s.rating));
-  const pBadge = s.part === 'part1' ? '<span class="svc-badge badge-p1">🕊 Av. enterrement</span>' : '<span class="svc-badge badge-p2">🪦 Entretien</span>';
-  const tBadge = s.type === 'pro' ? '<span class="svc-badge badge-pro">💼 Professionnel</span>' : '<span class="svc-badge badge-vol">🤝 Bénévole</span>';
-  const availText = { always: '24h/24', weekdays: 'Jours ouvrables', weekend: 'Week-end', oncall: 'Sur appel' }[s.avail] || s.avail;
+  const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : s.cat;
+  const stars = '★'.repeat(5);
   return `
     <div class="svc-card">
       <div class="svc-card-hd">
         <div class="svc-icon" style="background:${cat?.bg || '#f5f0e8'}">${cat?.icon || '🛠'}</div>
         <div class="svc-info">
-          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px;">${pBadge}${tBadge}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px;"><span class="svc-badge">💼 Professionnel</span></div>
           <h3>${s.name}</h3>
-          <div class="svc-gov">📍 ${s.gov} · ${cat?.fr || s.cat}</div>
+          <div class="svc-gov">📍 ${s.gov} · ${catName}</div>
         </div>
         <div class="svc-price-block"><strong>${s.price}</strong><span>TND</span></div>
       </div>
       <div class="svc-card-body">
         <div class="svc-desc">${s.desc}</div>
-        <div class="svc-tags"><span class="svc-avail">🟢 ${availText}</span><span class="svc-rating">${stars} ${s.rating} (${s.reviews})</span></div>
+        <div class="svc-tags"><span class="svc-avail">🟢 Disponible 24h/24</span><span class="svc-rating">${stars} 5.0</span></div>
       </div>
       <div class="svc-btns">
-        <button class="svc-btn-call" onclick="callProvider('${s.phone}')">📞 Appeler</button>
+        <button class="svc-btn-call" onclick="callProvider('${s.phone}')">📞 ${currentLang === 'ar' ? 'اتصال' : 'Appeler'}</button>
         <button class="svc-btn-wa" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button>
-        <button class="svc-btn-req" onclick="openSvcReqModal('${s.id}')">📋 Demander</button>
+        <button class="svc-btn-req" onclick="openSvcReqModal('${s.id}')">📋 ${currentLang === 'ar' ? 'طلب' : 'Demander'}</button>
       </div>
     </div>`;
 }
 
 function callProvider(phone) { window.open('tel:' + phone.replace(/\s/g, '')); }
 function whatsappProvider(phone, name) {
-  const msg = `Bonjour, je vous contacte via Maqabir concernant votre service "${name}".`;
+  const msg = currentLang === 'ar' ? `مرحباً، أود الاستفسار عن خدمة "${name}" على تطبيق مقابر.` : `Bonjour, je vous contacte via Maqabir concernant le service "${name}".`;
   window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + `?text=${encodeURIComponent(msg)}`);
 }
 
@@ -1655,59 +861,100 @@ function openSvcReqModal(id) {
   if (!currentServiceForRequest) return;
   const allCats = { ...CATS_P1, ...CATS_P2 };
   const cat = allCats[currentServiceForRequest.cat];
-  document.getElementById('reqSvcInfo').innerHTML = `<span style="font-size:24px;">${cat?.icon || '🛠'}</span> <strong>${cat?.fr || currentServiceForRequest.cat}</strong><br><small>${currentServiceForRequest.name} · ${currentServiceForRequest.gov}</small>`;
+  const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : currentServiceForRequest.cat;
+  document.getElementById('reqSvcInfo').innerHTML = `<span style="font-size:24px;">${cat?.icon || '🛠'}</span> <strong>${catName}</strong><br><small>${currentServiceForRequest.name} · ${currentServiceForRequest.price} TND</small>`;
   document.getElementById('svcReqModal').classList.add('open');
 }
 function closeSvcReqModal() { document.getElementById('svcReqModal').classList.remove('open'); currentServiceForRequest = null; }
+
 function submitServiceRequest() {
   const name = document.getElementById('reqName').value.trim();
   const phone = document.getElementById('reqPhone').value.trim();
-  if (!name || !phone) { showToast("Nom et téléphone requis"); return; }
+  if (!name || !phone) { showToast(currentLang === 'ar' ? 'الاسم والهاتف مطلوبان' : 'Nom et téléphone requis'); return; }
   if (currentServiceForRequest) {
     const loc = document.getElementById('reqLoc').value;
     const date = document.getElementById('reqDate').value;
     const msg = document.getElementById('reqMsg').value;
-    const txt = `Demande: ${currentServiceForRequest.name}\nNom: ${name}\nTél: ${phone}\nLieu: ${loc || '—'}\nDate: ${date || '—'}\nMessage: ${msg || '—'}`;
-    window.open('https://wa.me/' + currentServiceForRequest.phone.replace(/[^0-9]/g, '') + `?text=${encodeURIComponent(txt)}`);
+    const txt = `${currentLang === 'ar' ? 'طلب خدمة جديد' : 'Nouvelle demande de service'}:
+${currentLang === 'ar' ? 'الخدمة' : 'Service'}: ${currentServiceForRequest.name} (${currentServiceForRequest.price} TND)
+${currentLang === 'ar' ? 'الاسم' : 'Nom'}: ${name}
+${currentLang === 'ar' ? 'الهاتف' : 'Tél'}: ${phone}
+${currentLang === 'ar' ? 'الموقع' : 'Lieu'}: ${loc || '—'}
+${currentLang === 'ar' ? 'التاريخ' : 'Date'}: ${date || '—'}
+${currentLang === 'ar' ? 'رسالة' : 'Message'}: ${msg || '—'}`;
+    // Sauvegarder la demande dans le tableau de bord
+    const newRequest = {
+      id: Date.now(),
+      service: currentServiceForRequest.name,
+      price: currentServiceForRequest.price,
+      clientName: name,
+      clientPhone: phone,
+      location: loc || 'Non spécifié',
+      date: date || 'Non spécifiée',
+      message: msg || '',
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    requests.unshift(newRequest);
+    localStorage.setItem('maqabir_requests', JSON.stringify(requests));
+    window.open('https://wa.me/21692639366?text=' + encodeURIComponent(txt));
   }
   closeSvcReqModal();
-  showToast("Demande envoyée !");
-  ['reqName', 'reqPhone', 'reqLoc', 'reqMsg'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  showToast(currentLang === 'ar' ? 'تم إرسال الطلب !' : 'Demande envoyée !');
+  ['reqName', 'reqPhone', 'reqLoc', 'reqDate', 'reqMsg'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  if (document.getElementById('dashboardScreen').style.display === 'block') renderDashboard();
 }
 
-// MODAL AJOUT SERVICE
-function openSvcAddModal() { document.getElementById('svcAddModal').classList.add('open'); updateSvcCatOptions(); }
-function closeSvcAddModal() { document.getElementById('svcAddModal').classList.remove('open'); }
-function setProvType(type) { document.getElementById('svcProvType').value = type; }
-function updateSvcCatOptions() {
-  const pack = document.getElementById('svcPart').value;
-  const cats = pack === 'part1' ? CATS_P1 : CATS_P2;
-  const select = document.getElementById('svcCat');
-  select.innerHTML = Object.keys(cats).map(k => `<option value="${k}">${cats[k].fr}</option>`).join('');
+// ==================== DASHBOARD ====================
+function showDashboardScreen() {
+  if (!currentUser) { openAuthModal(); return; }
+  document.getElementById('dashboardScreen').style.display = 'block';
+  renderDashboard();
 }
-function submitNewService() {
-  const name = document.getElementById('svcName').value.trim();
-  const phone = document.getElementById('svcPhone').value.trim();
-  if (!name || !phone) { showToast("Nom et téléphone requis"); return; }
-  const newService = {
-    id: 'svc_' + Date.now(),
-    part: document.getElementById('svcPart').value,
-    cat: document.getElementById('svcCat').value,
-    type: document.getElementById('svcProvType').value,
-    name: name,
-    gov: document.getElementById('svcGov').value,
-    price: document.getElementById('svcPrice').value || '—',
-    phone: phone,
-    desc: document.getElementById('svcDesc').value || '',
-    avail: document.getElementById('svcAvail').value,
-    rating: 0,
-    reviews: 0
-  };
-  services.unshift(newService);
-  closeSvcAddModal();
-  renderServices();
-  showToast("Service publié !");
-  ['svcName', 'svcPhone', 'svcPrice', 'svcDesc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+function hideDashboardScreen() { document.getElementById('dashboardScreen').style.display = 'none'; }
+
+function renderDashboard() {
+  const statsDiv = document.getElementById('dashboardStats');
+  const pending = requests.filter(r => r.status === 'pending').length;
+  const progress = requests.filter(r => r.status === 'progress').length;
+  const done = requests.filter(r => r.status === 'done').length;
+  statsDiv.innerHTML = `
+    <div class="stat-card"><div class="number">${requests.length}</div><div class="label">${currentLang === 'ar' ? 'إجمالي الطلبات' : 'Total demandes'}</div></div>
+    <div class="stat-card"><div class="number" style="color:#d97706">${pending}</div><div class="label">${currentLang === 'ar' ? 'قيد الانتظار' : 'En attente'}</div></div>
+    <div class="stat-card"><div class="number" style="color:#2563eb">${progress}</div><div class="label">${currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours'}</div></div>
+    <div class="stat-card"><div class="number" style="color:#059669">${done}</div><div class="label">${currentLang === 'ar' ? 'مكتمل' : 'Terminé'}</div></div>
+  `;
+  const listDiv = document.getElementById('requestsList');
+  if (requests.length === 0) { listDiv.innerHTML = `<div class="svc-empty">📭 ${currentLang === 'ar' ? 'لا توجد طلبات بعد' : 'Aucune demande pour le moment'}</div>`; return; }
+  listDiv.innerHTML = requests.map(r => `
+    <div class="request-item" data-id="${r.id}">
+      <div class="request-header">
+        <span class="request-service">${r.service} - ${r.price} TND</span>
+        <span class="request-date">${new Date(r.createdAt).toLocaleDateString(currentLang === 'ar' ? 'ar-TN' : 'fr-FR')}</span>
+      </div>
+      <div class="request-client">👤 ${r.clientName} | 📞 ${r.clientPhone}</div>
+      <div class="request-details">📍 ${r.location} | 📅 ${r.date}</div>
+      ${r.message ? `<div class="request-details">📝 ${r.message.substring(0, 100)}${r.message.length > 100 ? '...' : ''}</div>` : ''}
+      <div class="request-header"><span class="status-badge ${r.status === 'pending' ? 'status-pending' : (r.status === 'progress' ? 'status-progress' : 'status-done')}">${r.status === 'pending' ? getText('statusPending') : (r.status === 'progress' ? getText('statusProgress') : getText('statusDone'))}</span></div>
+      <div class="request-actions">
+        ${r.status !== 'progress' ? `<button class="btn-status btn-progress" onclick="updateRequestStatus(${r.id}, 'progress')">${getText('btnProgress')}</button>` : ''}
+        ${r.status !== 'done' ? `<button class="btn-status btn-done" onclick="updateRequestStatus(${r.id}, 'done')">${getText('btnDone')}</button>` : ''}
+        <button class="btn-status btn-delete" onclick="deleteRequest(${r.id})">${getText('btnDelete')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateRequestStatus(id, status) {
+  const request = requests.find(r => r.id === id);
+  if (request) { request.status = status; localStorage.setItem('maqabir_requests', JSON.stringify(requests)); renderDashboard(); showToast(`Statut mis à jour : ${status}`); }
+}
+
+function deleteRequest(id) {
+  requests = requests.filter(r => r.id !== id);
+  localStorage.setItem('maqabir_requests', JSON.stringify(requests));
+  renderDashboard();
+  showToast(currentLang === 'ar' ? 'تم حذف الطلب' : 'Demande supprimée');
 }
 
 // ==================== INITIALISATION ====================
@@ -1722,40 +969,22 @@ loadStoredData();
 initMap();
 renderTombList();
 updateMarkers();
+setLanguage(currentLang);
 
 // Expose global functions
-window.selectTomb = selectTomb;
-window.closeDetail = closeDetail;
-window.copyGPS = copyGPS;
-window.filterTombs = filterTombs;
-window.syncSearch = syncSearch;
-window.requireAuth = requireAuth;
-window.openAddModal = openAddModal;
-window.closeAddModal = closeAddModal;
-window.saveTomb = saveTomb;
-window.handleLogin = handleLogin;
-window.handleRegister = handleRegister;
-window.guestLogin = guestLogin;
-window.logout = logout;
-window.toggleMenu = toggleMenu;
-window.closeAuthModal = closeAuthModal;
-window.switchAuthTab = switchAuthTab;
-window.showTab = showTab;
-window.showServicesScreen = showServicesScreen;
-window.hideServicesScreen = hideServicesScreen;
-window.switchSvcPack = switchSvcPack;
-window.filterSvcChip = filterSvcChip;
-window.renderServices = renderServices;
-window.callProvider = callProvider;
-window.whatsappProvider = whatsappProvider;
-window.openSvcReqModal = openSvcReqModal;
-window.closeSvcReqModal = closeSvcReqModal;
-window.submitServiceRequest = submitServiceRequest;
-window.openSvcAddModal = openSvcAddModal;
-window.closeSvcAddModal = closeSvcAddModal;
-window.setProvType = setProvType;
-window.updateSvcCatOptions = updateSvcCatOptions;
-window.submitNewService = submitNewService;
+window.selectTomb = selectTomb; window.closeDetail = closeDetail; window.copyGPS = copyGPS;
+window.filterTombs = filterTombs; window.syncSearch = syncSearch; window.requireAuth = requireAuth;
+window.openAddModal = openAddModal; window.closeAddModal = closeAddModal; window.saveTomb = saveTomb;
+window.handleLogin = handleLogin; window.handleRegister = handleRegister; window.guestLogin = guestLogin;
+window.logout = logout; window.toggleMenu = toggleMenu; window.closeAuthModal = closeAuthModal;
+window.switchAuthTab = switchAuthTab; window.showTab = showTab;
+window.showServicesScreen = showServicesScreen; window.hideServicesScreen = hideServicesScreen;
+window.switchSvcPack = switchSvcPack; window.filterSvcChip = filterSvcChip;
+window.renderServices = renderServices; window.callProvider = callProvider; window.whatsappProvider = whatsappProvider;
+window.openSvcReqModal = openSvcReqModal; window.closeSvcReqModal = closeSvcReqModal; window.submitServiceRequest = submitServiceRequest;
+window.showDashboardScreen = showDashboardScreen; window.hideDashboardScreen = hideDashboardScreen;
+window.updateRequestStatus = updateRequestStatus; window.deleteRequest = deleteRequest;
+window.setLanguage = setLanguage;
 </script>
 </body>
 </html>
