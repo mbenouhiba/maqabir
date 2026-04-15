@@ -1,373 +1,1284 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr" id="html-root">
+<html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>مقابر — Maqabir Tunisie</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Tajawal:wght@300;400;500;700&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-/* TON STYLE EXISTANT (gardé identique) */
-:root{--cream:#f5f0e8;--sand:#d4c5a9;--olive:#5a6b3c;--olive-light:#7a8f52;--olive-dim:rgba(90,107,60,0.1);--brown:#3d2b1f;--brown-mid:#6b4c38;--gold:#c9a84c;--gold-light:#e8c96d;--white:#fdfaf5;--text:#2a1f15;--text-mid:#5c4a3a;--shadow:rgba(61,43,31,0.15);--danger:#c0392b;--success:#27ae60;--radius:12px;--radius-sm:8px;--ff:'Tajawal',sans-serif;--ffd:'Playfair Display',serif;}
-[dir="rtl"]{--ffd:'Amiri',serif;}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{font-family:var(--ff);background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden;}
-.screen{display:none;min-height:100vh;}.screen.active{display:flex;flex-direction:column;}
+:root {
+  --cream: #f5f0e8;
+  --sand: #d4c5a9;
+  --olive: #5a6b3c;
+  --olive-light: #7a8f52;
+  --brown: #3d2b1f;
+  --brown-mid: #6b4c38;
+  --gold: #c9a84c;
+  --white: #fdfaf5;
+  --text: #2a1f15;
+  --text-mid: #5c4a3a;
+  --danger: #c0392b;
+  --success: #27ae60;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --ff: 'Tajawal', sans-serif;
+  --ffd: 'Playfair Display', serif;
+}
 
-/* LANG TOGGLE */
-.lang-toggle{display:flex;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(212,197,169,.25);border-radius:20px;overflow:hidden;}
-.lang-btn{padding:5px 13px;font-size:.8rem;font-family:var(--ff);font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--sand);transition:all .2s;}
-.lang-btn.active{background:var(--gold);color:var(--brown);}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-/* AUTH MODAL (Popup) */
-.auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s ease; }
-.auth-modal.open { visibility: visible; opacity: 1; }
-.auth-card{background:var(--white);border-radius:20px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.35);position:relative; margin: 20px;}
-.auth-brand{background:var(--brown);padding:26px 28px 20px;text-align:center;}
-.auth-brand .lc{width:56px;height:56px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:25px;margin:0 auto 11px;}
-.auth-brand h1{font-family:var(--ffd);color:var(--cream);font-size:1.8rem;}
-.auth-brand p{color:var(--sand);font-size:.77rem;margin-top:3px;}
-.auth-tabs{display:flex;border-bottom:2px solid var(--sand);}
-.auth-tab{flex:1;padding:13px;text-align:center;cursor:pointer;font-family:var(--ff);font-size:.9rem;color:var(--text-mid);border:none;background:transparent;transition:all .2s;font-weight:500;}
-.auth-tab.active{color:var(--olive);border-bottom:2px solid var(--olive);margin-bottom:-2px;}
-.auth-body{padding:22px;}
-.auth-form{display:none;}.auth-form.active{display:block;}
-.field{margin-bottom:15px;}
-.field label{display:block;font-size:.77rem;font-weight:600;color:var(--text-mid);margin-bottom:5px;}
-.field input{width:100%;padding:11px 14px;border:1.5px solid var(--sand);border-radius:var(--radius-sm);font-family:var(--ff);font-size:.93rem;background:var(--cream);outline:none;}
-.btn-primary{width:100%;padding:12px;background:var(--olive);color:var(--white);border:none;border-radius:var(--radius-sm);font-family:var(--ff);font-size:1rem;font-weight:700;cursor:pointer;}
-.btn-primary:hover{background:var(--olive-light);}
-.auth-div{text-align:center;margin:13px 0;color:var(--text-mid);font-size:.8rem;position:relative;}
-.auth-div::before,.auth-div::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--sand);}
-.auth-div::before{left:0;}.auth-div::after{right:0;}
-.btn-guest{width:100%;padding:10px;background:transparent;color:var(--text-mid);border:1.5px dashed var(--sand);border-radius:var(--radius-sm);font-family:var(--ff);font-size:.87rem;cursor:pointer;}
-.btn-guest:hover{border-color:var(--brown-mid);color:var(--brown-mid);}
-.auth-err{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.3);border-radius:6px;padding:8px 12px;font-size:.82rem;color:var(--danger);margin-bottom:13px;display:none;}
-.auth-err.show{display:block;}
-.fi-wrap{position:relative;}.fi-wrap input{padding-inline-end:42px;}
-.fi{position:absolute;inset-inline-end:13px;top:50%;transform:translateY(-50%);font-size:15px;cursor:pointer;}
-.modal-close { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.3); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-weight: bold; z-index: 10;}
+body {
+  font-family: var(--ff);
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-/* TOPNAV */
-.topnav{background:var(--brown);position:sticky;top:0;z-index:500;box-shadow:0 2px 16px rgba(0,0,0,.3);}
-.topnav-inner{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;max-width:1300px;margin:0 auto;gap:10px;}
-.nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.nav-logo-i{width:34px;height:34px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;}
-.nav-logo h1{font-family:var(--ffd);color:var(--cream);font-size:1.2rem;}
-.nav-logo span{font-size:.58rem;color:var(--sand);text-transform:uppercase;letter-spacing:.08em;display:block;line-height:1;}
-.nav-srch{flex:1;max-width:340px;}
-.ns-wrap{position:relative;}
-.ns-wrap .si{position:absolute;inset-inline-start:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--sand);}
-.ns-wrap input{width:100%;padding:8px 14px 8px 34px;border-radius:20px;border:none;background:rgba(255,255,255,.12);color:var(--cream);font-family:var(--ff);font-size:.86rem;outline:none;}
-.ns-wrap input::placeholder{color:rgba(212,197,169,.55);}
-.nav-act{display:flex;align-items:center;gap:8px;flex-shrink:0;position:relative;}
-.nav-btn{background:transparent;border:1px solid rgba(212,197,169,.3);color:var(--sand);padding:6px 12px;border-radius:6px;cursor:pointer;font-family:var(--ff);font-size:.8rem;transition:all .2s;}
-.nav-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--brown);font-weight:600;}
-.uchip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border-radius:20px;padding:4px 11px 4px 5px;border:1px solid rgba(212,197,169,.2);cursor:pointer;}
-.uav{width:25px;height:25px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--brown);}
-.uname{font-size:.78rem;color:var(--cream);max-width:75px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pmenu{position:absolute;top:calc(100% + 7px);inset-inline-end:0;background:var(--white);border-radius:var(--radius);border:1px solid var(--sand);box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:190px;z-index:600;display:none;overflow:hidden;}
-.pmenu.open{display:block;}
-.pm-u{padding:13px 15px;background:var(--cream);border-bottom:1px solid var(--sand);}
-.pm-u strong{display:block;font-size:.88rem;color:var(--brown);}
-.pm-u span{font-size:.74rem;color:var(--text-mid);}
-.pm-i{display:flex;align-items:center;gap:9px;padding:10px 15px;cursor:pointer;font-size:.84rem;color:var(--text);transition:background .2s;border:none;background:transparent;width:100%;font-family:var(--ff);text-align:start;}
-.pm-i:hover{background:var(--cream);}
-.pm-i.danger{color:var(--danger);}
+/* Navigation */
+.topnav {
+  background: var(--brown);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  padding: 11px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
-/* HERO */
-.hero{background:linear-gradient(135deg,var(--brown) 0%,var(--brown-mid) 55%,var(--olive) 100%);padding:26px 16px 38px;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a84c' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");}
-.hero-c{max-width:640px;margin:0 auto;text-align:center;position:relative;}
-.hero-c h2{font-family:var(--ffd);color:var(--cream);font-size:1.7rem;line-height:1.35;margin-bottom:7px;}
-.hero-c p{color:var(--sand);margin-bottom:20px;font-size:.88rem;font-weight:300;}
-.hs{display:flex;background:var(--white);border-radius:var(--radius-sm);overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.25);}
-.hs input{flex:1;border:none;padding:12px 15px;font-family:var(--ff);font-size:.88rem;color:var(--text);background:transparent;outline:none;}
-.hs select{border:none;border-inline-start:1px solid var(--sand);padding:12px 9px;font-family:var(--ff);font-size:.8rem;color:var(--text-mid);background:var(--cream);outline:none;cursor:pointer;}
-.hs button{background:var(--gold);border:none;padding:12px 16px;font-size:.9rem;color:var(--brown);cursor:pointer;transition:background .2s;font-family:var(--ff);font-weight:600;}
-.hs button:hover{background:var(--gold-light);}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-/* STATS */
-.stats-bar{background:var(--white);border-bottom:1px solid var(--sand);}
-.stats-in{max-width:1300px;margin:0 auto;display:flex;justify-content:space-around;}
-.stat{text-align:center;padding:11px 8px;flex:1;border-inline-end:1px solid var(--sand);}
-.stat:last-child{border-inline-end:none;}
-.stat strong{display:block;font-family:var(--ffd);font-size:1.25rem;color:var(--olive);}
-.stat span{font-size:.68rem;color:var(--text-mid);}
+.nav-logo-i {
+  width: 34px;
+  height: 34px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-/* LAYOUT */
-.app-body{max-width:1300px;margin:0 auto;padding:15px;display:grid;grid-template-columns:295px 1fr;gap:15px;}
-.sidebar{display:flex;flex-direction:column;gap:12px;}
-.panel{background:var(--white);border-radius:var(--radius);border:1px solid rgba(212,197,169,.55);overflow:hidden;box-shadow:0 2px 10px var(--shadow);}
-.panel-hd{background:var(--brown);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
-.panel-hd h3{font-family:var(--ffd);color:var(--cream);font-size:.88rem;font-weight:400;}
-.badge{background:var(--gold);color:var(--brown);font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:20px;}
-.panel-bd{padding:12px;overflow-y:auto;}
-.fg{margin-bottom:10px;}
-.fg label{display:block;font-size:.7rem;font-weight:600;color:var(--text-mid);margin-bottom:3px;text-transform:uppercase;letter-spacing:.07em;}
-.fg select{width:100%;padding:7px 9px;border:1px solid var(--sand);border-radius:6px;font-family:var(--ff);font-size:.83rem;background:var(--cream);color:var(--text);outline:none;}
-.btn-apply{width:100%;padding:8px;background:var(--olive);color:var(--white);border:none;border-radius:6px;font-family:var(--ff);font-size:.83rem;font-weight:700;cursor:pointer;transition:background .2s;}
-.btn-apply:hover{background:var(--olive-light);}
+.nav-logo h1 {
+  font-family: var(--ffd);
+  color: var(--cream);
+  font-size: 1.2rem;
+}
 
-/* CARDS */
-.tc{border:1px solid rgba(212,197,169,.5);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px;cursor:pointer;transition:all .2s;background:var(--cream);position:relative;}
-.tc:hover{border-color:var(--gold);box-shadow:0 3px 10px var(--shadow);transform:translateY(-1px);}
-.tc.sel{border-color:var(--olive);background:#f0f4e8;}
-.tc-top{display:flex;align-items:flex-start;gap:9px;}
-.tc-av{width:42px;height:42px;border-radius:7px;background:var(--sand);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;border:2px solid rgba(212,197,169,.6);overflow:hidden;}
-.tc-inf h4{font-family:var(--ffd);font-size:.88rem;color:var(--brown);margin-bottom:2px;}
-.tc-inf .dt{font-size:.7rem;color:var(--text-mid);margin-bottom:2px;}
-.tc-inf .lc2{font-size:.7rem;color:var(--olive);}
-.tc-ft{margin-top:7px;padding-top:6px;border-top:1px solid rgba(212,197,169,.4);display:flex;gap:5px;flex-wrap:wrap;}
-.tag{font-size:.65rem;padding:2px 7px;border-radius:20px;background:var(--olive-dim);color:var(--olive);}
-.tag.ph{background:rgba(201,168,76,.15);color:var(--brown-mid);}
-.tag.pr{background:rgba(192,57,43,.08);color:var(--danger);}
-.tag.pu{background:rgba(39,174,96,.1);color:var(--success);}
-.tc-lk{position:absolute;top:9px;inset-inline-end:9px;font-size:12px;}
+.nav-srch {
+  flex: 1;
+  max-width: 300px;
+}
 
-/* MAP / DETAIL */
-.rcol{display:flex;flex-direction:column;gap:14px;}
-#map{height:420px;border-radius:var(--radius);border:1px solid rgba(212,197,169,.6);box-shadow:0 2px 10px var(--shadow);}
-.leaflet-popup-content-wrapper{border-radius:10px!important;border:1px solid var(--sand)!important;box-shadow:0 4px 18px rgba(0,0,0,.2)!important;font-family:var(--ff)!important;padding:0!important;overflow:hidden;}
-.leaflet-popup-content{margin:0!important;padding:0!important;min-width:200px;}
-.pi{padding:12px 14px;}
-.pi h4{font-family:var(--ffd);font-size:.93rem;color:var(--brown);margin-bottom:3px;}
-.pi .pm{font-size:.73rem;color:var(--text-mid);margin-bottom:5px;}
-.pi .pg{font-size:.69rem;color:var(--olive);font-weight:600;background:var(--olive-dim);padding:3px 7px;border-radius:4px;margin-bottom:8px;}
-.pbtn{display:block;padding:7px 0;background:var(--olive);color:var(--white);border-radius:5px;font-size:.78rem;cursor:pointer;border:none;font-family:var(--ff);font-weight:600;width:100%;text-align:center;transition:background .2s;}
-.pbtn:hover{background:var(--olive-light);}
-.dp{background:var(--white);border-radius:var(--radius);border:1px solid rgba(212,197,169,.6);box-shadow:0 2px 10px var(--shadow);overflow:hidden;display:none;}
-.dp.vis{display:block;}
-.dhd{background:linear-gradient(135deg,var(--brown) 0%,var(--brown-mid) 100%);padding:15px 17px;position:relative;}
-.dhd h2{font-family:var(--ffd);color:var(--cream);font-size:1.18rem;margin-bottom:3px;}
-.dhd .dm{color:var(--sand);font-size:.76rem;}
-.dhd .ptag{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;padding:2px 8px;border-radius:20px;margin-top:4px;}
-.ptag.pu{background:rgba(39,174,96,.2);color:#a8f0c0;}
-.ptag.pr{background:rgba(255,255,255,.1);color:var(--sand);}
-.cbt{position:absolute;top:11px;inset-inline-end:11px;background:rgba(255,255,255,.15);border:none;color:var(--cream);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
-.dbd{padding:15px 17px;}
-.gpsbdg{display:flex;align-items:center;gap:9px;background:var(--olive-dim);border:1px solid rgba(90,107,60,.2);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:10px;}
-.gpsico{font-size:18px;}
-.gpsinf{flex:1;}
-.gpslb{font-size:.63rem;text-transform:uppercase;letter-spacing:.09em;color:var(--text-mid);}
-.gpsc{font-size:.86rem;font-weight:700;color:var(--olive);}
-.gpscpy{background:var(--gold);border:none;border-radius:5px;padding:4px 10px;font-size:.7rem;font-family:var(--ff);font-weight:700;color:var(--brown);cursor:pointer;transition:background .2s;flex-shrink:0;}
-.dirbtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:9px;background:var(--brown);color:var(--cream);border:none;border-radius:var(--radius-sm);font-family:var(--ff);font-size:.83rem;font-weight:600;cursor:pointer;margin-bottom:13px;transition:background .2s;text-decoration:none;}
-.dirbtn:hover{background:var(--brown-mid);}
-.igrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px;}
-.ii label{display:block;font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-mid);margin-bottom:2px;}
-.ii span{font-size:.82rem;color:var(--text);font-weight:600;}
-.phs h4{font-family:var(--ffd);font-size:.88rem;color:var(--brown);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--sand);}
-.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:9px;}
-.pth{aspect-ratio:1;border-radius:5px;border:2px solid var(--sand);cursor:pointer;transition:all .2s;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:21px;overflow:hidden;}
-.apbtn{width:100%;padding:9px;border:2px dashed var(--sand);border-radius:var(--radius-sm);background:var(--cream);color:var(--text-mid);font-family:var(--ff);font-size:.83rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
-.apbtn:hover{border-color:var(--olive);color:var(--olive);background:var(--olive-dim);}
-.lknot{text-align:center;padding:18px;color:var(--text-mid);}
-.lkico{font-size:30px;margin-bottom:7px;}
+.nav-srch input {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(255,255,255,0.12);
+  color: var(--cream);
+  outline: none;
+}
 
-/* MODAL */
-.movl{position:fixed;inset:0;background:rgba(42,31,21,.68);backdrop-filter:blur(4px);z-index:800;display:none;align-items:flex-end;justify-content:center;}
-.movl.open{display:flex;}
-.modal{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 38px rgba(0,0,0,.3);animation:slideUp .3s ease;}
-@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mhnd{width:38px;height:4px;background:var(--sand);border-radius:4px;margin:11px auto 0;}
-.mhd{background:var(--brown);padding:15px 19px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-.mhd h3{font-family:var(--ffd);color:var(--cream);font-size:1.03rem;font-weight:400;}
-.mbd{padding:19px;}
-.fgrp{margin-bottom:12px;}
-.fgrp label{display:block;font-size:.74rem;font-weight:600;color:var(--text-mid);margin-bottom:4px;}
-.fgrp input,.fgrp select,.fgrp textarea{width:100%;padding:9px 11px;border:1.5px solid var(--sand);border-radius:var(--radius-sm);font-family:var(--ff);font-size:.88rem;color:var(--text);background:var(--cream);outline:none;}
-.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--olive);}
-.fgrp textarea{resize:vertical;min-height:62px;}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.ptgl{display:flex;gap:8px;margin-top:4px;}
-.po{flex:1;padding:9px;border:1.5px solid var(--sand);border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .2s;font-size:.8rem;color:var(--text-mid);}
-.po.active.public{border-color:var(--success);background:rgba(39,174,96,.08);color:var(--success);}
-.po.active.private{border-color:var(--danger);background:rgba(192,57,43,.06);color:var(--danger);}
-.po .poi{font-size:17px;display:block;margin-bottom:2px;}
-.gpkr{background:var(--cream);border:1.5px solid var(--sand);border-radius:var(--radius-sm);overflow:hidden;margin-top:4px;}
-.gpkr-hd{padding:7px 11px;background:var(--olive-dim);border-bottom:1px solid var(--sand);font-size:.76rem;color:var(--olive);font-weight:600;}
-#pickerMap{height:195px;}
-.gpkr-ft{padding:7px 11px;font-size:.76rem;color:var(--text-mid);}
-#pickedCoords{color:var(--olive);font-weight:700;}
-.crow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:7px;}
-.upz{border:2px dashed var(--sand);border-radius:var(--radius-sm);padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--cream);}
-.upz:hover{border-color:var(--gold);}
-.upz .uzi{font-size:24px;margin-bottom:4px;}
-.mft{padding:12px 19px;background:var(--cream);border-top:1px solid var(--sand);display:flex;gap:9px;justify-content:flex-end;position:sticky;bottom:0;}
-.bcancel{padding:8px 15px;background:transparent;border:1.5px solid var(--sand);border-radius:var(--radius-sm);font-family:var(--ff);font-size:.84rem;color:var(--text-mid);cursor:pointer;transition:all .2s;}
-.bcancel:hover{background:var(--sand);}
-.bsave{padding:8px 19px;background:var(--olive);border:none;border-radius:var(--radius-sm);font-family:var(--ff);font-size:.84rem;font-weight:700;color:var(--white);cursor:pointer;transition:background .2s;}
-.bsave:hover{background:var(--olive-light);}
+.nav-act {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
-/* BOTTOM NAV */
-.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--brown);border-top:1px solid rgba(212,197,169,.2);z-index:500;padding:5px 0 env(safe-area-inset-bottom,5px);}
-.bnav-in{display:flex;justify-content:space-around;}
-.bbn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 3px;cursor:pointer;border:none;background:transparent;color:var(--sand);font-family:var(--ff);font-size:.62rem;transition:color .2s;}
-.bbn .ic{font-size:19px;}
-.bbn.active{color:var(--gold);}
-.fab{position:fixed;bottom:78px;inset-inline-end:18px;background:var(--gold);border:none;border-radius:50%;width:50px;height:50px;font-size:21px;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.25);z-index:400;transition:all .2s;display:flex;align-items:center;justify-content:center;}
-.fab:hover{background:var(--gold-light);transform:scale(1.08);}
-.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:var(--brown);color:var(--cream);padding:10px 17px;border-radius:20px;font-size:.84rem;z-index:900;display:none;box-shadow:0 4px 15px rgba(0,0,0,.25);white-space:nowrap;animation:fadeIn .3s ease;}
-.toast.show{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.nav-btn {
+  background: transparent;
+  border: 1px solid var(--sand);
+  color: var(--sand);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-/* SERVICES (extrait minimal pour conserver la structure) */
-.svc-tab{background:transparent;border:none;border-bottom:2px solid transparent;padding:11px 10px;font-family:var(--ff);font-size:.8rem;color:var(--text-mid);cursor:pointer;transition:all .2s;white-space:nowrap;}
-.svc-tab.active{color:var(--olive);border-bottom-color:var(--olive);font-weight:700;}
-/* ... autres styles services ... */
-@media(max-width:860px){
-  .app-body{grid-template-columns:1fr;}
-  .sidebar{display:none;}
-  .bnav{display:block;}
-  .fab{bottom:70px;}
-  .nav-srch{display:none;}
-  #map{height:290px;}
+.nav-btn:hover {
+  background: var(--gold);
+  color: var(--brown);
+}
+
+.uchip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 4px 11px;
+  cursor: pointer;
+}
+
+.uav {
+  width: 25px;
+  height: 25px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.uname {
+  font-size: 0.78rem;
+  color: var(--cream);
+}
+
+.pmenu {
+  position: absolute;
+  top: 60px;
+  right: 16px;
+  background: var(--white);
+  border-radius: var(--radius);
+  min-width: 180px;
+  display: none;
+  z-index: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pmenu.open {
+  display: block;
+}
+
+.pm-u {
+  padding: 12px;
+  border-bottom: 1px solid var(--sand);
+}
+
+.pm-i {
+  padding: 10px 12px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-family: var(--ff);
+}
+
+.pm-i:hover {
+  background: var(--cream);
+}
+
+.pm-i.danger {
+  color: var(--danger);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--brown), var(--olive));
+  padding: 30px 16px;
+  text-align: center;
+  color: var(--cream);
+}
+
+.hero h2 {
+  font-family: var(--ffd);
+  font-size: 1.7rem;
+  margin-bottom: 10px;
+}
+
+.hs {
+  display: flex;
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 500px;
+  margin: 15px auto 0;
+}
+
+.hs input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  outline: none;
+}
+
+.hs select {
+  padding: 12px;
+  border: none;
+  background: var(--cream);
+}
+
+.hs button {
+  padding: 12px 20px;
+  background: var(--gold);
+  border: none;
+  cursor: pointer;
+}
+
+/* Stats */
+.stats-bar {
+  background: var(--white);
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  border-bottom: 1px solid var(--sand);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat strong {
+  font-size: 1.3rem;
+  color: var(--olive);
+}
+
+.stat span {
+  font-size: 0.7rem;
+  color: var(--text-mid);
+}
+
+/* Layout */
+.app-body {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 15px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--sand);
+  overflow: hidden;
+}
+
+.panel-hd {
+  background: var(--brown);
+  padding: 10px 14px;
+  color: var(--cream);
+}
+
+.panel-bd {
+  padding: 12px;
+}
+
+.fg {
+  margin-bottom: 12px;
+}
+
+.fg label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.fg select {
+  width: 100%;
+  padding: 7px;
+  border: 1px solid var(--sand);
+  border-radius: 6px;
+  background: var(--cream);
+}
+
+.btn-apply {
+  width: 100%;
+  padding: 8px;
+  background: var(--olive);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Tomb Cards */
+.tc {
+  background: var(--cream);
+  border: 1px solid var(--sand);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.tc:hover {
+  border-color: var(--gold);
+}
+
+.tc h4 {
+  font-family: var(--ffd);
+  margin-bottom: 4px;
+}
+
+.tc .dt {
+  font-size: 0.7rem;
+  color: var(--text-mid);
+}
+
+/* Map */
+#map {
+  height: 400px;
+  border-radius: var(--radius);
+  border: 1px solid var(--sand);
+}
+
+/* Detail Panel */
+.dp {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--sand);
+  display: none;
+}
+
+.dp.vis {
+  display: block;
+}
+
+.dhd {
+  background: var(--brown);
+  padding: 12px;
+  color: var(--cream);
+  position: relative;
+}
+
+.cbt {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dbd {
+  padding: 15px;
+}
+
+.gpsbdg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--olive-dim);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.gpscpy {
+  background: var(--gold);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dirbtn {
+  display: block;
+  background: var(--brown);
+  color: var(--cream);
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+/* Modal */
+.movl {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 800;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.movl.open {
+  display: flex;
+}
+
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.mhd {
+  background: var(--brown);
+  padding: 15px;
+  color: var(--cream);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mbd {
+  padding: 20px;
+}
+
+.fgrp {
+  margin-bottom: 12px;
+}
+
+.fgrp label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.fgrp input, .fgrp select, .fgrp textarea {
+  width: 100%;
+  padding: 8px 11px;
+  border: 1.5px solid var(--sand);
+  border-radius: 8px;
+  background: var(--cream);
+}
+
+.frow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mft {
+  padding: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--sand);
+}
+
+.bcancel {
+  padding: 8px 15px;
+  background: transparent;
+  border: 1.5px solid var(--sand);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.bsave {
+  padding: 8px 19px;
+  background: var(--olive);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Auth Modal */
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-modal.open {
+  display: flex;
+}
+
+.auth-card {
+  background: var(--white);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.auth-brand {
+  background: var(--brown);
+  padding: 25px;
+  text-align: center;
+  color: var(--cream);
+}
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--sand);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.auth-tab.active {
+  color: var(--olive);
+  border-bottom: 2px solid var(--olive);
+}
+
+.auth-body {
+  padding: 22px;
+}
+
+.field {
+  margin-bottom: 15px;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px;
+  border: 1.5px solid var(--sand);
+  border-radius: 8px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: var(--olive);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-div {
+  text-align: center;
+  margin: 12px 0;
+}
+
+.btn-guest {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1.5px dashed var(--sand);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.auth-err {
+  background: rgba(192,57,43,0.1);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 0.8rem;
+  color: var(--danger);
+  margin-bottom: 12px;
+  display: none;
+}
+
+.auth-err.show {
+  display: block;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0,0,0,0.3);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brown);
+  color: var(--cream);
+  padding: 10px 20px;
+  border-radius: 30px;
+  display: none;
+  z-index: 900;
+}
+
+.toast.show {
+  display: block;
+}
+
+/* Fab Button */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--gold);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  border: none;
+  z-index: 400;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Bottom Nav */
+.bnav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--brown);
+  padding: 8px;
+  z-index: 500;
+}
+
+.bnav-in {
+  display: flex;
+  justify-content: space-around;
+}
+
+.bbn {
+  background: none;
+  border: none;
+  color: var(--sand);
+  text-align: center;
+  cursor: pointer;
+}
+
+.bbn.active {
+  color: var(--gold);
+}
+
+@media (max-width: 860px) {
+  .app-body {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    display: none;
+  }
+  .bnav {
+    display: block;
+  }
+  .nav-srch {
+    display: none;
+  }
+  .fab {
+    bottom: 70px;
+  }
 }
 </style>
 </head>
 <body>
 
-<!-- AUTH MODAL (Popup) -->
+<!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal">
   <div class="auth-card">
     <div class="modal-close" onclick="closeAuthModal()">✕</div>
     <div class="auth-brand">
       <div class="lc">🕌</div>
       <h1>Maqabir</h1>
-      <p>Connectez-vous pour ajouter ou payer</p>
+      <p>Connectez-vous pour ajouter un tombeau</p>
     </div>
     <div class="auth-tabs">
-      <button class="auth-tab active" id="modalTabLogin" onclick="switchModalAuthTab('login')">Connexion</button>
-      <button class="auth-tab" id="modalTabReg" onclick="switchModalAuthTab('register')">Inscription</button>
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Inscription</button>
     </div>
     <div class="auth-body">
-      <form id="modalLoginForm" onsubmit="handleModalLogin(event)">
-        <div class="auth-err" id="modalLoginErr"></div>
-        <div class="field"><label>Email</label><input type="email" id="modalLoginEmail" required></div>
-        <div class="field"><label>Mot de passe</label><input type="password" id="modalLoginPwd" required></div>
-        <button type="submit" class="btn-primary">Se connecter</button>
+      <div id="loginForm">
+        <div class="auth-err" id="loginErr"></div>
+        <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="exemple@email.com"></div>
+        <div class="field"><label>Mot de passe</label><input type="password" id="loginPwd" placeholder="••••••"></div>
+        <button class="btn-primary" onclick="handleLogin()">Se connecter</button>
         <div class="auth-div">ou</div>
-        <button type="button" class="btn-guest" onclick="guestLogin()">Continuer sans compte (lecture seule)</button>
-      </form>
-      <form id="modalRegisterForm" style="display:none;" onsubmit="handleModalRegister(event)">
-        <div class="auth-err" id="modalRegErr"></div>
-        <div class="field"><label>Nom complet</label><input type="text" id="modalRegName" required></div>
-        <div class="field"><label>Email</label><input type="email" id="modalRegEmail" required></div>
-        <div class="field"><label>Mot de passe</label><input type="password" id="modalRegPwd" required minlength="6"></div>
-        <button type="submit" class="btn-primary">Créer mon compte</button>
+        <button class="btn-guest" onclick="guestLogin()">Continuer sans compte</button>
+      </div>
+      <div id="registerForm" style="display:none;">
+        <div class="auth-err" id="regErr"></div>
+        <div class="field"><label>Nom complet</label><input type="text" id="regName" placeholder="Mohamed Ben Ali"></div>
+        <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="exemple@email.com"></div>
+        <div class="field"><label>Mot de passe (min 6 caractères)</label><input type="password" id="regPwd" placeholder="••••••"></div>
+        <button class="btn-primary" onclick="handleRegister()">Créer mon compte</button>
         <div class="auth-div">ou</div>
-        <button type="button" class="btn-guest" onclick="guestLogin()">Continuer sans compte (lecture seule)</button>
-      </form>
+        <button class="btn-guest" onclick="guestLogin()">Continuer sans compte</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- APP SCREEN (toujours active, plus d'écran de connexion forcée) -->
-<div id="appScreen" class="screen active">
+<!-- APP MAIN -->
+<div id="appScreen">
   <nav class="topnav">
-    <div class="topnav-inner">
-      <div class="nav-logo"><div class="nav-logo-i">🕌</div><div><h1>Maqabir</h1><span>Tunisie</span></div></div>
-      <div class="nav-srch"><div class="ns-wrap"><span class="si">🔍</span><input type="text" id="navSearch" oninput="filterCards()" placeholder="Rechercher..."></div></div>
-      <div class="nav-act">
-        <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('fr')">FR</button><button class="lang-btn" onclick="setLang('ar')">ع</button></div>
-        <button class="nav-btn" id="addBtn" onclick="requireAuthThenOpenModal()">➕ Ajouter</button>
-        <div class="uchip" onclick="toggleProfileMenu()"><div class="uav" id="uAvatar">👤</div><span class="uname" id="uName">Invité</span></div>
-        <div class="pmenu" id="pmenu"><div class="pm-u"><strong id="pmName">Invité</strong><span id="pmEmail">Mode visite</span></div><button class="pm-i danger" onclick="logout()">🚪 Déconnexion</button></div>
+    <div class="nav-logo">
+      <div class="nav-logo-i">🕌</div>
+      <h1>Maqabir</h1>
+    </div>
+    <div class="nav-srch">
+      <input type="text" id="searchInput" placeholder="Rechercher un défunt..." oninput="filterTombs()">
+    </div>
+    <div class="nav-act">
+      <button class="nav-btn" onclick="requireAuth()">➕ Ajouter</button>
+      <div class="uchip" onclick="toggleMenu()">
+        <div class="uav" id="userAvatar">👤</div>
+        <span class="uname" id="userName">Invité</span>
+      </div>
+      <div class="pmenu" id="userMenu">
+        <div class="pm-u"><strong id="menuName">Invité</strong><span id="menuEmail">Mode visite</span></div>
+        <button class="pm-i danger" onclick="logout()">🚪 Déconnexion</button>
       </div>
     </div>
   </nav>
-  <div class="hero"><div class="hero-c"><h2>Retrouvez vos proches,<br><em>préservez la mémoire</em></h2><p>Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p><div class="hs"><input type="text" id="heroSearch" oninput="syncSearch(this)"><select id="govFilter" onchange="filterCards()"><option value="">Tous</option><option>Tunis</option><option>Sfax</option><option>Sousse</option></select><button onclick="filterCards()">🔍</button></div></div></div>
-  <div class="stats-bar"><div class="stats-in"><div class="stat"><strong id="statTombs">4</strong><span>Tombeaux</span></div><div class="stat"><strong>4</strong><span>Cimetières</span></div><div class="stat"><strong id="statPhotos">9</strong><span>Photos</span></div><div class="stat"><strong id="statUsers">1</strong><span>Membres</span></div></div></div>
-  <div class="app-body"><aside class="sidebar" id="sidebar"><div class="panel"><div class="panel-hd"><h3>Filtres</h3></div><div class="panel-bd"><div class="fg"><label>Cimetière</label><select id="filterCem"><option value="">Tous</option><option>Djellaz</option></select></div><div class="fg"><label>Visibilité</label><select id="filterPriv"><option value="">Tous</option><option value="public">Publics</option></select></div><button class="btn-apply" onclick="filterCards()">Appliquer</button></div></div><div class="panel"><div class="panel-hd"><h3>Résultats</h3><span class="badge" id="resultCount">4</span></div><div class="panel-bd" id="tombCards"></div></div></aside><div class="rcol"><div id="map"></div><div class="dp" id="detailPanel"><div class="dhd"><h2 id="detailName">—</h2><div class="dm" id="detailMeta">—</div><button class="cbt" onclick="closeDetail()">✕</button></div><div class="dbd"><div class="gpsbdg"><div class="gpsico">📍</div><div class="gpsinf"><div class="gpslb">Coordonnées GPS</div><div class="gpsc" id="detailGPS">—</div></div><button class="gpscpy" onclick="copyGPS()">Copier</button></div><a id="dirLink" class="dirbtn" href="#" target="_blank">🧭 Itinéraire</a><div id="detailContent"></div></div></div></div></div>
-  <nav class="bnav"><div class="bnav-in"><button class="bbn active" onclick="bnTab(this,'map')"><span class="ic">🗺</span><span>Carte</span></button><button class="bbn" onclick="bnTab(this,'list')"><span class="ic">📋</span><span>Liste</span></button><button class="bbn" onclick="requireAuthThenOpenModal()"><span class="ic">➕</span><span>Ajouter</span></button><button class="bbn" onclick="bnTab(this,'filter')"><span class="ic">🔍</span><span>Filtrer</span></button></div></nav>
-  <button class="fab" onclick="requireAuthThenOpenModal()" id="fabBtn">➕</button>
+
+  <div class="hero">
+    <h2>Retrouvez vos proches,<br>préservez la mémoire</h2>
+    <p>Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p>
+    <div class="hs">
+      <input type="text" id="heroSearch" placeholder="Nom du défunt..." oninput="syncSearch()">
+      <select id="govFilter" onchange="filterTombs()">
+        <option value="">Tous les gouvernorats</option>
+        <option>Tunis</option><option>Sfax</option><option>Sousse</option>
+        <option>Nabeul</option><option>Bizerte</option><option>Kairouan</option>
+      </select>
+      <button onclick="filterTombs()">🔍</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><strong id="statCount">4</strong><span>Tombeaux</span></div>
+    <div class="stat"><strong>4</strong><span>Cimetières</span></div>
+    <div class="stat"><strong id="statPhotos">9</strong><span>Photos</span></div>
+  </div>
+
+  <div class="app-body">
+    <aside class="sidebar" id="sidebar">
+      <div class="panel">
+        <div class="panel-hd"><h3>Filtres</h3></div>
+        <div class="panel-bd">
+          <div class="fg"><label>Cimetière</label><select id="cemFilter" onchange="filterTombs()"><option value="">Tous</option><option>Djellaz</option><option>Sidi Bou Saïd</option><option>El Gorjani</option></select></div>
+          <div class="fg"><label>Visibilité</label><select id="privFilter" onchange="filterTombs()"><option value="">Tous</option><option value="public">Publics</option><option value="private">Privés</option></select></div>
+          <button class="btn-apply" onclick="filterTombs()">Appliquer</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hd"><h3>Résultats</h3><span class="badge" id="resultCount">4</span></div>
+        <div class="panel-bd" id="tombList"></div>
+      </div>
+    </aside>
+
+    <div class="rcol">
+      <div id="map"></div>
+      <div class="dp" id="detailPanel">
+        <div class="dhd">
+          <h2 id="detailName">—</h2>
+          <div class="dm" id="detailMeta">—</div>
+          <button class="cbt" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="dbd">
+          <div class="gpsbdg">
+            <div class="gpsinf"><div class="gpslb">Coordonnées GPS</div><div class="gpsc" id="detailGPS">—</div></div>
+            <button class="gpscpy" onclick="copyGPS()">Copier</button>
+          </div>
+          <a id="dirLink" class="dirbtn" href="#" target="_blank">🧭 Itinéraire Google Maps</a>
+          <div id="detailContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bnav">
+    <div class="bnav-in">
+      <button class="bbn active" onclick="showTab('map')"><span>🗺</span><span>Carte</span></button>
+      <button class="bbn" onclick="showTab('list')"><span>📋</span><span>Liste</span></button>
+      <button class="bbn" onclick="requireAuth()"><span>➕</span><span>Ajouter</span></button>
+      <button class="bbn" onclick="showTab('filter')"><span>🔍</span><span>Filtrer</span></button>
+    </div>
+  </nav>
+  <button class="fab" onclick="requireAuth()">➕</button>
 </div>
 
-<div class="movl" id="modalOverlay" onclick="closeModalOutside(event)"><div class="modal"><div class="mhnd"></div><div class="mhd"><h3>➕ Ajouter un tombeau</h3><button class="cbt" onclick="closeModal()">✕</button></div><div class="mbd"><div class="fgrp"><label>Visibilité</label><div class="ptgl"><div class="po public active" onclick="setPrivacy('public')"><span class="poi">🌐</span><span>Public</span></div><div class="po private" onclick="setPrivacy('private')"><span class="poi">🔒</span><span>Privé</span></div></div><input type="hidden" id="fPrivacy" value="public"></div><div class="frow"><div class="fgrp"><label>Prénom</label><input type="text" id="fPrenom"></div><div class="fgrp"><label>Nom</label><input type="text" id="fNom"></div></div><div class="frow"><div class="fgrp"><label>Naissance</label><input type="date" id="fBirth"></div><div class="fgrp"><label>Décès</label><input type="date" id="fDeath"></div></div><div class="frow"><div class="fgrp"><label>Gouvernorat</label><select id="fGov"><option>Tunis</option><option>Sfax</option></select></div><div class="fgrp"><label>Cimetière</label><input type="text" id="fCem"></div></div><div class="frow"><div class="fgrp"><label>Rangée</label><input type="text" id="fRangee"></div><div class="fgrp"><label>Numéro</label><input type="text" id="fNum"></div></div><div class="fgrp"><label>📍 Localisation</label><div class="gpkr"><div class="gpkr-hd">Cliquez sur la carte</div><div id="pickerMap"></div><div class="gpkr-ft"><span>Position:</span><span id="pickedCoords">Aucune</span></div></div><div class="crow"><div class="fgrp"><label>Latitude</label><input type="number" id="fLat" step="0.000001"></div><div class="fgrp"><label>Longitude</label><input type="number" id="fLng" step="0.000001"></div></div></div><div class="fgrp"><label>Notes</label><textarea id="fNotes"></textarea></div></div><div class="mft"><button class="bcancel" onclick="closeModal()">Annuler</button><button class="bsave" onclick="saveTomb()">Enregistrer</button></div></div></div>
+<!-- ADD TOMB MODAL -->
+<div class="movl" id="addModal">
+  <div class="modal">
+    <div class="mhd"><h3>➕ Ajouter un tombeau</h3><button class="cbt" onclick="closeAddModal()">✕</button></div>
+    <div class="mbd">
+      <div class="fgrp"><label>Visibilité</label><select id="tombPrivacy"><option value="public">🌐 Public (visible par tous)</option><option value="private">🔒 Privé (famille uniquement)</option></select></div>
+      <div class="frow"><div class="fgrp"><label>Prénom</label><input type="text" id="tombFirstname"></div><div class="fgrp"><label>Nom</label><input type="text" id="tombLastname"></div></div>
+      <div class="frow"><div class="fgrp"><label>Date naissance</label><input type="date" id="tombBirth"></div><div class="fgrp"><label>Date décès</label><input type="date" id="tombDeath"></div></div>
+      <div class="frow"><div class="fgrp"><label>Gouvernorat</label><select id="tombGov"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option></select></div><div class="fgrp"><label>Cimetière</label><input type="text" id="tombCem" placeholder="Nom du cimetière"></div></div>
+      <div class="frow"><div class="fgrp"><label>Rangée/Secteur</label><input type="text" id="tombRow"></div><div class="fgrp"><label>Numéro</label><input type="text" id="tombNum"></div></div>
+      <div class="fgrp"><label>📍 Position GPS (cliquez sur la carte)</label><div id="pickerMap" style="height:200px; border-radius:8px; margin-top:5px;"></div></div>
+      <div class="frow"><div class="fgrp"><label>Latitude</label><input type="number" id="tombLat" step="0.000001"></div><div class="fgrp"><label>Longitude</label><input type="number" id="tombLng" step="0.000001"></div></div>
+      <div class="fgrp"><label>Notes / Épitaphe</label><textarea id="tombNotes" rows="3"></textarea></div>
+    </div>
+    <div class="mft"><button class="bcancel" onclick="closeAddModal()">Annuler</button><button class="bsave" onclick="saveTomb()">Enregistrer</button></div>
+  </div>
+</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, getDoc, setDoc, updateDoc, query, orderBy, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
+<div class="toast" id="toastMsg"></div>
 
-// Configuration Firebase (à remplacer par la tienne)
-const firebaseConfig = {
-  apiKey: "AIzaSyD-6mZsgjGsDc76-mkWrx_nqL9YrRJ5xxU",
-  authDomain: "maqabir-tunisie.firebaseapp.com",
-  projectId: "maqabir-tunisie",
-  storageBucket: "maqabir-tunisie.firebasestorage.app",
-  messagingSenderId: "876259874847",
-  appId: "1:876259874847:web:aa5490e520b202c84b9d2a",
-  measurementId: "G-15TC7J6P6D"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
-
-// État global
-let currentUser = null;
-let selectedId = null;
-let map, pickerMap, pickerMarker;
-const markers = {};
+<script>
+// ==================== DONNÉES DE DÉMONSTRATION ====================
 let tombs = [
-  {id:"d0",name:"محمد بن صالح",birth:"15 mars 1928",death:"2 nov. 1995",cem:"الجلاز",gov:"Tunis",loc:"B14",lat:36.82120,lng:10.17320,photos:[],privacy:'public',owner:null,ownerName:'Admin'},
-  {id:"d1",name:"فاطمة بوزيد",birth:"8 juin 1935",death:"14 avril 2010",cem:"سيدي بوسعيد",gov:"Tunis",loc:"A7",lat:36.87005,lng:10.34105,photos:[],privacy:'public',owner:null,ownerName:'Admin'}
+  { id: "t1", name: "Mohamed Ben Salah", firstname: "Mohamed", lastname: "Ben Salah", birth: "15 mars 1928", death: "2 novembre 1995", cem: "Djellaz", gov: "Tunis", location: "Section B, Rangée 14", lat: 36.8212, lng: 10.1732, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
+  { id: "t2", name: "Fatma Bouzid", firstname: "Fatma", lastname: "Bouzid", birth: "8 juin 1935", death: "14 avril 2010", cem: "Sidi Bou Saïd", gov: "Tunis", location: "Section A, Tombe 7", lat: 36.87005, lng: 10.34105, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
+  { id: "t3", name: "Ali Haddad", firstname: "Ali", lastname: "Haddad", birth: "3 janvier 1950", death: "27 septembre 2018", cem: "El Gorjani", gov: "Tunis", location: "Allée C, Tombe 22", lat: 36.7914, lng: 10.1748, photos: [], privacy: "public", owner: null, ownerName: "Admin" }
 ];
 
-// Fonctions UI
-function showToast(msg) { const t = document.getElementById('toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
-function updateUI() { if(currentUser) { document.getElementById('uName').textContent = currentUser.name.split(' ')[0]; document.getElementById('pmName').textContent = currentUser.name; document.getElementById('pmEmail').textContent = currentUser.email; } else { document.getElementById('uName').textContent = "Invité"; document.getElementById('pmName').textContent = "Invité"; document.getElementById('pmEmail').textContent = "Mode visite"; } }
-function toggleProfileMenu() { document.getElementById('pmenu').classList.toggle('open'); }
-function closeProfileMenu() { document.getElementById('pmenu').classList.remove('open'); }
-function logout() { signOut(auth); currentUser = null; updateUI(); showToast("Déconnecté"); closeProfileMenu(); location.reload(); }
-function setLang(l) { /* à implémenter si besoin */ }
-function syncSearch(el) { document.getElementById('navSearch').value = el.value; filterCards(); }
+// ==================== ÉTAT GLOBAL ====================
+let currentUser = null;
+let selectedTombId = null;
+let map = null;
+let pickerMap = null;
+let pickerMarker = null;
+let markers = {};
 
-// Auth Modal
-const authModal = document.getElementById('authModal');
-let pendingAction = null;
-function openAuthModal(action) { pendingAction = action; authModal.classList.add('open'); }
-function closeAuthModal() { authModal.classList.remove('open'); pendingAction = null; }
-function switchModalAuthTab(tab) { const isLogin = tab === 'login'; document.getElementById('modalLoginForm').style.display = isLogin ? 'block' : 'none'; document.getElementById('modalRegisterForm').style.display = isLogin ? 'none' : 'block'; document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active')); document.getElementById(isLogin ? 'modalTabLogin' : 'modalTabReg').classList.add('active'); }
-async function handleModalLogin(e) { e.preventDefault(); const email = document.getElementById('modalLoginEmail').value; const pwd = document.getElementById('modalLoginPwd').value; try { await signInWithEmailAndPassword(auth, email, pwd); closeAuthModal(); if(pendingAction === 'add') openModal(); pendingAction = null; } catch(err) { document.getElementById('modalLoginErr').textContent = "Erreur de connexion"; document.getElementById('modalLoginErr').classList.add('show'); } }
-async function handleModalRegister(e) { e.preventDefault(); const name = document.getElementById('modalRegName').value; const email = document.getElementById('modalRegEmail').value; const pwd = document.getElementById('modalRegPwd').value; try { const cred = await createUserWithEmailAndPassword(auth, email, pwd); await setDoc(doc(db, 'users', cred.user.uid), { name, email, createdAt: new Date() }); closeAuthModal(); if(pendingAction === 'add') openModal(); pendingAction = null; } catch(err) { document.getElementById('modalRegErr').textContent = err.message; document.getElementById('modalRegErr').classList.add('show'); } }
-function guestLogin() { closeAuthModal(); currentUser = null; updateUI(); showToast("Mode invité actif"); }
-function requireAuthThenOpenModal() { if(currentUser) openModal(); else openAuthModal('add'); }
+// ==================== FONCTIONS AUTH (SANS FIREBASE - MODE LOCAL) ====================
+// Stockage local des utilisateurs
+let localUsers = JSON.parse(localStorage.getItem('maqabir_users') || '[]');
 
-// Map & Tombes
-function initMap() { map = L.map('map').setView([36.4,9.8],7); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); tombs.forEach(t => addMarker(t)); renderCards(tombs); }
-function canSee(t) { return t.privacy === 'public' || (currentUser && t.owner === currentUser.uid); }
-function makeIcon(active, priv) { const c = active ? '#c9a84c' : (priv ? '#8b3a2a' : '#5a6b3c'); return L.divIcon({html:`<div style="width:28px;height:28px;background:${c};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:12px">${priv?'🔒':'🪦'}</span></div>`,iconSize:[28,28],iconAnchor:[14,28]}); }
-function addMarker(t) { const m = L.marker([t.lat,t.lng],{icon:makeIcon(false,t.privacy==='private')}).addTo(map); m.bindPopup(`<div class="pi"><h4>${t.name}</h4><button class="pbtn" onclick="selectTomb('${t.id}')">Voir</button></div>`); markers[t.id] = m; }
-function selectTomb(id) { const t = tombs.find(x=>x.id===id); if(!t) return; map.flyTo([t.lat,t.lng],17); document.getElementById('detailName').textContent = t.name; document.getElementById('detailMeta').textContent = `${t.birth} – ${t.death} · ${t.cem}`; document.getElementById('detailGPS').textContent = t.lat.toFixed(5)+', '+t.lng.toFixed(5); document.getElementById('dirLink').href = `https://www.google.com/maps/dir/?api=1&destination=${t.lat},${t.lng}`; document.getElementById('detailPanel').classList.add('vis'); }
-function closeDetail() { document.getElementById('detailPanel').classList.remove('vis'); }
-function renderCards(list) { const container = document.getElementById('tombCards'); if(!container) return; container.innerHTML = ''; list.filter(t => canSee(t)).forEach(t => { const div = document.createElement('div'); div.className = 'tc'; div.innerHTML = `<div class="tc-top"><div class="tc-inf"><h4>${t.name}</h4><div class="dt">${t.birth} – ${t.death}</div><div class="lc2">${t.cem}</div></div></div>`; div.onclick = () => selectTomb(t.id); container.appendChild(div); }); }
-function filterCards() { const q = document.getElementById('navSearch').value.toLowerCase(); const gov = document.getElementById('govFilter').value; const filtered = tombs.filter(t => (!q || t.name.toLowerCase().includes(q)) && (!gov || t.gov === gov)); renderCards(filtered); }
+function showToast(msg) {
+  const toast = document.getElementById('toastMsg');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
 
-// Modal Ajout Tombeau
-function openModal() { document.getElementById('modalOverlay').classList.add('open'); initPickerMap(); }
-function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); if(pickerMap) pickerMap.remove(); }
-function closeModalOutside(e) { if(e.target === document.getElementById('modalOverlay')) closeModal(); }
-function setPrivacy(val) { document.getElementById('fPrivacy').value = val; document.querySelectorAll('.ptgl .po').forEach(el => el.classList.remove('active')); document.getElementById(val === 'public' ? 'privPub' : 'privPriv')?.classList.add('active'); }
-function initPickerMap() { if(pickerMap) pickerMap.remove(); setTimeout(() => { pickerMap = L.map('pickerMap').setView([36.4,9.8],6); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap); pickerMap.on('click', e => { if(pickerMarker) pickerMarker.setLatLng(e.latlng); else pickerMarker = L.marker(e.latlng).addTo(pickerMap); document.getElementById('fLat').value = e.latlng.lat; document.getElementById('fLng').value = e.latlng.lng; document.getElementById('pickedCoords').textContent = e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5); }); }, 100); }
-async function saveTomb() { if(!currentUser) { closeModal(); openAuthModal('add'); return; } const p = document.getElementById('fPrenom').value, n = document.getElementById('fNom').value; const lat = parseFloat(document.getElementById('fLat').value), lng = parseFloat(document.getElementById('fLng').value); if(!p || !n || isNaN(lat) || isNaN(lng)) { showToast("Remplissez tous les champs"); return; } const newTomb = { name: p+' '+n, birth: document.getElementById('fBirth').value || '—', death: document.getElementById('fDeath').value || '—', cem: document.getElementById('fCem').value || '—', gov: document.getElementById('fGov').value, loc: document.getElementById('fRangee').value + ' ' + document.getElementById('fNum').value, lat, lng, privacy: document.getElementById('fPrivacy').value, owner: currentUser.uid, ownerName: currentUser.name, photos: [], createdAt: new Date() }; try { const ref = await addDoc(collection(db, 'tombs'), newTomb); newTomb.id = ref.id; tombs.push(newTomb); addMarker(newTomb); renderCards(tombs); closeModal(); showToast("Tombeau ajouté !"); } catch(e) { showToast("Erreur: " + e.message); } }
+function updateUserUI() {
+  if (currentUser) {
+    document.getElementById('userName').textContent = currentUser.name.split(' ')[0];
+    document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+    document.getElementById('menuName').textContent = currentUser.name;
+    document.getElementById('menuEmail').textContent = currentUser.email;
+  } else {
+    document.getElementById('userName').textContent = 'Invité';
+    document.getElementById('userAvatar').textContent = '👤';
+    document.getElementById('menuName').textContent = 'Invité';
+    document.getElementById('menuEmail').textContent = 'Mode visite (lecture seule)';
+  }
+}
 
-// Auth state
-onAuthStateChanged(auth, user => { if(user) { getDoc(doc(db, 'users', user.uid)).then(docSnap => { currentUser = { uid: user.uid, email: user.email, name: docSnap.exists() ? docSnap.data().name : user.email }; updateUI(); }); } else { currentUser = null; updateUI(); } initMap(); startListener(); });
-function startListener() { onSnapshot(query(collection(db, 'tombs'), orderBy('createdAt', 'desc')), snap => { const fbTombs = snap.docs.map(d => ({ id: d.id, ...d.data() })); const demoIds = ['d0','d1']; tombs = [...tombs.filter(t => demoIds.includes(t.id)), ...fbTombs]; renderCards(tombs); document.getElementById('statTombs').textContent = tombs.length; }); }
+function toggleMenu() {
+  document.getElementById('userMenu').classList.toggle('open');
+}
 
-// Expose globals
-window.selectTomb = selectTomb; window.filterCards = filterCards; window.syncSearch = syncSearch; window.copyGPS = () => { const t = tombs.find(x=>x.id===selectedId); if(t) navigator.clipboard.writeText(t.lat+', '+t.lng); }; window.bnTab = (btn, type) => { document.querySelectorAll('.bbn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); if(type === 'map') document.querySelector('.rcol').style.display = 'flex'; };
-window.requireAuthThenOpenModal = requireAuthThenOpenModal; window.openModal = openModal; window.closeModal = closeModal; window.closeModalOutside = closeModalOutside; window.setPrivacy = setPrivacy; window.saveTomb = saveTomb;
-window.closeDetail = closeDetail; window.toggleProfileMenu = toggleProfileMenu; window.logout = logout; window.setLang = setLang;
-window.closeAuthModal = closeAuthModal; window.switchModalAuthTab = switchModalAuthTab; window.handleModalLogin = handleModalLogin; window.handleModalRegister = handleModalRegister; window.guestLogin = guestLogin;
+function closeMenu() {
+  document.getElementById('userMenu').classList.remove('open');
+}
+
+function openAuthModal() {
+  document.getElementById('authModal').classList.add('open');
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+  document.getElementById('loginErr').classList.remove('show');
+  document.getElementById('regErr').classList.remove('show');
+}
+
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
+  document.querySelectorAll('.auth-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && isLogin) || (i === 1 && !isLogin));
+  });
+}
+
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd = document.getElementById('loginPwd').value;
+  const user = localUsers.find(u => u.email === email);
+  
+  if (!user) {
+    document.getElementById('loginErr').textContent = "Email ou mot de passe incorrect";
+    document.getElementById('loginErr').classList.add('show');
+    return;
+  }
+  
+  // Pour la démo, on accepte n'importe quel mot de passe
+  currentUser = { uid: user.uid, name: user.name, email: user.email };
+  localStorage.setItem('maqabir_currentUser', JSON.stringify(currentUser));
+  updateUserUI();
+  closeAuthModal();
+  showToast(`Bonjour ${user.name} !`);
+  renderTombList(tombs);
+  updateMarkers();
+}
+
+function handleRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pwd = document.getElementById('regPwd').value;
+  
+  if (!name || !email || !pwd) {
+    document.getElementById('regErr').textContent = "Tous les champs sont requis";
+    document.getElementById('regErr').classList.add('show');
+    return;
+  }
+  
+  if (pwd.length < 6) {
+    document.getElementById('regErr').textContent = "Le mot de passe doit faire au moins 6 caractères";
+    document.getElementById('regErr').classList.add('show');
+    return;
+  }
+  
+  if (localUsers.find(u => u.email === email)) {
+    document.getElementById('regErr').textContent = "Cet email est déjà utilisé";
+    document.getElementById('regErr').classList.add('show');
+    return;
+  }
+  
+  const newUser = {
+    uid: 'user_' + Date.now(),
+    name: name,
+    email: email
+  };
+  
+  localUsers.push(newUser);
+  localStorage.setItem('maqabir_users', JSON.stringify(localUsers));
+  
+  currentUser = newUser;
+  localStorage.setItem('maqabir_currentUser', JSON.stringify(currentUser));
+  updateUserUI();
+  closeAuthModal();
+  showToast(`Bienvenue ${name} ! Votre compte a été créé.`);
+  renderTombList(tombs);
+  updateMarkers();
+}
+
+function guestLogin() {
+  currentUser = null;
+  localStorage.removeItem('maqabir_currentUser');
+  updateUserUI();
+  closeAuthModal();
+  showToast("Mode invité - Vous pouvez consulter mais pas ajouter");
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('maqabir_currentUser');
+  updateUserUI();
+  closeMenu();
+  showToast("Déconnecté");
+}
+
+function requireAuth() {
+  if (currentUser) {
+    openAddModal();
+  } else {
+    openAuthModal();
+  }
+}
+
+// ==================== FONCTIONS CARTE ====================
+function initMap() {
+  map = L.map('map').setView([36.4, 9.8], 7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  updateMarkers();
+}
+
+function canSeeTomb(tomb) {
+  if (tomb.privacy === 'public') return true;
+  if (currentUser && tomb.owner === currentUser.uid) return true;
+  return false;
+}
+
+function getMarkerIcon(isPrivate, isSelected) {
+  const color = isSelected ? '#c9a84c' : (isPrivate ? '#8b3a2a' : '#5a6b3c');
+  return L.divIcon({
+    html: `<div style="width:28px;height:28px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:12px">${isPrivate ? '🔒' : '🪦'}</span></div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -32]
+  });
+}
+
+function updateMarkers() {
+  tombs.forEach(tomb => {
+    if (markers[tomb.id]) {
+      map.removeLayer(markers[tomb.id]);
+      delete markers[tomb.id];
+    }
+    if (canSeeTomb(tomb)) {
+      const isPrivate = tomb.privacy === 'private';
+      const marker = L.marker([tomb.lat, tomb.lng], {
+        icon: getMarkerIcon(isPrivate, selectedTombId === tomb.id)
+      }).addTo(map);
+      marker.bindPopup(`
+        <div style="padding:8px">
+          <strong>${tomb.name}</strong><br>
+          ${tomb.cem}, ${tomb.gov}<br>
+          <button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">Voir détails</button>
+        </div>
+      `);
+      markers[tomb.id] = marker;
+    }
+  });
+}
+
+function selectTomb(id) {
+  const tomb = tombs.find(t => t.id === id);
+  if (!tomb) return;
+  
+  selectedTombId = id;
+  map.flyTo([tomb.lat, tomb.lng], 16);
+  updateMarkers();
+  
+  document.getElementById('detailName').textContent = tomb.name;
+  document.getElementById('detailMeta').textContent = `${tomb.birth} – ${tomb.death} · ${tomb.cem}, ${tomb.gov}`;
+  document.getElementById('detailGPS').textContent = `${tomb.lat.toFixed(5)}°, ${tomb.lng.toFixed(5)}°`;
+  document.getElementById('dirLink').href = `https://www.google.com/maps/dir/?api=1&destination=${tomb.lat},${tomb.lng}`;
+  
+  const contentDiv = document.getElementById('detailContent');
+  contentDiv.innerHTML = `
+    <div style="margin-top:10px">
+      <p><strong>📍 Emplacement :</strong> ${tomb.location}</p>
+      <p><strong>🔒 Visibilité :</strong> ${tomb.privacy === 'public' ? 'Public' : 'Privé (famille)'}</p>
+      <p><strong>👤 Ajouté par :</strong> ${tomb.ownerName || 'Admin'}</p>
+    </div>
+  `;
+  
+  document.getElementById('detailPanel').classList.add('vis');
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('vis');
+  selectedTombId = null;
+  updateMarkers();
+}
+
+function copyGPS() {
+  const tomb = tombs.find(t => t.id === selectedTombId);
+  if (tomb) {
+    navigator.clipboard.writeText(`${tomb.lat}, ${tomb.lng}`);
+    showToast("Coordonnées copiées !");
+  }
+}
+
+// ==================== LISTE DES TOMBEAUX ====================
+function renderTombList(filteredList = null) {
+  const list = filteredList || tombs.filter(t => canSeeTomb(t));
+  const container = document.getElementById('tombList');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  list.forEach(tomb => {
+    const div = document.createElement('div');
+    div.className = 'tc';
+    div.innerHTML = `
+      <h4>${tomb.name}</h4>
+      <div class="dt">${tomb.birth} – ${tomb.death}</div>
+      <div class="dt">${tomb.cem}, ${tomb.gov}</div>
+    `;
+    div.onclick = () => selectTomb(tomb.id);
+    container.appendChild(div);
+  });
+  
+  document.getElementById('resultCount').textContent = list.length;
+  document.getElementById('statCount').textContent = tombs.filter(t => canSeeTomb(t)).length;
+}
+
+function filterTombs() {
+  const searchTerm = (document.getElementById('searchInput').value || document.getElementById('heroSearch').value || '').toLowerCase();
+  const gov = document.getElementById('govFilter').value;
+  const cem = document.getElementById('cemFilter').value;
+  const priv = document.getElementById('privFilter').value;
+  
+  const filtered = tombs.filter(tomb => {
+    if (!canSeeTomb(tomb)) return false;
+    if (searchTerm && !tomb.name.toLowerCase().includes(searchTerm)) return false;
+    if (gov && tomb.gov !== gov) return false;
+    if (cem && tomb.cem !== cem) return false;
+    if (priv === 'public' && tomb.privacy !== 'public') return false;
+    if (priv === 'private' && tomb.privacy !== 'private') return false;
+    return true;
+  });
+  
+  renderTombList(filtered);
+}
+
+function syncSearch() {
+  const heroVal = document.getElementById('heroSearch').value;
+  document.getElementById('searchInput').value = heroVal;
+  filterTombs();
+}
+
+// ==================== MODAL AJOUT ====================
+function initPickerMap() {
+  if (pickerMap) pickerMap.remove();
+  setTimeout(() => {
+    pickerMap = L.map('pickerMap').setView([36.4, 9.8], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
+    pickerMap.on('click', (e) => {
+      if (pickerMarker) pickerMarker.setLatLng(e.latlng);
+      else pickerMarker = L.marker(e.latlng).addTo(pickerMap);
+      document.getElementById('tombLat').value = e.latlng.lat.toFixed(6);
+      document.getElementById('tombLng').value = e.latlng.lng.toFixed(6);
+      showToast("Position enregistrée !");
+    });
+  }, 100);
+}
+
+function openAddModal() {
+  if (!currentUser) {
+    openAuthModal();
+    return;
+  }
+  // Reset form
+  document.getElementById('tombFirstname').value = '';
+  document.getElementById('tombLastname').value = '';
+  document.getElementById('tombBirth').value = '';
+  document.getElementById('tombDeath').value = '';
+  document.getElementById('tombCem').value = '';
+  document.getElementById('tombRow').value = '';
+  document.getElementById('tombNum').value = '';
+  document.getElementById('tombLat').value = '';
+  document.getElementById('tombLng').value = '';
+  document.getElementById('tombNotes').value = '';
+  document.getElementById('tombPrivacy').value = 'public';
+  
+  document.getElementById('addModal').classList.add('open');
+  initPickerMap();
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+  if (pickerMap) pickerMap.remove();
+}
+
+function saveTomb() {
+  if (!currentUser) {
+    closeAddModal();
+    openAuthModal();
+    return;
+  }
+  
+  const firstname = document.getElementById('tombFirstname').value.trim();
+  const lastname = document.getElementById('tombLastname').value.trim();
+  const lat = parseFloat(document.getElementById('tombLat').value);
+  const lng = parseFloat(document.getElementById('tombLng').value);
+  
+  if (!firstname || !lastname) {
+    showToast("Veuillez entrer le prénom et le nom");
+    return;
+  }
+  
+  if (isNaN(lat) || isNaN(lng)) {
+    showToast("Veuillez cliquer sur la carte pour sélectionner la position GPS");
+    return;
+  }
+  
+  const newTomb = {
+    id: 't_' + Date.now(),
+    name: firstname + ' ' + lastname,
+    firstname: firstname,
+    lastname: lastname,
+    birth: document.getElementById('tombBirth').value || 'Date inconnue',
+    death: document.getElementById('tombDeath').value || 'Date inconnue',
+    cem: document.getElementById('tombCem').value || 'Cimetière inconnu',
+    gov: document.getElementById('tombGov').value,
+    location: (document.getElementById('tombRow').value ? 'Rangée ' + document.getElementById('tombRow').value : '') + 
+               (document.getElementById('tombNum').value ? ', Tombe ' + document.getElementById('tombNum').value : ''),
+    lat: lat,
+    lng: lng,
+    photos: [],
+    privacy: document.getElementById('tombPrivacy').value,
+    owner: currentUser.uid,
+    ownerName: currentUser.name,
+    notes: document.getElementById('tombNotes').value
+  };
+  
+  tombs.push(newTomb);
+  renderTombList();
+  updateMarkers();
+  closeAddModal();
+  showToast("Tombeau ajouté avec succès !");
+  
+  // Sauvegarde locale
+  localStorage.setItem('maqabir_tombs', JSON.stringify(tombs));
+}
+
+// ==================== UI TABS ====================
+function showTab(tab) {
+  const sidebar = document.getElementById('sidebar');
+  const mapContainer = document.getElementById('map');
+  const listContainer = document.getElementById('tombList');
+  
+  if (tab === 'map') {
+    sidebar.style.display = 'none';
+    if (map) map.invalidateSize();
+  } else if (tab === 'list') {
+    sidebar.style.display = 'none';
+  } else if (tab === 'filter') {
+    sidebar.style.display = 'block';
+  }
+  
+  document.querySelectorAll('.bbn').forEach(btn => btn.classList.remove('active'));
+  event.target.closest('.bbn').classList.add('active');
+}
+
+// ==================== INITIALISATION ====================
+function loadStoredData() {
+  const storedTombs = localStorage.getItem('maqabir_tombs');
+  if (storedTombs) {
+    tombs = JSON.parse(storedTombs);
+  }
+  const savedUser = localStorage.getItem('maqabir_currentUser');
+  if (savedUser) {
+    currentUser = JSON.parse(savedUser);
+    updateUserUI();
+  }
+}
+
+loadStoredData();
+initMap();
+renderTombList();
+updateMarkers();
+
+// Expose global functions
+window.selectTomb = selectTomb;
+window.closeDetail = closeDetail;
+window.copyGPS = copyGPS;
+window.filterTombs = filterTombs;
+window.syncSearch = syncSearch;
+window.requireAuth = requireAuth;
+window.openAddModal = openAddModal;
+window.closeAddModal = closeAddModal;
+window.saveTomb = saveTomb;
+window.handleLogin = handleLogin;
+window.handleRegister = handleRegister;
+window.guestLogin = guestLogin;
+window.logout = logout;
+window.toggleMenu = toggleMenu;
+window.closeAuthModal = closeAuthModal;
+window.switchAuthTab = switchAuthTab;
+window.showTab = showTab;
 </script>
-<div class="toast" id="toast"></div>
 </body>
 </html>
