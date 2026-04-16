@@ -34,6 +34,9 @@
   .dark ::-webkit-scrollbar-thumb { background: #c9a84c; }
   .dark .leaflet-container { filter: brightness(0.9) contrast(1.1); }
   * { transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+  /* Map toggle button */
+  .map-toggle-btn { transition: all 0.3s ease; }
+  .map-toggle-btn:hover { transform: scale(1.02); }
 </style>
 </head>
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-stone-100 dark:from-stone-900 dark:via-stone-800 dark:to-stone-900 transition-colors duration-300 font-['Inter']">
@@ -45,7 +48,7 @@
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-white/70 hover:text-white text-xl">&times;</button>
       <div class="text-4xl mb-2">🕌</div>
       <h2 class="text-2xl font-bold text-white font-['Amiri']" id="authTitle">Maqabir</h2>
-      <p class="text-amber-200 text-sm mt-1" id="authSubtitle">Connectez-vous pour accéder au tableau de bord</p>
+      <p class="text-amber-200 text-sm mt-1" id="authSubtitle">Connectez-vous pour ajouter un tombeau</p>
     </div>
     <div class="flex border-b border-stone-200 dark:border-stone-700">
       <button class="auth-tab flex-1 py-3 text-center font-semibold text-stone-600 dark:text-stone-400 border-b-2 border-transparent active" onclick="switchAuthTab('login')" id="authTabLogin">Connexion</button>
@@ -54,14 +57,14 @@
     <div class="p-6">
       <div id="loginForm">
         <div class="auth-err hidden bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-600 dark:text-red-400 mb-4" id="loginErr"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginEmailLabel">Email</label><input type="email" id="loginEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="admin@maqabir.com"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginEmailLabel">Email</label><input type="email" id="loginEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="exemple@email.com"></div>
         <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginPwdLabel">Mot de passe</label><input type="password" id="loginPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="••••••"></div>
         <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all" onclick="handleLogin()" id="loginBtn">Se connecter</button>
       </div>
       <div id="registerForm" style="display:none;">
         <div class="auth-err hidden bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-600 dark:text-red-400 mb-4" id="regErr"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regNameLabel">Nom complet</label><input type="text" id="regName" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="Admin Maqabir"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regEmailLabel">Email</label><input type="email" id="regEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="admin@maqabir.com"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regNameLabel">Nom complet</label><input type="text" id="regName" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="Mohamed Ben Ali"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regEmailLabel">Email</label><input type="email" id="regEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="exemple@email.com"></div>
         <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regPwdLabel">Mot de passe (min 6)</label><input type="password" id="regPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="••••••"></div>
         <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all" onclick="handleRegisterWithCaptcha()" id="regBtn">Créer mon compte</button>
       </div>
@@ -85,9 +88,13 @@
           <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">🔍</span><input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 border border-stone-200 dark:border-stone-700 rounded-xl bg-stone-50 dark:bg-stone-800 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="Rechercher un défunt..." oninput="filterTombs()"></div>
         </div>
         <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 rounded-full p-1">
+            <button class="lang-btn w-8 h-8 rounded-full text-sm font-semibold transition-all flex items-center justify-center bg-amber-500 text-white" onclick="setLanguage('fr')">FR</button>
+            <button class="lang-btn w-8 h-8 rounded-full text-sm font-semibold transition-all flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700" onclick="setLanguage('ar')">ع</button>
+          </div>
           <button class="theme-toggle w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-all" onclick="toggleDarkMode()">🌙</button>
           <button class="hidden md:flex px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" onclick="showServicesScreen()" id="servicesBtn">🛠 Services</button>
-          <button class="hidden md:flex px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" onclick="showDashboardScreen()" id="dashboardBtn">📊 Dashboard</button>
+          <button id="dashboardNavBtn" class="hidden md:flex px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" onclick="showDashboardScreen()">📊 Dashboard</button>
           <button class="hidden md:flex px-4 py-2 text-sm font-medium bg-gradient-to-r from-amber-500 to-emerald-500 text-white rounded-xl hover:shadow-md transition-all" onclick="openQuickAddModal()" id="quickAddBtn">📸 Ajout rapide</button>
           <button class="hidden md:flex px-4 py-2 text-sm font-medium border border-stone-300 dark:border-stone-600 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 transition-all" onclick="requireAuth()" id="addNavBtn">➕ Ajouter</button>
           <div class="relative">
@@ -111,10 +118,24 @@
     <div class="relative max-w-4xl mx-auto text-center px-4">
       <h2 class="text-3xl md:text-4xl font-bold font-['Amiri'] mb-3" id="heroTitle">Retrouvez vos proches,<br>préservez la mémoire</h2>
       <p class="text-amber-100/80 mb-6" id="heroSubtitle">Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p>
-      <div class="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
-        <input type="text" id="heroSearch" class="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Nom du défunt..." oninput="syncSearch()">
-        <select id="govFilter" class="px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="filterTombs()"><option value="" id="allGovs">Tous les gouvernorats</option><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select>
-        <button class="px-6 py-3 bg-amber-500 text-stone-900 font-semibold rounded-xl hover:bg-amber-400 transition-all" onclick="filterTombs()">🔍 Rechercher</button>
+      
+      <!-- Recherche avancée -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <input type="text" id="searchNom" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Nom du défunt..." oninput="filterTombs()">
+          <input type="text" id="searchPrenom" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Prénom..." oninput="filterTombs()">
+          <input type="text" id="searchCimetiere" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Cimetière..." oninput="filterTombs()">
+          <select id="searchGov" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="filterTombs()">
+            <option value="" class="text-stone-900">Tous les gouvernorats</option>
+            <option value="Tunis" class="text-stone-900">Tunis</option>
+            <option value="Sfax" class="text-stone-900">Sfax</option>
+            <option value="Sousse" class="text-stone-900">Sousse</option>
+            <option value="Nabeul" class="text-stone-900">Nabeul</option>
+            <option value="Bizerte" class="text-stone-900">Bizerte</option>
+            <option value="Kairouan" class="text-stone-900">Kairouan</option>
+          </select>
+        </div>
+        <button class="mt-3 px-6 py-2 bg-amber-500 text-stone-900 font-semibold rounded-lg hover:bg-amber-400 transition-all" onclick="filterTombs()">🔍 Rechercher</button>
       </div>
     </div>
   </div>
@@ -165,8 +186,15 @@
           <div class="divide-y divide-stone-200 dark:divide-stone-700 max-h-[400px] overflow-y-auto" id="tombList"></div>
         </div>
 
-        <!-- Map -->
-        <div id="map" class="h-[400px] rounded-xl overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700"></div>
+        <!-- Map Toggle Button -->
+        <button id="toggleMapBtn" class="map-toggle-btn w-full py-3 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2" onclick="toggleMap()">
+          <span id="mapToggleIcon">🗺️</span> <span id="mapToggleText">Afficher la carte</span>
+        </button>
+
+        <!-- Map (hidden by default) -->
+        <div id="mapContainer" class="hidden">
+          <div id="map" class="h-[300px] rounded-xl overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700"></div>
+        </div>
 
         <!-- Detail Panel -->
         <div id="detailPanel" class="hidden bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden animate-fade-in-up">
@@ -194,7 +222,7 @@
       <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400 active:text-amber-600" onclick="showTab('map')"><span class="text-xl">🗺</span><span class="text-xs" id="bnMap">Carte</span></button>
       <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showTab('list')"><span class="text-xl">📋</span><span class="text-xs" id="bnList">Liste</span></button>
       <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showServicesScreen()"><span class="text-xl">🛠</span><span class="text-xs" id="bnServices">Services</span></button>
-      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showDashboardScreen()"><span class="text-xl">📊</span><span class="text-xs" id="bnDashboard">Dashboard</span></button>
+      <button id="dashboardMobileBtn" class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400 hidden" onclick="showDashboardScreen()"><span class="text-xl">📊</span><span class="text-xs" id="bnDashboard">Dashboard</span></button>
       <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="openQuickAddModal()"><span class="text-xl">📸</span><span class="text-xs" id="bnQuickAdd">Rapide</span></button>
     </div>
   </nav>
@@ -210,9 +238,7 @@
     <h2 class="flex-1 text-white font-bold text-xl font-['Amiri']" id="dashboardTitle">📊 Tableau de bord</h2>
   </div>
   <div class="p-5">
-    <!-- Stats Cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="dashboardStats"></div>
-    <!-- Requests List -->
     <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
       <div class="bg-gradient-to-r from-amber-50 to-stone-50 dark:from-stone-700 dark:to-stone-800 px-5 py-3 border-b border-stone-200 dark:border-stone-700">
         <h3 class="font-semibold text-stone-800 dark:text-stone-200" id="requestsTitle">📋 Demandes des clients</h3>
@@ -279,15 +305,15 @@
 <div id="toastMsg" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-stone-800 dark:bg-stone-700 text-white px-5 py-2.5 rounded-full text-sm shadow-lg hidden z-[1100]"></div>
 
 <script>
-// ==================== TRADUCTIONS ====================
+// ==================== TRADUCTIONS COMPLÈTES ====================
 const translations = {
   fr: {
-    authTitle: "Maqabir", authSubtitle: "Connectez-vous pour accéder au tableau de bord",
+    authTitle: "Maqabir", authSubtitle: "Connectez-vous pour ajouter un tombeau",
     authTabLogin: "Connexion", authTabReg: "Inscription",
     loginEmailLabel: "Email", loginPwdLabel: "Mot de passe", loginBtn: "Se connecter",
     regNameLabel: "Nom complet", regEmailLabel: "Email", regPwdLabel: "Mot de passe (min 6)", regBtn: "Créer mon compte",
     navTitle: "Maqabir", servicesBtn: "🛠 Services", dashboardBtn: "📊 Dashboard", addNavBtn: "➕ Ajouter", logoutBtn: "🚪 Déconnexion",
-    heroTitle: "Retrouvez vos proches,<br>préservez la mémoire", heroSubtitle: "Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.", allGovs: "Tous les gouvernorats",
+    heroTitle: "Retrouvez vos proches,<br>préservez la mémoire", heroSubtitle: "Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.",
     statTombsLabel: "Tombeaux", statCemsLabel: "Cimetières", statPhotosLabel: "Photos", statMembersLabel: "Membres",
     filterTitle: "Filtres", cemFilterLabel: "Cimetière", allCems: "Tous", privFilterLabel: "Visibilité", allVis: "Tous", publicOpt: "Publics", privateOpt: "Privés", applyBtn: "Appliquer", resultsTitle: "Résultats",
     gpsLabel: "Coordonnées GPS", copyGpsBtn: "Copier", dirText: "Itinéraire Google Maps",
@@ -298,15 +324,16 @@ const translations = {
     svcReqTitle: "Demander ce service", reqNameLabel: "Votre nom", reqPhoneLabel: "Téléphone", reqLocLabel: "Lieu", reqDateLabel: "Date", reqMsgLabel: "Message", reqCancelBtn: "Annuler", reqSendBtn: "Envoyer",
     dashboardTitle: "📊 Tableau de bord", requestsTitle: "📋 Demandes des clients",
     totalRequests: "Total demandes", pendingStatus: "En attente", progressStatus: "En cours", doneStatus: "Terminé",
-    btnProgress: "En cours", btnDone: "Terminé", btnDelete: "Supprimer"
+    btnProgress: "En cours", btnDone: "Terminé", btnDelete: "Supprimer",
+    mapToggleShow: "Afficher la carte", mapToggleHide: "Masquer la carte"
   },
   ar: {
-    authTitle: "مقابر", authSubtitle: "سجل الدخول للوصول إلى لوحة التحكم",
+    authTitle: "مقابر", authSubtitle: "سجل الدخول لإضافة قبر",
     authTabLogin: "تسجيل الدخول", authTabReg: "إنشاء حساب",
     loginEmailLabel: "البريد الإلكتروني", loginPwdLabel: "كلمة المرور", loginBtn: "تسجيل الدخول",
     regNameLabel: "الاسم الكامل", regEmailLabel: "البريد الإلكتروني", regPwdLabel: "كلمة المرور", regBtn: "إنشاء حساب",
     navTitle: "مقابر", servicesBtn: "الخدمات", dashboardBtn: "لوحة التحكم", addNavBtn: "إضافة", logoutBtn: "تسجيل خروج",
-    heroTitle: "ابحث عن أحبائك،<br>احفظ ذكراهم", heroSubtitle: "حدّد موقع القبر، أضف الصور.", allGovs: "كل الولايات",
+    heroTitle: "ابحث عن أحبائك،<br>احفظ ذكراهم", heroSubtitle: "حدّد موقع القبر، أضف الصور.",
     statTombsLabel: "قبور", statCemsLabel: "مقابر", statPhotosLabel: "صور", statMembersLabel: "أعضاء",
     filterTitle: "تصفية", cemFilterLabel: "المقبرة", allCems: "الكل", privFilterLabel: "الخصوصية", allVis: "الكل", publicOpt: "عامة", privateOpt: "خاصة", applyBtn: "تطبيق", resultsTitle: "النتائج",
     gpsLabel: "الإحداثيات", copyGpsBtn: "نسخ", dirText: "الاتجاهات",
@@ -317,7 +344,8 @@ const translations = {
     svcReqTitle: "طلب هذه الخدمة", reqNameLabel: "اسمك", reqPhoneLabel: "الهاتف", reqLocLabel: "الموقع", reqDateLabel: "التاريخ", reqMsgLabel: "رسالة", reqCancelBtn: "إلغاء", reqSendBtn: "إرسال",
     dashboardTitle: "📊 لوحة التحكم", requestsTitle: "📋 طلبات العملاء",
     totalRequests: "إجمالي الطلبات", pendingStatus: "قيد الانتظار", progressStatus: "قيد التنفيذ", doneStatus: "مكتمل",
-    btnProgress: "قيد التنفيذ", btnDone: "مكتمل", btnDelete: "حذف"
+    btnProgress: "قيد التنفيذ", btnDone: "مكتمل", btnDelete: "حذف",
+    mapToggleShow: "إظهار الخريطة", mapToggleHide: "إخفاء الخريطة"
   }
 };
 
@@ -348,10 +376,15 @@ let services = [
 // Demandes clients
 let requests = JSON.parse(localStorage.getItem('maqabir_requests') || '[]');
 
+// Admins emails
+const adminEmails = ['mbenouhiba@globalnet.tn', 'mbenouhiba2012@gmail.com'];
+const adminPassword = '12345678';
+
 // ==================== ÉTAT GLOBAL ====================
 let currentUser = null;
 let selectedTombId = null;
 let map = null;
+let mapInitialized = false;
 let markers = {};
 let localUsers = JSON.parse(localStorage.getItem('maqabir_users') || '[]');
 let currentLang = localStorage.getItem('maqabir_lang') || 'fr';
@@ -361,6 +394,7 @@ let svcPackFilter = 'all';
 let svcChipFilter = 'all1';
 let currentServiceForRequest = null;
 let isDarkMode = localStorage.getItem('darkMode') === 'true';
+let isMapVisible = false;
 
 // ==================== DARK MODE ====================
 function toggleDarkMode() {
@@ -378,15 +412,30 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('maqabir_lang', lang);
   const t = translations[lang];
+  // Mettre à jour les boutons de langue
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.remove('bg-amber-500', 'text-white');
+    btn.classList.add('text-stone-600', 'dark:text-stone-300');
+    if ((lang === 'fr' && btn.textContent === 'FR') || (lang === 'ar' && btn.textContent === 'ع')) {
+      btn.classList.add('bg-amber-500', 'text-white');
+      btn.classList.remove('text-stone-600', 'dark:text-stone-300');
+    }
+  });
   for (let key in t) {
     let el = document.getElementById(key);
     if (el) el.innerHTML = t[key];
   }
+  // Mettre à jour les placeholders
+  document.getElementById('searchNom').placeholder = lang === 'ar' ? 'اسم المتوفى...' : 'Nom du défunt...';
+  document.getElementById('searchPrenom').placeholder = lang === 'ar' ? 'الاسم الأول...' : 'Prénom...';
+  document.getElementById('searchCimetiere').placeholder = lang === 'ar' ? 'المقبرة...' : 'Cimetière...';
+  document.getElementById('mapToggleText').textContent = isMapVisible ? (lang === 'ar' ? 'إخفاء الخريطة' : 'Masquer la carte') : (lang === 'ar' ? 'إظهار الخريطة' : 'Afficher la carte');
   renderServices();
-  renderTombList();
+  filterTombs();
   updateMarkers();
   if (selectedTombId) displayTombServices(selectedTombId);
   renderDashboard();
+  updateDashboardVisibility();
 }
 
 function showToast(msg) {
@@ -409,6 +458,15 @@ function updateUserUI() {
     document.getElementById('menuName').textContent = currentLang === 'ar' ? 'زائر' : 'Invité';
     document.getElementById('menuEmail').textContent = currentLang === 'ar' ? 'وضع الزائر' : 'Mode visite';
   }
+  updateDashboardVisibility();
+}
+
+function updateDashboardVisibility() {
+  const isAdmin = currentUser && adminEmails.includes(currentUser.email);
+  const dashboardBtn = document.getElementById('dashboardNavBtn');
+  const dashboardMobileBtn = document.getElementById('dashboardMobileBtn');
+  if (dashboardBtn) dashboardBtn.style.display = isAdmin ? 'flex' : 'none';
+  if (dashboardMobileBtn) dashboardMobileBtn.style.display = isAdmin ? 'flex' : 'none';
 }
 
 function toggleMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
@@ -425,6 +483,20 @@ function switchAuthTab(tab) {
 function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pwd = document.getElementById('loginPwd').value;
+  
+  // Vérifier si c'est un admin
+  if (adminEmails.includes(email) && pwd === adminPassword) {
+    currentUser = { uid: 'admin_' + Date.now(), name: 'Admin', email: email };
+    localStorage.setItem('maqabir_currentUser', JSON.stringify(currentUser));
+    updateUserUI();
+    closeAuthModal();
+    showToast(`Bienvenue Admin ${email} !`);
+    renderTombList();
+    updateMarkers();
+    renderDashboard();
+    return;
+  }
+  
   const user = localUsers.find(u => u.email === email);
   if (!user) { document.getElementById('loginErr').classList.remove('hidden'); return; }
   currentUser = { uid: user.uid, name: user.name, email: user.email };
@@ -465,57 +537,28 @@ function guestLogin() { currentUser = null; localStorage.removeItem('maqabir_cur
 function logout() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); showToast('Déconnecté'); }
 function requireAuth() { if (currentUser) openQuickAddModal(); else openAuthModal(); }
 
-// ==================== DASHBOARD ====================
-function showDashboardScreen() {
-  if (!currentUser) { openAuthModal(); return; }
-  document.getElementById('dashboardScreen').classList.remove('hidden');
-  renderDashboard();
+// ==================== MAP TOGGLE ====================
+function toggleMap() {
+  const mapContainer = document.getElementById('mapContainer');
+  isMapVisible = !isMapVisible;
+  if (isMapVisible) {
+    mapContainer.classList.remove('hidden');
+    document.getElementById('mapToggleText').textContent = currentLang === 'ar' ? 'إخفاء الخريطة' : 'Masquer la carte';
+    if (!mapInitialized) {
+      initMap();
+      mapInitialized = true;
+    } else if (map) {
+      setTimeout(() => map.invalidateSize(), 100);
+    }
+  } else {
+    mapContainer.classList.add('hidden');
+    document.getElementById('mapToggleText').textContent = currentLang === 'ar' ? 'إظهار الخريطة' : 'Afficher la carte';
+  }
 }
-function hideDashboardScreen() { document.getElementById('dashboardScreen').classList.add('hidden'); }
-
-function renderDashboard() {
-  const statsDiv = document.getElementById('dashboardStats');
-  const pending = requests.filter(r => r.status === 'pending').length;
-  const progress = requests.filter(r => r.status === 'progress').length;
-  const done = requests.filter(r => r.status === 'done').length;
-  const t = translations[currentLang];
-  statsDiv.innerHTML = `
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-amber-600 dark:text-amber-400">${requests.length}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.totalRequests || 'Total demandes'}</div></div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">${pending}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.pendingStatus || 'En attente'}</div></div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${progress}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.progressStatus || 'En cours'}</div></div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-green-600 dark:text-green-400">${done}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.doneStatus || 'Terminé'}</div></div>
-  `;
-  const listDiv = document.getElementById('requestsList');
-  if (requests.length === 0) { listDiv.innerHTML = `<div class="p-8 text-center text-stone-500 dark:text-stone-400">📭 ${currentLang === 'ar' ? 'لا توجد طلبات بعد' : 'Aucune demande pour le moment'}</div>`; return; }
-  listDiv.innerHTML = requests.map(r => `
-    <div class="p-4 hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" data-id="${r.id}">
-      <div class="flex justify-between items-start flex-wrap gap-2 mb-2">
-        <div><span class="font-semibold text-stone-800 dark:text-stone-200">${r.service}</span> - <span class="text-amber-600 dark:text-amber-400 font-medium">${r.price} TND</span></div>
-        <span class="text-xs text-stone-500 dark:text-stone-400">${new Date(r.createdAt).toLocaleDateString(currentLang === 'ar' ? 'ar-TN' : 'fr-FR')}</span>
-      </div>
-      <div class="text-sm text-stone-600 dark:text-stone-400 mb-2">👤 ${r.clientName} | 📞 ${r.clientPhone}</div>
-      <div class="text-xs text-stone-500 dark:text-stone-500 mb-2">📍 ${r.location} | 📅 ${r.date}</div>
-      ${r.message ? `<div class="text-xs text-stone-500 dark:text-stone-500 mb-3 bg-stone-100 dark:bg-stone-700 p-2 rounded-lg">📝 ${r.message.substring(0, 100)}${r.message.length > 100 ? '...' : ''}</div>` : ''}
-      <div class="flex justify-between items-center flex-wrap gap-2">
-        <span class="px-2 py-1 rounded-full text-xs font-medium ${r.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : (r.status === 'progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400')}">${r.status === 'pending' ? (currentLang === 'ar' ? 'قيد الانتظار' : 'En attente') : (r.status === 'progress' ? (currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours') : (currentLang === 'ar' ? 'مكتمل' : 'Terminé'))}</span>
-        <div class="flex gap-2">
-          ${r.status !== 'progress' ? `<button class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-all" onclick="updateRequestStatus('${r.id}', 'progress')">${currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours'}</button>` : ''}
-          ${r.status !== 'done' ? `<button class="px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-all" onclick="updateRequestStatus('${r.id}', 'done')">${currentLang === 'ar' ? 'مكتمل' : 'Terminé'}</button>` : ''}
-          <button class="px-3 py-1 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-all" onclick="deleteRequest('${r.id}')">${currentLang === 'ar' ? 'حذف' : 'Supprimer'}</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function updateRequestStatus(id, status) {
-  const request = requests.find(r => r.id == id);
-  if (request) { request.status = status; localStorage.setItem('maqabir_requests', JSON.stringify(requests)); renderDashboard(); showToast(`Statut mis à jour : ${status}`); }
-}
-function deleteRequest(id) { requests = requests.filter(r => r.id != id); localStorage.setItem('maqabir_requests', JSON.stringify(requests)); renderDashboard(); showToast(currentLang === 'ar' ? 'تم حذف الطلب' : 'Demande supprimée'); }
 
 // ==================== CARTE ====================
 function initMap() {
+  if (map) return;
   map = L.map('map').setView([36.4, 9.8], 7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
   updateMarkers();
@@ -533,6 +576,7 @@ function getMarkerIcon(isPrivate, isSelected) {
 }
 
 function updateMarkers() {
+  if (!map) return;
   tombs.forEach(tomb => {
     if (markers[tomb.id]) { map.removeLayer(markers[tomb.id]); delete markers[tomb.id]; }
     if (canSeeTomb(tomb)) {
@@ -547,7 +591,7 @@ function selectTomb(id) {
   const tomb = tombs.find(t => t.id === id);
   if (!tomb) return;
   selectedTombId = id;
-  map.flyTo([tomb.lat, tomb.lng], 16);
+  if (map && isMapVisible) map.flyTo([tomb.lat, tomb.lng], 16);
   updateMarkers();
   document.getElementById('detailName').textContent = tomb.name;
   document.getElementById('detailMeta').textContent = `${tomb.birth} – ${tomb.death} · ${tomb.cem}, ${tomb.gov}`;
@@ -562,7 +606,7 @@ function displayTombServices(tombId) {
   const tomb = tombs.find(t => t.id === tombId);
   if (!tomb) return;
   const container = document.getElementById('detailServicesActions');
-  container.innerHTML = `<h4 class="font-semibold text-stone-700 dark:text-stone-300 mb-2">Services pour ce tombeau</h4><div class="grid grid-cols-2 gap-2"><button class="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'cleaning')">🧹 Nettoyer</button><button class="px-3 py-2 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'painting')">🎨 Peindre</button><button class="px-3 py-2 bg-stone-500 text-white rounded-lg text-sm hover:bg-stone-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'marble')">🪨 Marbre</button><button class="px-3 py-2 bg-pink-500 text-white rounded-lg text-sm hover:bg-pink-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'flowers')">🌹 Fleurs</button><button class="px-3 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'findtomb')">🔍 Retrouver</button></div>`;
+  container.innerHTML = `<h4 class="font-semibold text-stone-700 dark:text-stone-300 mb-2">${currentLang === 'ar' ? 'خدمات لهذا القبر' : 'Services pour ce tombeau'}</h4><div class="grid grid-cols-2 gap-2"><button class="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'cleaning')">🧹 ${currentLang === 'ar' ? 'تنظيف' : 'Nettoyer'}</button><button class="px-3 py-2 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'painting')">🎨 ${currentLang === 'ar' ? 'طلاء' : 'Peindre'}</button><button class="px-3 py-2 bg-stone-500 text-white rounded-lg text-sm hover:bg-stone-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'marble')">🪨 ${currentLang === 'ar' ? 'رخام' : 'Marbre'}</button><button class="px-3 py-2 bg-pink-500 text-white rounded-lg text-sm hover:bg-pink-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'flowers')">🌹 ${currentLang === 'ar' ? 'زهور' : 'Fleurs'}</button><button class="px-3 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'findtomb')">🔍 ${currentLang === 'ar' ? 'بحث' : 'Retrouver'}</button></div>`;
 }
 
 function requestServiceForTomb(tombId, serviceCat) {
@@ -574,9 +618,9 @@ function requestServiceForTomb(tombId, serviceCat) {
   const allCats = { ...CATS_P1, ...CATS_P2 };
   const cat = allCats[serviceCat];
   const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : serviceCat;
-  document.getElementById('reqSvcInfo').innerHTML = `<span class="text-2xl">${cat?.icon || '🛠'}</span> <strong>${catName}</strong><br><small>Tombeau de ${tomb.name} à ${tomb.cem}</small>`;
+  document.getElementById('reqSvcInfo').innerHTML = `<span class="text-2xl">${cat?.icon || '🛠'}</span> <strong>${catName}</strong><br><small>${currentLang === 'ar' ? 'قبر' : 'Tombeau'} ${tomb.name} à ${tomb.cem}</small>`;
   document.getElementById('reqLoc').value = `${tomb.cem}, ${tomb.gov}`;
-  document.getElementById('reqMsg').value = `Tombeau de ${tomb.name} (${tomb.birth} - ${tomb.death})`;
+  document.getElementById('reqMsg').value = `${currentLang === 'ar' ? 'قبر' : 'Tombeau'} ${tomb.name} (${tomb.birth} - ${tomb.death})`;
   document.getElementById('svcReqModal').classList.remove('hidden');
   document.getElementById('svcReqModal').style.display = 'flex';
 }
@@ -584,7 +628,31 @@ function requestServiceForTomb(tombId, serviceCat) {
 function closeDetail() { document.getElementById('detailPanel').classList.add('hidden'); selectedTombId = null; updateMarkers(); }
 function copyGPS() { const tomb = tombs.find(t => t.id === selectedTombId); if (tomb) { navigator.clipboard.writeText(`${tomb.lat}, ${tomb.lng}`); showToast('Copié !'); } }
 
-// ==================== LISTE ====================
+// ==================== RECHERCHE AVANCÉE ====================
+function filterTombs() {
+  const searchNom = document.getElementById('searchNom')?.value.toLowerCase() || '';
+  const searchPrenom = document.getElementById('searchPrenom')?.value.toLowerCase() || '';
+  const searchCimetiere = document.getElementById('searchCimetiere')?.value.toLowerCase() || '';
+  const searchGov = document.getElementById('searchGov')?.value || '';
+  const gov = document.getElementById('govFilter')?.value || '';
+  const cem = document.getElementById('cemFilter')?.value || '';
+  const priv = document.getElementById('privFilter')?.value || '';
+  
+  const filtered = tombs.filter(tomb => {
+    if (!canSeeTomb(tomb)) return false;
+    if (searchNom && !tomb.name.toLowerCase().includes(searchNom)) return false;
+    if (searchPrenom && !tomb.firstname?.toLowerCase().includes(searchPrenom) && !tomb.name.toLowerCase().includes(searchPrenom)) return false;
+    if (searchCimetiere && !tomb.cem.toLowerCase().includes(searchCimetiere)) return false;
+    if (searchGov && tomb.gov !== searchGov) return false;
+    if (gov && tomb.gov !== gov) return false;
+    if (cem && tomb.cem !== cem) return false;
+    if (priv === 'public' && tomb.privacy !== 'public') return false;
+    if (priv === 'private' && tomb.privacy !== 'private') return false;
+    return true;
+  });
+  renderTombList(filtered);
+}
+
 function renderTombList(filteredList = null) {
   const list = filteredList || tombs.filter(t => canSeeTomb(t));
   const container = document.getElementById('tombList');
@@ -601,24 +669,7 @@ function renderTombList(filteredList = null) {
   document.getElementById('statCount').textContent = tombs.filter(t => canSeeTomb(t)).length;
 }
 
-function filterTombs() {
-  const searchTerm = (document.getElementById('searchInput').value || document.getElementById('heroSearch').value || '').toLowerCase();
-  const gov = document.getElementById('govFilter').value;
-  const cem = document.getElementById('cemFilter').value;
-  const priv = document.getElementById('privFilter').value;
-  const filtered = tombs.filter(tomb => {
-    if (!canSeeTomb(tomb)) return false;
-    if (searchTerm && !tomb.name.toLowerCase().includes(searchTerm)) return false;
-    if (gov && tomb.gov !== gov) return false;
-    if (cem && tomb.cem !== cem) return false;
-    if (priv === 'public' && tomb.privacy !== 'public') return false;
-    if (priv === 'private' && tomb.privacy !== 'private') return false;
-    return true;
-  });
-  renderTombList(filtered);
-}
-
-function syncSearch() { const heroVal = document.getElementById('heroSearch').value; document.getElementById('searchInput').value = heroVal; filterTombs(); }
+function syncSearch() { filterTombs(); }
 function showTab(tab) { const sidebar = document.getElementById('sidebar'); if (tab === 'map') sidebar.style.display = 'none'; else if (tab === 'list') sidebar.style.display = 'none'; else sidebar.style.display = 'block'; }
 
 // ==================== QUICK ADD ====================
@@ -708,7 +759,7 @@ function saveQuickTomb() {
   const newTomb = { id: 't_' + Date.now(), name: firstname + ' ' + lastname, firstname, lastname, birth: document.getElementById('quickBirth').value.trim() || 'Date inconnue', death: document.getElementById('quickDeath').value.trim() || 'Date inconnue', cem: document.getElementById('quickCem').value.trim() || 'Cimetière', gov: document.getElementById('quickGov').value, location: 'Ajouté par photo', lat: currentLocation.lat, lng: currentLocation.lng, photos: [], privacy: 'public', owner: currentUser.uid, ownerName: currentUser.name };
   tombs.push(newTomb);
   localStorage.setItem('maqabir_tombs', JSON.stringify(tombs));
-  renderTombList();
+  filterTombs();
   updateMarkers();
   closeQuickAddModal();
   showToast('Tombeau ajouté !');
@@ -751,7 +802,7 @@ function renderServices() {
   grid.innerHTML = list.map(s => {
     const cat = { ...CATS_P1, ...CATS_P2 }[s.cat] || { icon: '🛠', fr: s.cat };
     const stars = '★'.repeat(Math.floor(s.rating)) + '☆'.repeat(5 - Math.ceil(s.rating));
-    return `<div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden hover:shadow-lg transition-all"><div class="p-4 flex gap-3"><div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xl">${cat.icon}</div><div class="flex-1"><h3 class="font-bold text-stone-800 dark:text-stone-200">${s.name}</h3><div class="text-sm text-stone-500">📍 ${s.gov}</div><div class="text-xs text-stone-400 mt-1">${s.desc.substring(0, 80)}...</div><div class="flex flex-wrap gap-2 mt-2"><span class="text-xs bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded-full">${stars} ${s.rating}</span><span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-full">🟢 ${s.avail === 'always' ? '24/7' : 'Disponible'}</span></div></div><div class="text-right"><strong class="text-amber-600 dark:text-amber-400">${s.price}</strong><span class="text-xs"> TND</span></div></div><div class="flex border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="callProvider('${s.phone}')">📞 Appeler</button><button class="flex-1 py-2 text-blue-600 dark:text-blue-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button><button class="flex-1 py-2 text-amber-600 dark:text-amber-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="openSvcReqModal('${s.id}')">📋 Demander</button></div></div>`;
+    return `<div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden hover:shadow-lg transition-all"><div class="p-4 flex gap-3"><div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xl">${cat.icon}</div><div class="flex-1"><h3 class="font-bold text-stone-800 dark:text-stone-200">${s.name}</h3><div class="text-sm text-stone-500">📍 ${s.gov}</div><div class="text-xs text-stone-400 mt-1">${s.desc.substring(0, 80)}...</div><div class="flex flex-wrap gap-2 mt-2"><span class="text-xs bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded-full">${stars} ${s.rating}</span><span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-full">🟢 ${s.avail === 'always' ? '24/7' : 'Disponible'}</span></div></div><div class="text-right"><strong class="text-amber-600 dark:text-amber-400">${s.price}</strong><span class="text-xs"> TND</span></div></div><div class="flex border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="callProvider('${s.phone}')">📞 ${currentLang === 'ar' ? 'اتصال' : 'Appeler'}</button><button class="flex-1 py-2 text-blue-600 dark:text-blue-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button><button class="flex-1 py-2 text-amber-600 dark:text-amber-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="openSvcReqModal('${s.id}')">📋 ${currentLang === 'ar' ? 'طلب' : 'Demander'}</button></div></div>`;
   }).join('');
 }
 function callProvider(phone) { window.open('tel:' + phone.replace(/\s/g, '')); }
@@ -785,6 +836,53 @@ function submitServiceRequest() {
   if (!document.getElementById('dashboardScreen').classList.contains('hidden')) renderDashboard();
 }
 
+// ==================== DASHBOARD ====================
+function showDashboardScreen() {
+  if (!currentUser || !adminEmails.includes(currentUser.email)) { showToast('Accès réservé aux administrateurs'); return; }
+  document.getElementById('dashboardScreen').classList.remove('hidden');
+  renderDashboard();
+}
+function hideDashboardScreen() { document.getElementById('dashboardScreen').classList.add('hidden'); }
+function renderDashboard() {
+  const statsDiv = document.getElementById('dashboardStats');
+  const pending = requests.filter(r => r.status === 'pending').length;
+  const progress = requests.filter(r => r.status === 'progress').length;
+  const done = requests.filter(r => r.status === 'done').length;
+  const t = translations[currentLang];
+  statsDiv.innerHTML = `
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-amber-600 dark:text-amber-400">${requests.length}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.totalRequests || 'Total demandes'}</div></div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">${pending}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.pendingStatus || 'En attente'}</div></div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${progress}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.progressStatus || 'En cours'}</div></div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-green-600 dark:text-green-400">${done}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.doneStatus || 'Terminé'}</div></div>
+  `;
+  const listDiv = document.getElementById('requestsList');
+  if (requests.length === 0) { listDiv.innerHTML = `<div class="p-8 text-center text-stone-500 dark:text-stone-400">📭 ${currentLang === 'ar' ? 'لا توجد طلبات بعد' : 'Aucune demande pour le moment'}</div>`; return; }
+  listDiv.innerHTML = requests.map(r => `
+    <div class="p-4 hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" data-id="${r.id}">
+      <div class="flex justify-between items-start flex-wrap gap-2 mb-2">
+        <div><span class="font-semibold text-stone-800 dark:text-stone-200">${r.service}</span> - <span class="text-amber-600 dark:text-amber-400 font-medium">${r.price} TND</span></div>
+        <span class="text-xs text-stone-500 dark:text-stone-400">${new Date(r.createdAt).toLocaleDateString(currentLang === 'ar' ? 'ar-TN' : 'fr-FR')}</span>
+      </div>
+      <div class="text-sm text-stone-600 dark:text-stone-400 mb-2">👤 ${r.clientName} | 📞 ${r.clientPhone}</div>
+      <div class="text-xs text-stone-500 dark:text-stone-500 mb-2">📍 ${r.location} | 📅 ${r.date}</div>
+      ${r.message ? `<div class="text-xs text-stone-500 dark:text-stone-500 mb-3 bg-stone-100 dark:bg-stone-700 p-2 rounded-lg">📝 ${r.message.substring(0, 100)}${r.message.length > 100 ? '...' : ''}</div>` : ''}
+      <div class="flex justify-between items-center flex-wrap gap-2">
+        <span class="px-2 py-1 rounded-full text-xs font-medium ${r.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : (r.status === 'progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400')}">${r.status === 'pending' ? (currentLang === 'ar' ? 'قيد الانتظار' : 'En attente') : (r.status === 'progress' ? (currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours') : (currentLang === 'ar' ? 'مكتمل' : 'Terminé'))}</span>
+        <div class="flex gap-2">
+          ${r.status !== 'progress' ? `<button class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-all" onclick="updateRequestStatus('${r.id}', 'progress')">${currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours'}</button>` : ''}
+          ${r.status !== 'done' ? `<button class="px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-all" onclick="updateRequestStatus('${r.id}', 'done')">${currentLang === 'ar' ? 'مكتمل' : 'Terminé'}</button>` : ''}
+          <button class="px-3 py-1 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-all" onclick="deleteRequest('${r.id}')">${currentLang === 'ar' ? 'حذف' : 'Supprimer'}</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function updateRequestStatus(id, status) {
+  const request = requests.find(r => r.id == id);
+  if (request) { request.status = status; localStorage.setItem('maqabir_requests', JSON.stringify(requests)); renderDashboard(); showToast(`Statut mis à jour : ${status}`); }
+}
+function deleteRequest(id) { requests = requests.filter(r => r.id != id); localStorage.setItem('maqabir_requests', JSON.stringify(requests)); renderDashboard(); showToast(currentLang === 'ar' ? 'تم حذف الطلب' : 'Demande supprimée'); }
+
 // ==================== INIT ====================
 function loadStoredData() {
   const storedTombs = localStorage.getItem('maqabir_tombs');
@@ -793,9 +891,7 @@ function loadStoredData() {
   if (savedUser) { currentUser = JSON.parse(savedUser); updateUserUI(); }
 }
 loadStoredData();
-initMap();
-renderTombList();
-updateMarkers();
+filterTombs();
 setLanguage(currentLang);
 
 window.selectTomb = selectTomb; window.closeDetail = closeDetail; window.copyGPS = copyGPS;
@@ -813,6 +909,7 @@ window.setLanguage = setLanguage; window.toggleDarkMode = toggleDarkMode;
 window.requestServiceForTomb = requestServiceForTomb;
 window.showDashboardScreen = showDashboardScreen; window.hideDashboardScreen = hideDashboardScreen;
 window.updateRequestStatus = updateRequestStatus; window.deleteRequest = deleteRequest; window.renderDashboard = renderDashboard;
+window.toggleMap = toggleMap;
 </script>
 </body>
 </html>
