@@ -4,439 +4,349 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>مقابر — Maqabir Tunisie</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Tajawal:wght@300;400;500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Tesseract.js -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!-- reCAPTCHA -->
 <script src="https://www.google.com/recaptcha/api.js?render=6LdE9LgsAAAAAFN8T2rYcqNpB_5UzaHxlVxeD_-K"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-:root {
-  --cream: #f5f0e8;
-  --sand: #d4c5a9;
-  --olive: #5a6b3c;
-  --olive-light: #7a8f52;
-  --olive-dim: rgba(90,107,60,0.1);
-  --brown: #3d2b1f;
-  --brown-mid: #6b4c38;
-  --gold: #c9a84c;
-  --gold-light: #e8c96d;
-  --white: #fdfaf5;
-  --text: #2a1f15;
-  --text-mid: #5c4a3a;
-  --danger: #c0392b;
-  --success: #27ae60;
-  --warning: #f39c12;
-  --info: #3498db;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --ff: 'Tajawal', sans-serif;
-  --ffd: 'Playfair Display', serif;
-}
-
-[dir="rtl"] { --ffd: 'Amiri', serif; }
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: var(--ff);
-  background: var(--cream);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-/* Navigation */
-.topnav {
-  background: var(--brown);
-  position: sticky;
-  top: 0;
-  z-index: 500;
-  padding: 11px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.nav-logo { display: flex; align-items: center; gap: 10px; }
-.nav-logo-i { width: 34px; height: 34px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-.nav-logo h1 { font-family: var(--ffd); color: var(--cream); font-size: 1.2rem; }
-.nav-srch { flex: 1; max-width: 300px; }
-.nav-srch input { width: 100%; padding: 8px 14px; border-radius: 20px; border: none; background: rgba(255,255,255,0.12); color: var(--cream); outline: none; }
-.nav-act { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.nav-btn { background: transparent; border: 1px solid var(--sand); color: var(--sand); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-.nav-btn:hover { background: var(--gold); color: var(--brown); }
-.nav-btn-primary { background: var(--gold); border: none; color: var(--brown); font-weight: bold; }
-.nav-btn-primary:hover { background: var(--gold-light); }
-.uchip { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 11px; cursor: pointer; }
-.uav { width: 25px; height: 25px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-.uname { font-size: 0.78rem; color: var(--cream); }
-.pmenu { position: absolute; top: 60px; right: 16px; background: var(--white); border-radius: var(--radius); min-width: 180px; display: none; z-index: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.pmenu.open { display: block; }
-.pm-u { padding: 12px; border-bottom: 1px solid var(--sand); }
-.pm-i { padding: 10px 12px; cursor: pointer; width: 100%; text-align: left; background: none; border: none; font-family: var(--ff); }
-.pm-i:hover { background: var(--cream); }
-.pm-i.danger { color: var(--danger); }
-
-/* Hero */
-.hero { background: linear-gradient(135deg, var(--brown), var(--olive)); padding: 30px 16px; text-align: center; color: var(--cream); }
-.hero h2 { font-family: var(--ffd); font-size: 1.7rem; margin-bottom: 10px; }
-.hs { display: flex; background: var(--white); border-radius: 8px; overflow: hidden; max-width: 500px; margin: 15px auto 0; }
-.hs input { flex: 1; padding: 12px; border: none; outline: none; font-family: var(--ff); }
-.hs select { padding: 12px; border: none; background: var(--cream); font-family: var(--ff); }
-.hs button { padding: 12px 20px; background: var(--gold); border: none; cursor: pointer; }
-
-/* Stats */
-.stats-bar { background: var(--white); padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid var(--sand); }
-.stat { text-align: center; }
-.stat strong { font-size: 1.3rem; color: var(--olive); }
-.stat span { font-size: 0.7rem; color: var(--text-mid); }
-
-/* Layout */
-.app-body { max-width: 1300px; margin: 0 auto; padding: 15px; display: grid; grid-template-columns: 280px 1fr; gap: 15px; }
-.sidebar { display: flex; flex-direction: column; gap: 12px; }
-.panel { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand); overflow: hidden; }
-.panel-hd { background: var(--brown); padding: 10px 14px; color: var(--cream); display: flex; justify-content: space-between; align-items: center; }
-.panel-bd { padding: 12px; }
-.fg { margin-bottom: 12px; }
-.fg label { display: block; font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; }
-.fg select { width: 100%; padding: 7px; border: 1px solid var(--sand); border-radius: 6px; background: var(--cream); font-family: var(--ff); }
-.btn-apply { width: 100%; padding: 8px; background: var(--olive); color: white; border: none; border-radius: 6px; cursor: pointer; font-family: var(--ff); }
-
-/* Tomb Cards */
-.tc { background: var(--cream); border: 1px solid var(--sand); border-radius: 8px; padding: 10px; margin-bottom: 8px; cursor: pointer; }
-.tc:hover { border-color: var(--gold); }
-.tc h4 { font-family: var(--ffd); margin-bottom: 4px; }
-.tc .dt { font-size: 0.7rem; color: var(--text-mid); }
-
-/* Map */
-#map { height: 400px; border-radius: var(--radius); border: 1px solid var(--sand); }
-
-/* Detail Panel */
-.dp { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand); display: none; }
-.dp.vis { display: block; }
-.dhd { background: var(--brown); padding: 12px; color: var(--cream); position: relative; }
-.cbt { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
-.dbd { padding: 15px; }
-.gpsbdg { display: flex; align-items: center; gap: 10px; background: var(--olive-dim); padding: 10px; border-radius: 8px; margin-bottom: 12px; }
-.gpscpy { background: var(--gold); border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-family: var(--ff); }
-.dirbtn { display: block; background: var(--brown); color: var(--cream); padding: 10px; text-align: center; border-radius: 8px; text-decoration: none; margin-bottom: 12px; font-family: var(--ff); }
-
-/* Services Action Buttons */
-.services-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 15px 0 10px; }
-.svc-action-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: var(--ff); text-align: center; }
-.svc-action-cleaning { background: #3498db; color: white; }
-.svc-action-painting { background: #e67e22; color: white; }
-.svc-action-marble { background: #95a5a6; color: white; }
-.svc-action-flowers { background: #e84393; color: white; }
-.svc-action-find { background: #27ae60; color: white; }
-
-/* Modals */
-.movl { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 800; display: none; align-items: center; justify-content: center; }
-.movl.open { display: flex; }
-.modal { background: var(--white); border-radius: 20px; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
-.mhd { background: var(--brown); padding: 15px; color: var(--cream); display: flex; justify-content: space-between; align-items: center; }
-.mbd { padding: 20px; }
-.fgrp { margin-bottom: 12px; }
-.fgrp label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; }
-.fgrp input, .fgrp select, .fgrp textarea { width: 100%; padding: 8px 11px; border: 1.5px solid var(--sand); border-radius: 8px; background: var(--cream); font-family: var(--ff); }
-.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mft { padding: 15px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--sand); }
-.bcancel { padding: 8px 15px; background: transparent; border: 1.5px solid var(--sand); border-radius: 8px; cursor: pointer; font-family: var(--ff); }
-.bsave { padding: 8px 19px; background: var(--olive); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: var(--ff); }
-
-/* Auth Modal */
-.auth-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; }
-.auth-modal.open { display: flex; }
-.auth-card { background: var(--white); border-radius: 20px; width: 100%; max-width: 400px; overflow: hidden; }
-.auth-brand { background: var(--brown); padding: 25px; text-align: center; color: var(--cream); }
-.auth-tabs { display: flex; border-bottom: 2px solid var(--sand); }
-.auth-tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; background: none; border: none; font-family: var(--ff); }
-.auth-tab.active { color: var(--olive); border-bottom: 2px solid var(--olive); }
-.auth-body { padding: 22px; }
-.field { margin-bottom: 15px; }
-.field input { width: 100%; padding: 10px; border: 1.5px solid var(--sand); border-radius: 8px; font-family: var(--ff); }
-.btn-primary { width: 100%; padding: 12px; background: var(--olive); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: var(--ff); }
-.auth-div { text-align: center; margin: 12px 0; }
-.btn-guest { width: 100%; padding: 10px; background: transparent; border: 1.5px dashed var(--sand); border-radius: 8px; cursor: pointer; font-family: var(--ff); }
-.auth-err { background: rgba(192,57,43,0.1); border: 1px solid var(--danger); border-radius: 6px; padding: 8px; font-size: 0.8rem; color: var(--danger); margin-bottom: 12px; display: none; }
-.auth-err.show { display: block; }
-.modal-close { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.3); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; }
-
-/* Toast */
-.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--brown); color: var(--cream); padding: 10px 20px; border-radius: 30px; display: none; z-index: 900; font-family: var(--ff); }
-.toast.show { display: block; }
-
-/* Fab Button */
-.fab { position: fixed; bottom: 20px; right: 20px; background: var(--gold); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; border: none; z-index: 400; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-
-/* Bottom Nav */
-.bnav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--brown); padding: 8px; z-index: 500; }
-.bnav-in { display: flex; justify-content: space-around; }
-.bbn { background: none; border: none; color: var(--sand); text-align: center; cursor: pointer; flex: 1; padding: 5px; font-family: var(--ff); }
-.bbn.active { color: var(--gold); }
-
-/* Camera Modal */
-.camera-container { position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
-#cameraVideo { width: 100%; max-height: 400px; object-fit: cover; }
-#cameraCanvas { display: none; }
-.camera-controls { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
-.camera-btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-.btn-capture { background: var(--gold); color: var(--brown); }
-.btn-upload { background: var(--olive); color: white; }
-.detection-loading { text-align: center; padding: 20px; }
-.detection-result { background: var(--olive-dim); border-radius: 8px; padding: 12px; margin: 10px 0; }
-.detected-field { margin: 5px 0; }
-.detected-label { font-weight: bold; color: var(--olive); }
-.spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.lang-toggle { display: flex; align-items: center; background: rgba(255,255,255,0.12); border: 1px solid rgba(212,197,169,0.25); border-radius: 20px; overflow: hidden; }
-.lang-btn { padding: 5px 13px; font-size: 0.8rem; font-family: var(--ff); font-weight: 700; cursor: pointer; border: none; background: transparent; color: var(--sand); transition: all 0.2s; }
-.lang-btn.active { background: var(--gold); color: var(--brown); }
-
-/* Services Screen */
-.svc-screen { display: none; position: fixed; inset: 0; background: var(--cream); z-index: 700; overflow-y: auto; padding-bottom: 80px; }
-.svc-header { background: linear-gradient(135deg, var(--brown), var(--olive)); padding: 14px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
-.svc-back { background: rgba(255,255,255,0.15); border: none; color: var(--cream); width: 34px; height: 34px; border-radius: 50%; font-size: 18px; cursor: pointer; }
-.svc-title { flex: 1; font-family: var(--ffd); color: var(--cream); font-size: 1.15rem; }
-.svc-tabs { background: var(--white); border-bottom: 1px solid var(--sand); display: flex; overflow-x: auto; }
-.svc-tab { flex: 1; padding: 11px 10px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; font-family: var(--ff); }
-.svc-tab.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: bold; }
-.svc-search { padding: 10px 12px; background: var(--white); border-bottom: 1px solid var(--sand); }
-.svc-search input { width: 100%; padding: 8px 11px 8px 33px; border: 1.5px solid var(--sand); border-radius: 8px; background: var(--cream); outline: none; font-family: var(--ff); }
-.svc-chips { padding: 10px 12px; background: var(--cream); border-bottom: 1px solid var(--sand); overflow-x: auto; white-space: nowrap; }
-.chip { display: inline-block; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--sand); background: var(--white); font-size: 0.76rem; cursor: pointer; margin-right: 6px; font-family: var(--ff); }
-.chip.active { background: var(--olive); color: white; border-color: var(--olive); }
-.svc-grid { padding: 12px; }
-.svc-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand); margin-bottom: 11px; overflow: hidden; }
-.svc-card-hd { display: flex; gap: 12px; padding: 13px 14px 8px; }
-.svc-icon { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
-.svc-info { flex: 1; }
-.svc-info h3 { font-family: var(--ffd); font-size: 0.95rem; margin-bottom: 2px; }
-.svc-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; padding: 2px 7px; border-radius: 20px; margin-bottom: 3px; background: rgba(61,43,31,0.08); color: var(--brown-mid); }
-.svc-gov { font-size: 0.71rem; color: var(--olive); }
-.svc-price-block { text-align: end; flex-shrink: 0; }
-.svc-price-block strong { display: block; font-family: var(--ffd); font-size: 0.95rem; }
-.svc-card-body { padding: 0 14px 11px; }
-.svc-desc { font-size: 0.81rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 8px; }
-.svc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.svc-avail { font-size: 0.68rem; padding: 2px 8px; border-radius: 20px; background: rgba(39,174,96,0.1); color: var(--success); }
-.svc-btns { display: flex; gap: 7px; padding: 9px 14px 13px; border-top: 1px solid var(--sand); }
-.svc-btn-call { flex: 1; padding: 9px; background: var(--olive); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: var(--ff); }
-.svc-btn-wa { flex: 1; padding: 9px; background: #25d366; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: var(--ff); }
-.svc-btn-req { flex: 1; padding: 9px; background: transparent; color: var(--brown-mid); border: 1.5px solid var(--sand); border-radius: 6px; font-weight: 600; cursor: pointer; font-family: var(--ff); }
-.svc-section-title { font-family: var(--ffd); font-size: 1rem; color: var(--brown); padding: 4px 0 10px; border-bottom: 2px solid var(--sand); margin-bottom: 12px; }
-.svc-empty { text-align: center; padding: 38px 20px; color: var(--text-mid); }
-.svc-banner { padding: 14px 16px; margin: 12px 12px 0; border-radius: var(--radius); border: 1px solid var(--sand); }
-.svc-pack1 { background: rgba(61,43,31,0.06); border-color: rgba(107,76,56,0.2); }
-.svc-pack2 { background: rgba(90,107,60,0.06); border-color: rgba(90,107,60,0.2); }
-.svc-pack-full { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.35); }
-
-@media (max-width: 860px) {
-  .app-body { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
-  .bnav { display: flex; }
-  .nav-srch { display: none; }
-  .fab { bottom: 70px; }
-  .nav-act { gap: 5px; }
-  .nav-btn { padding: 4px 8px; font-size: 0.7rem; }
-  .services-actions { flex-direction: column; }
-}
+  @layer utilities {
+    .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+    .dark .glass { background: rgba(30, 30, 40, 0.9); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02); }
+  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: #c9a84c; border-radius: 10px; }
+  .dark ::-webkit-scrollbar-track { background: #2d2d3d; }
+  .dark ::-webkit-scrollbar-thumb { background: #c9a84c; }
+  .dark .leaflet-container { filter: brightness(0.9) contrast(1.1); }
+  * { transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
 </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-stone-100 dark:from-stone-900 dark:via-stone-800 dark:to-stone-900 transition-colors duration-300 font-['Inter']">
 
 <!-- AUTH MODAL -->
-<div id="authModal" class="auth-modal">
-  <div class="auth-card">
-    <div class="modal-close" onclick="closeAuthModal()">✕</div>
-    <div class="auth-brand"><div class="lc">🕌</div><h1 id="authTitle">Maqabir</h1><p id="authSubtitle">Connectez-vous pour ajouter un tombeau</p></div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Connexion</button>
-      <button class="auth-tab" id="authTabReg" onclick="switchAuthTab('register')">Inscription</button>
+<div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] hidden items-center justify-center">
+  <div class="bg-white dark:bg-stone-800 rounded-2xl w-full max-w-md mx-4 overflow-hidden shadow-2xl animate-fade-in-up">
+    <div class="relative bg-gradient-to-r from-amber-800 to-emerald-800 p-6 text-center">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-white/70 hover:text-white text-xl">&times;</button>
+      <div class="text-4xl mb-2">🕌</div>
+      <h2 class="text-2xl font-bold text-white font-['Amiri']" id="authTitle">Maqabir</h2>
+      <p class="text-amber-200 text-sm mt-1" id="authSubtitle">Connectez-vous pour accéder au tableau de bord</p>
     </div>
-    <div class="auth-body">
+    <div class="flex border-b border-stone-200 dark:border-stone-700">
+      <button class="auth-tab flex-1 py-3 text-center font-semibold text-stone-600 dark:text-stone-400 border-b-2 border-transparent active" onclick="switchAuthTab('login')" id="authTabLogin">Connexion</button>
+      <button class="auth-tab flex-1 py-3 text-center font-semibold text-stone-600 dark:text-stone-400 border-b-2 border-transparent" onclick="switchAuthTab('register')" id="authTabReg">Inscription</button>
+    </div>
+    <div class="p-6">
       <div id="loginForm">
-        <div class="auth-err" id="loginErr"></div>
-        <div class="field"><label id="loginEmailLabel">Email</label><input type="email" id="loginEmail" placeholder="exemple@email.com"></div>
-        <div class="field"><label id="loginPwdLabel">Mot de passe</label><input type="password" id="loginPwd" placeholder="••••••"></div>
-        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">Se connecter</button>
+        <div class="auth-err hidden bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-600 dark:text-red-400 mb-4" id="loginErr"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginEmailLabel">Email</label><input type="email" id="loginEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="admin@maqabir.com"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginPwdLabel">Mot de passe</label><input type="password" id="loginPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="••••••"></div>
+        <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all" onclick="handleLogin()" id="loginBtn">Se connecter</button>
       </div>
       <div id="registerForm" style="display:none;">
-        <div class="auth-err" id="regErr"></div>
-        <div class="field"><label id="regNameLabel">Nom complet</label><input type="text" id="regName" placeholder="Mohamed Ben Ali"></div>
-        <div class="field"><label id="regEmailLabel">Email</label><input type="email" id="regEmail" placeholder="exemple@email.com"></div>
-        <div class="field"><label id="regPwdLabel">Mot de passe (min 6)</label><input type="password" id="regPwd" placeholder="••••••"></div>
-        <button class="btn-primary" id="regBtn" onclick="handleRegisterWithCaptcha()">Créer mon compte</button>
+        <div class="auth-err hidden bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-600 dark:text-red-400 mb-4" id="regErr"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regNameLabel">Nom complet</label><input type="text" id="regName" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="Admin Maqabir"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regEmailLabel">Email</label><input type="email" id="regEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="admin@maqabir.com"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regPwdLabel">Mot de passe (min 6)</label><input type="password" id="regPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="••••••"></div>
+        <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all" onclick="handleRegisterWithCaptcha()" id="regBtn">Créer mon compte</button>
       </div>
+      <div class="text-center text-sm text-stone-500 dark:text-stone-400 mt-4">ou</div>
+      <button class="w-full mt-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="guestLogin()" id="guestBtn">Continuer sans compte</button>
     </div>
   </div>
 </div>
 
 <!-- APP MAIN -->
-<div id="appScreen">
-  <nav class="topnav">
-    <div class="nav-logo"><div class="nav-logo-i">🕌</div><h1 id="navTitle">Maqabir</h1></div>
-    <div class="nav-srch"><input type="text" id="searchInput" placeholder="Rechercher un défunt..." oninput="filterTombs()"></div>
-    <div class="nav-act">
-      <div class="lang-toggle"><button class="lang-btn active" onclick="setLanguage('fr')">FR</button><button class="lang-btn" onclick="setLanguage('ar')">ع</button></div>
-      <button class="nav-btn" id="servicesBtn" onclick="showServicesScreen()">🛠 Services</button>
-      <button class="nav-btn nav-btn-primary" id="quickAddBtn" onclick="openQuickAddModal()">📸 Ajout rapide</button>
-      <button class="nav-btn" id="addNavBtn" onclick="requireAuth()">➕ Ajouter</button>
-      <div class="uchip" onclick="toggleMenu()"><div class="uav" id="userAvatar">👤</div><span class="uname" id="userName">Invité</span></div>
-      <div class="pmenu" id="userMenu"><div class="pm-u"><strong id="menuName">Invité</strong><span id="menuEmail">Mode visite</span></div><button class="pm-i danger" id="logoutBtn" onclick="logout()">🚪 Déconnexion</button></div>
+<div id="appScreen" class="min-h-screen">
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-gradient-to-br from-amber-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md">🕌</div>
+          <h1 class="text-xl font-bold bg-gradient-to-r from-amber-700 to-emerald-700 dark:from-amber-400 dark:to-emerald-400 bg-clip-text text-transparent font-['Amiri']" id="navTitle">Maqabir</h1>
+        </div>
+        <div class="hidden md:block flex-1 max-w-md mx-4">
+          <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">🔍</span><input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 border border-stone-200 dark:border-stone-700 rounded-xl bg-stone-50 dark:bg-stone-800 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="Rechercher un défunt..." oninput="filterTombs()"></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="theme-toggle w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-all" onclick="toggleDarkMode()">🌙</button>
+          <button class="hidden md:flex px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" onclick="showServicesScreen()" id="servicesBtn">🛠 Services</button>
+          <button class="hidden md:flex px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" onclick="showDashboardScreen()" id="dashboardBtn">📊 Dashboard</button>
+          <button class="hidden md:flex px-4 py-2 text-sm font-medium bg-gradient-to-r from-amber-500 to-emerald-500 text-white rounded-xl hover:shadow-md transition-all" onclick="openQuickAddModal()" id="quickAddBtn">📸 Ajout rapide</button>
+          <button class="hidden md:flex px-4 py-2 text-sm font-medium border border-stone-300 dark:border-stone-600 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 transition-all" onclick="requireAuth()" id="addNavBtn">➕ Ajouter</button>
+          <div class="relative">
+            <div class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all" onclick="toggleMenu()">
+              <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-sm" id="userAvatar">👤</div>
+              <span class="text-sm font-medium text-stone-700 dark:text-stone-300" id="userName">Invité</span>
+            </div>
+            <div class="absolute right-0 mt-2 w-56 bg-white dark:bg-stone-800 rounded-xl shadow-lg border border-stone-200 dark:border-stone-700 hidden z-50" id="userMenu">
+              <div class="p-3 border-b border-stone-200 dark:border-stone-700"><strong class="block text-stone-800 dark:text-stone-200" id="menuName">Invité</strong><span class="text-xs text-stone-500 dark:text-stone-400" id="menuEmail">Mode visite</span></div>
+              <button class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors" onclick="logout()" id="logoutBtn">🚪 Déconnexion</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
 
-  <div class="hero">
-    <h2 id="heroTitle">Retrouvez vos proches,<br>préservez la mémoire</h2>
-    <p id="heroSubtitle">Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p>
-    <div class="hs">
-      <input type="text" id="heroSearch" placeholder="Nom du défunt..." oninput="syncSearch()">
-      <select id="govFilter" onchange="filterTombs()"><option value="" id="allGovs">Tous les gouvernorats</option><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select>
-      <button onclick="filterTombs()">🔍</button>
+  <!-- Hero Section -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-amber-900 via-stone-800 to-emerald-900 text-white py-16">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23c9a84c" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+    <div class="relative max-w-4xl mx-auto text-center px-4">
+      <h2 class="text-3xl md:text-4xl font-bold font-['Amiri'] mb-3" id="heroTitle">Retrouvez vos proches,<br>préservez la mémoire</h2>
+      <p class="text-amber-100/80 mb-6" id="heroSubtitle">Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p>
+      <div class="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+        <input type="text" id="heroSearch" class="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Nom du défunt..." oninput="syncSearch()">
+        <select id="govFilter" class="px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="filterTombs()"><option value="" id="allGovs">Tous les gouvernorats</option><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select>
+        <button class="px-6 py-3 bg-amber-500 text-stone-900 font-semibold rounded-xl hover:bg-amber-400 transition-all" onclick="filterTombs()">🔍 Rechercher</button>
+      </div>
     </div>
   </div>
 
-  <div class="stats-bar">
-    <div class="stat"><strong id="statCount">4</strong><span id="statTombsLabel">Tombeaux</span></div>
-    <div class="stat"><strong>4</strong><span id="statCemsLabel">Cimetières</span></div>
-    <div class="stat"><strong id="statPhotos">9</strong><span id="statPhotosLabel">Photos</span></div>
+  <!-- Stats Bar -->
+  <div class="grid grid-cols-4 gap-4 max-w-4xl mx-auto px-4 -mt-8 relative z-10">
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
+      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="statCount">4</strong>
+      <span class="block text-sm text-stone-600 dark:text-stone-400" id="statTombsLabel">Tombeaux</span>
+    </div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
+      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400">4</strong>
+      <span class="block text-sm text-stone-600 dark:text-stone-400" id="statCemsLabel">Cimetières</span>
+    </div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
+      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="statPhotos">9</strong>
+      <span class="block text-sm text-stone-600 dark:text-stone-400" id="statPhotosLabel">Photos</span>
+    </div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
+      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="statUsers">1</strong>
+      <span class="block text-sm text-stone-600 dark:text-stone-400" id="statMembersLabel">Membres</span>
+    </div>
   </div>
 
-  <div class="app-body">
-    <aside class="sidebar" id="sidebar">
-      <div class="panel"><div class="panel-hd"><h3 id="filterTitle">Filtres</h3></div><div class="panel-bd"><div class="fg"><label id="cemFilterLabel">Cimetière</label><select id="cemFilter" onchange="filterTombs()"><option value="" id="allCems">Tous</option><option>Djellaz</option><option>Sidi Bou Saïd</option><option>El Gorjani</option></select></div><div class="fg"><label id="privFilterLabel">Visibilité</label><select id="privFilter" onchange="filterTombs()"><option value="" id="allVis">Tous</option><option value="public" id="publicOpt">Publics</option><option value="private" id="privateOpt">Privés</option></select></div><button class="btn-apply" id="applyBtn" onclick="filterTombs()">Appliquer</button></div></div>
-      <div class="panel"><div class="panel-hd"><h3 id="resultsTitle">Résultats</h3><span class="badge" id="resultCount">4</span></div><div class="panel-bd" id="tombList"></div></div>
-    </aside>
-    <div class="rcol"><div id="map"></div><div class="dp" id="detailPanel"><div class="dhd"><h2 id="detailName">—</h2><div class="dm" id="detailMeta">—</div><button class="cbt" onclick="closeDetail()">✕</button></div><div class="dbd"><div class="gpsbdg"><div class="gpsinf"><div class="gpslb" id="gpsLabel">Coordonnées GPS</div><div class="gpsc" id="detailGPS">—</div></div><button class="gpscpy" id="copyGpsBtn" onclick="copyGPS()">Copier</button></div><a id="dirLink" class="dirbtn" href="#" target="_blank"><span id="dirIcon">🧭</span> <span id="dirText">Itinéraire Google Maps</span></a><div id="detailContent"></div><div id="detailServicesActions" class="services-actions"></div></div></div></div>
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Sidebar Filters -->
+      <aside class="lg:col-span-3" id="sidebar">
+        <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden sticky top-24">
+          <div class="bg-gradient-to-r from-amber-700 to-emerald-700 px-4 py-3"><h3 class="text-white font-semibold" id="filterTitle">Filtres</h3></div>
+          <div class="p-4 space-y-4">
+            <div><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="cemFilterLabel">Cimetière</label><select id="cemFilter" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" onchange="filterTombs()"><option value="" id="allCems">Tous</option><option>Djellaz</option><option>Sidi Bou Saïd</option><option>El Gorjani</option></select></div>
+            <div><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="privFilterLabel">Visibilité</label><select id="privFilter" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" onchange="filterTombs()"><option value="" id="allVis">Tous</option><option value="public" id="publicOpt">Publics</option><option value="private" id="privateOpt">Privés</option></select></div>
+            <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-md transition-all" onclick="filterTombs()" id="applyBtn">Appliquer</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="lg:col-span-9 space-y-6">
+        <!-- Tomb List -->
+        <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
+          <div class="flex justify-between items-center bg-gradient-to-r from-amber-50 to-stone-50 dark:from-stone-700 dark:to-stone-800 px-4 py-3 border-b border-stone-200 dark:border-stone-700">
+            <h3 class="font-semibold text-stone-800 dark:text-stone-200" id="resultsTitle">Résultats</h3>
+            <span class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold px-2 py-1 rounded-full" id="resultCount">4</span>
+          </div>
+          <div class="divide-y divide-stone-200 dark:divide-stone-700 max-h-[400px] overflow-y-auto" id="tombList"></div>
+        </div>
+
+        <!-- Map -->
+        <div id="map" class="h-[400px] rounded-xl overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700"></div>
+
+        <!-- Detail Panel -->
+        <div id="detailPanel" class="hidden bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden animate-fade-in-up">
+          <div class="bg-gradient-to-r from-amber-800 to-emerald-800 px-5 py-4 flex justify-between items-center">
+            <div><h2 class="text-xl font-bold text-white font-['Amiri']" id="detailName">—</h2><div class="text-amber-200 text-sm" id="detailMeta">—</div></div>
+            <button class="w-8 h-8 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all" onclick="closeDetail()">✕</button>
+          </div>
+          <div class="p-5">
+            <div class="flex items-center justify-between bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 mb-4">
+              <div><div class="text-xs text-stone-500 dark:text-stone-400 uppercase" id="gpsLabel">Coordonnées GPS</div><div class="font-mono text-sm text-stone-700 dark:text-stone-300" id="detailGPS">—</div></div>
+              <button class="px-3 py-1.5 bg-amber-500 text-white text-sm rounded-lg hover:bg-amber-600 transition-all" onclick="copyGPS()" id="copyGpsBtn">Copier</button>
+            </div>
+            <a id="dirLink" class="flex items-center justify-center gap-2 w-full py-2.5 bg-stone-800 dark:bg-stone-700 text-white rounded-lg hover:bg-stone-700 transition-all mb-4" href="#" target="_blank"><span id="dirIcon">🧭</span> <span id="dirText">Itinéraire Google Maps</span></a>
+            <div id="detailContent" class="text-stone-600 dark:text-stone-400"></div>
+            <div id="detailServicesActions" class="mt-4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <nav class="bnav"><div class="bnav-in"><button class="bbn active" onclick="showTab('map')"><span>🗺</span><span id="bnMap">Carte</span></button><button class="bbn" onclick="showTab('list')"><span>📋</span><span id="bnList">Liste</span></button><button class="bbn" onclick="showServicesScreen()"><span>🛠</span><span id="bnServices">Services</span></button><button class="bbn" onclick="openQuickAddModal()"><span>📸</span><span id="bnQuickAdd">Rapide</span></button><button class="bbn" onclick="requireAuth()"><span>➕</span><span id="bnAdd">Ajouter</span></button></div></nav>
-  <button class="fab" onclick="openQuickAddModal()" id="fabBtn">📸</button>
+  <!-- Bottom Navigation Mobile -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md border-t border-stone-200 dark:border-stone-700 md:hidden z-40">
+    <div class="flex justify-around py-2">
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400 active:text-amber-600" onclick="showTab('map')"><span class="text-xl">🗺</span><span class="text-xs" id="bnMap">Carte</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showTab('list')"><span class="text-xl">📋</span><span class="text-xs" id="bnList">Liste</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showServicesScreen()"><span class="text-xl">🛠</span><span class="text-xs" id="bnServices">Services</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showDashboardScreen()"><span class="text-xl">📊</span><span class="text-xs" id="bnDashboard">Dashboard</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="openQuickAddModal()"><span class="text-xl">📸</span><span class="text-xs" id="bnQuickAdd">Rapide</span></button>
+    </div>
+  </nav>
+
+  <!-- FAB Button -->
+  <button class="fixed bottom-20 right-4 md:bottom-8 w-14 h-14 bg-gradient-to-r from-amber-500 to-emerald-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-2xl z-30 md:hidden" onclick="openQuickAddModal()">📸</button>
+</div>
+
+<!-- DASHBOARD SCREEN -->
+<div id="dashboardScreen" class="fixed inset-0 bg-stone-100 dark:bg-stone-900 z-[900] overflow-y-auto hidden">
+  <div class="sticky top-0 bg-gradient-to-r from-amber-800 to-emerald-800 px-5 py-4 flex items-center gap-3">
+    <button class="w-9 h-9 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="hideDashboardScreen()">←</button>
+    <h2 class="flex-1 text-white font-bold text-xl font-['Amiri']" id="dashboardTitle">📊 Tableau de bord</h2>
+  </div>
+  <div class="p-5">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="dashboardStats"></div>
+    <!-- Requests List -->
+    <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
+      <div class="bg-gradient-to-r from-amber-50 to-stone-50 dark:from-stone-700 dark:to-stone-800 px-5 py-3 border-b border-stone-200 dark:border-stone-700">
+        <h3 class="font-semibold text-stone-800 dark:text-stone-200" id="requestsTitle">📋 Demandes des clients</h3>
+      </div>
+      <div id="requestsList" class="divide-y divide-stone-200 dark:divide-stone-700 max-h-[calc(100vh-200px)] overflow-y-auto"></div>
+    </div>
+  </div>
 </div>
 
 <!-- QUICK ADD MODAL -->
-<div class="movl" id="quickAddModal">
-  <div class="modal" style="max-width: 600px;">
-    <div class="mhd"><h3 id="quickAddTitle">📸 Ajout rapide par photo</h3><button class="cbt" onclick="closeQuickAddModal()">✕</button></div>
-    <div class="mbd">
+<div id="quickAddModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4">
+  <div class="bg-white dark:bg-stone-800 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="sticky top-0 bg-gradient-to-r from-amber-700 to-emerald-700 px-5 py-4 flex justify-between items-center">
+      <h3 class="text-white font-semibold" id="quickAddTitle">📸 Ajout rapide par photo</h3>
+      <button class="w-8 h-8 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="closeQuickAddModal()">✕</button>
+    </div>
+    <div class="p-5">
       <div id="cameraSection">
-        <div class="camera-container"><video id="cameraVideo" autoplay playsinline></video><canvas id="cameraCanvas"></canvas></div>
-        <div class="camera-controls"><button class="camera-btn btn-capture" onclick="capturePhoto()">📸 Prendre une photo</button><input type="file" id="uploadInput" accept="image/*" style="display:none" onchange="uploadPhoto(this)"><button class="camera-btn btn-upload" onclick="document.getElementById('uploadInput').click()">📁 Choisir une photo</button></div>
+        <div class="relative bg-black rounded-xl overflow-hidden"><video id="cameraVideo" class="w-full" autoplay playsinline></video><canvas id="cameraCanvas" class="hidden"></canvas></div>
+        <div class="flex gap-3 mt-4"><button class="flex-1 py-2 bg-amber-500 text-stone-900 font-semibold rounded-lg hover:bg-amber-400 transition-all" onclick="capturePhoto()">📸 Prendre une photo</button><input type="file" id="uploadInput" accept="image/*" class="hidden" onchange="uploadPhoto(this)"><button class="flex-1 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-500 transition-all" onclick="document.getElementById('uploadInput').click()">📁 Choisir une photo</button></div>
       </div>
-      <div id="detectionSection" style="display:none;">
-        <div class="detection-loading" id="detectionLoading"><div class="spinner"></div> <span id="detectionLoadingText">Analyse de la photo en cours...</span></div>
-        <div id="detectionResult" style="display:none;"></div>
-        <div class="frow" style="margin-top:15px;"><div class="fgrp"><label id="quickFirstnameLabel">Prénom détecté</label><input type="text" id="quickFirstname" placeholder="Prénom"></div><div class="fgrp"><label id="quickLastnameLabel">Nom détecté</label><input type="text" id="quickLastname" placeholder="Nom"></div></div>
-        <div class="frow"><div class="fgrp"><label id="quickBirthLabel">Date naissance</label><input type="text" id="quickBirth" placeholder="jj/mm/aaaa"></div><div class="fgrp"><label id="quickDeathLabel">Date décès</label><input type="text" id="quickDeath" placeholder="jj/mm/aaaa"></div></div>
-        <div class="fgrp"><label id="quickLocationLabel">📍 Position GPS</label><div style="display:flex;gap:10px;align-items:center;"><input type="text" id="quickGps" readonly placeholder="En attente du GPS..."><button class="btn-status" onclick="getCurrentLocation()" style="background:var(--info);color:white;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;">📍 Obtenir position</button></div></div>
-        <div class="fgrp"><label id="quickCemLabel">Cimetière / Gouvernorat</label><select id="quickGov"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select><input type="text" id="quickCem" placeholder="Nom du cimetière" style="margin-top:8px;"></div>
+      <div id="detectionSection" class="hidden">
+        <div id="detectionLoading" class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div><p class="mt-2 text-stone-600 dark:text-stone-400" id="detectionLoadingText">Analyse de la photo en cours...</p></div>
+        <div id="detectionResult" class="hidden bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 mb-4"></div>
+        <div class="grid grid-cols-2 gap-3 mb-3"><input type="text" id="quickFirstname" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Prénom"><input type="text" id="quickLastname" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Nom"></div>
+        <div class="grid grid-cols-2 gap-3 mb-3"><input type="text" id="quickBirth" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Date naissance"><input type="text" id="quickDeath" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Date décès"></div>
+        <div class="mb-3"><label class="block text-sm font-medium mb-1">📍 Position GPS</label><div class="flex gap-2"><input type="text" id="quickGps" class="flex-1 px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" readonly placeholder="En attente..."><button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onclick="getCurrentLocation()">📍 Obtenir</button></div></div>
+        <div class="mb-3"><select id="quickGov" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select><input type="text" id="quickCem" class="w-full mt-2 px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Nom du cimetière"></div>
+        <button id="quickSaveBtn" class="hidden w-full py-3 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-md transition-all" onclick="saveQuickTomb()">💾 Enregistrer le tombeau</button>
       </div>
     </div>
-    <div class="mft"><button class="bcancel" onclick="closeQuickAddModal()">Annuler</button><button class="bsave" id="quickSaveBtn" onclick="saveQuickTomb()" style="display:none;">💾 Enregistrer</button></div>
+    <div class="flex gap-3 p-5 border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 border border-stone-300 dark:border-stone-600 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="closeQuickAddModal()">Annuler</button></div>
   </div>
 </div>
 
-<!-- SERVICES SCREEN COMPLET -->
-<div id="servicesScreen" class="svc-screen">
-  <div class="svc-header"><button class="svc-back" onclick="hideServicesScreen()">←</button><div class="svc-title" id="svcScreenTitle">Services Funéraires</div></div>
-  <div class="svc-tabs"><button class="svc-tab active" onclick="switchSvcPack('all')"><span id="svcTabAllText">🌟 Tous</span></button><button class="svc-tab" onclick="switchSvcPack('part1')"><span id="svcTabPart1Text">🕊 Avant l'enterrement</span></button><button class="svc-tab" onclick="switchSvcPack('part2')"><span id="svcTabPart2Text">🪦 Entretien</span></button><button class="svc-tab" onclick="switchSvcPack('full')"><span id="svcTabFullText">⭐ Pack complet</span></button></div>
-  <div id="svcBanner" style="display:none;" class="svc-banner"></div>
-  <div class="svc-search"><input type="text" id="svcSearch" placeholder="Rechercher un service..." oninput="renderServices()"></div>
-  <div id="svcChips1" class="svc-chips" style="display:none;"><button class="chip active" onclick="filterSvcChip(this, 'all1')"><span id="chipAll1Text">✨ Tous</span></button><button class="chip" onclick="filterSvcChip(this, 'docs')"><span id="chipDocsText">📋 Documentation</span></button><button class="chip" onclick="filterSvcChip(this, 'transport')"><span id="chipTransportText">🚗 Transport</span></button><button class="chip" onclick="filterSvcChip(this, 'kafan')"><span id="chipKafanText">🤍 Kafan</span></button><button class="chip" onclick="filterSvcChip(this, 'quran')"><span id="chipQuranText">📖 Lecture Coran</span></button><button class="chip" onclick="filterSvcChip(this, 'construction')"><span id="chipConstructionText">🏗 Construction</span></button><button class="chip" onclick="filterSvcChip(this, 'dua')"><span id="chipDuaText">🤲 Doua</span></button></div>
-  <div id="svcChips2" class="svc-chips" style="display:none;"><button class="chip active" onclick="filterSvcChip(this, 'all2')"><span id="chipAll2Text">✨ Tous</span></button><button class="chip" onclick="filterSvcChip(this, 'cleaning')"><span id="chipCleaningText">🧹 Nettoyage</span></button><button class="chip" onclick="filterSvcChip(this, 'painting')"><span id="chipPaintingText">🎨 Peinture</span></button><button class="chip" onclick="filterSvcChip(this, 'marble')"><span id="chipMarbleText">🪨 Marbre</span></button><button class="chip" onclick="filterSvcChip(this, 'flowers')"><span id="chipFlowersText">🌹 Fleurs</span></button><button class="chip" onclick="filterSvcChip(this, 'findtomb')"><span id="chipFindTombText">🔍 Trouver tombeau</span></button></div>
-  <div id="svcGrid" class="svc-grid"></div>
+<!-- SERVICES SCREEN -->
+<div id="servicesScreen" class="fixed inset-0 bg-stone-100 dark:bg-stone-900 z-[900] overflow-y-auto hidden">
+  <div class="sticky top-0 bg-gradient-to-r from-amber-800 to-emerald-800 px-5 py-4 flex items-center gap-3">
+    <button class="w-9 h-9 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="hideServicesScreen()">←</button>
+    <h2 class="flex-1 text-white font-bold text-xl font-['Amiri']" id="svcScreenTitle">Services Funéraires</h2>
+  </div>
+  <div class="flex overflow-x-auto bg-white dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700">
+    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent active" onclick="switchSvcPack('all')">🌟 Tous</button>
+    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent" onclick="switchSvcPack('part1')">🕊 Avant l'enterrement</button>
+    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent" onclick="switchSvcPack('part2')">🪦 Entretien</button>
+    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent" onclick="switchSvcPack('full')">⭐ Pack complet</button>
+  </div>
+  <div id="svcBanner" class="hidden mx-4 mt-4 p-4 rounded-xl"></div>
+  <div class="p-4"><input type="text" id="svcSearch" class="w-full px-4 py-3 border border-stone-200 dark:border-stone-700 rounded-xl bg-white dark:bg-stone-800" placeholder="Rechercher un service..." oninput="renderServices()"></div>
+  <div id="svcChips1" class="flex overflow-x-auto gap-2 px-4 pb-2 hidden"><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 active:bg-amber-500 active:text-white" onclick="filterSvcChip(this, 'all1')">✨ Tous</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'docs')">📋 Documentation</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'transport')">🚗 Transport</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'kafan')">🤍 Kafan</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'quran')">📖 Coran</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'construction')">🏗 Construction</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'dua')">🤲 Doua</button></div>
+  <div id="svcChips2" class="flex overflow-x-auto gap-2 px-4 pb-2 hidden"><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 active:bg-amber-500 active:text-white" onclick="filterSvcChip(this, 'all2')">✨ Tous</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'cleaning')">🧹 Nettoyage</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'painting')">🎨 Peinture</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'marble')">🪨 Marbre</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'flowers')">🌹 Fleurs</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'findtomb')">🔍 Trouver</button></div>
+  <div id="svcGrid" class="p-4 space-y-4"></div>
 </div>
 
 <!-- SERVICE REQUEST MODAL -->
-<div class="movl" id="svcReqModal">
-  <div class="modal"><div class="mhd"><h3 id="svcReqTitle">📋 Demander ce service</h3><button class="cbt" onclick="closeSvcReqModal()">✕</button></div><div class="mbd"><div id="reqSvcInfo" style="background:var(--olive-dim);border-radius:8px;padding:11px;margin-bottom:14px;"></div><div class="fgrp"><label id="reqNameLabel">Votre nom</label><input type="text" id="reqName" placeholder="Mohamed Ben Ali"></div><div class="fgrp"><label id="reqPhoneLabel">Téléphone</label><input type="tel" id="reqPhone" placeholder="+216 XX XXX XXX"></div><div class="fgrp"><label id="reqLocLabel">Gouvernorat / Cimetière</label><input type="text" id="reqLoc" placeholder="Ex: Djellaz, Tunis"></div><div class="fgrp"><label id="reqDateLabel">Date souhaitée</label><input type="date" id="reqDate"></div><div class="fgrp"><label id="reqMsgLabel">Message</label><textarea id="reqMsg" rows="3" placeholder="Précisions sur votre demande..."></textarea></div></div><div class="mft"><button class="bcancel" onclick="closeSvcReqModal()">Annuler</button><button class="bsave" onclick="submitServiceRequest()">📨 Envoyer</button></div></div>
+<div id="svcReqModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4">
+  <div class="bg-white dark:bg-stone-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="sticky top-0 bg-gradient-to-r from-amber-700 to-emerald-700 px-5 py-4 flex justify-between items-center"><h3 class="text-white font-semibold" id="svcReqTitle">📋 Demander ce service</h3><button class="w-8 h-8 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="closeSvcReqModal()">✕</button></div>
+    <div class="p-5"><div id="reqSvcInfo" class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 mb-4"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqNameLabel">Votre nom</label><input type="text" id="reqName" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Mohamed Ben Ali"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqPhoneLabel">Téléphone</label><input type="tel" id="reqPhone" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="+216 XX XXX XXX"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqLocLabel">Gouvernorat / Cimetière</label><input type="text" id="reqLoc" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Ex: Djellaz, Tunis"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqDateLabel">Date souhaitée</label><input type="date" id="reqDate" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqMsgLabel">Message</label><textarea id="reqMsg" rows="3" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Précisions..."></textarea></div></div>
+    <div class="flex gap-3 p-5 border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 border border-stone-300 dark:border-stone-600 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="closeSvcReqModal()">Annuler</button><button class="flex-1 py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-md" onclick="submitServiceRequest()">📨 Envoyer</button></div>
+  </div>
 </div>
 
-<div class="toast" id="toastMsg"></div>
+<div id="toastMsg" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-stone-800 dark:bg-stone-700 text-white px-5 py-2.5 rounded-full text-sm shadow-lg hidden z-[1100]"></div>
 
 <script>
 // ==================== TRADUCTIONS ====================
 const translations = {
   fr: {
-    authTitle: "Maqabir", authSubtitle: "Connectez-vous pour ajouter un tombeau",
+    authTitle: "Maqabir", authSubtitle: "Connectez-vous pour accéder au tableau de bord",
     authTabLogin: "Connexion", authTabReg: "Inscription",
     loginEmailLabel: "Email", loginPwdLabel: "Mot de passe", loginBtn: "Se connecter",
     regNameLabel: "Nom complet", regEmailLabel: "Email", regPwdLabel: "Mot de passe (min 6)", regBtn: "Créer mon compte",
-    navTitle: "Maqabir", servicesBtn: "🛠 Services", addNavBtn: "➕ Ajouter", logoutBtn: "🚪 Déconnexion",
+    navTitle: "Maqabir", servicesBtn: "🛠 Services", dashboardBtn: "📊 Dashboard", addNavBtn: "➕ Ajouter", logoutBtn: "🚪 Déconnexion",
     heroTitle: "Retrouvez vos proches,<br>préservez la mémoire", heroSubtitle: "Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.", allGovs: "Tous les gouvernorats",
-    statTombsLabel: "Tombeaux", statCemsLabel: "Cimetières", statPhotosLabel: "Photos",
+    statTombsLabel: "Tombeaux", statCemsLabel: "Cimetières", statPhotosLabel: "Photos", statMembersLabel: "Membres",
     filterTitle: "Filtres", cemFilterLabel: "Cimetière", allCems: "Tous", privFilterLabel: "Visibilité", allVis: "Tous", publicOpt: "Publics", privateOpt: "Privés", applyBtn: "Appliquer", resultsTitle: "Résultats",
     gpsLabel: "Coordonnées GPS", copyGpsBtn: "Copier", dirText: "Itinéraire Google Maps",
-    svcScreenTitle: "Services Funéraires", svcTabAllText: "🌟 Tous", svcTabPart1Text: "🕊 Avant l'enterrement", svcTabPart2Text: "🪦 Entretien", svcTabFullText: "⭐ Pack complet",
-    chipAll1Text: "✨ Tous", chipDocsText: "📋 Documentation", chipTransportText: "🚗 Transport", chipKafanText: "🤍 Kafan", chipQuranText: "📖 Lecture Coran", chipConstructionText: "🏗 Construction", chipDuaText: "🤲 Doua",
-    chipAll2Text: "✨ Tous", chipCleaningText: "🧹 Nettoyage", chipPaintingText: "🎨 Peinture", chipMarbleText: "🪨 Marbre", chipFlowersText: "🌹 Fleurs", chipFindTombText: "🔍 Trouver tombeau",
-    svcReqTitle: "📋 Demander ce service", reqNameLabel: "Votre nom", reqPhoneLabel: "Téléphone", reqLocLabel: "Gouvernorat / Cimetière", reqDateLabel: "Date souhaitée", reqMsgLabel: "Message", reqCancelBtn: "Annuler", reqSendBtn: "📨 Envoyer",
-    quickAddTitle: "📸 Ajout rapide par photo", quickFirstnameLabel: "Prénom", quickLastnameLabel: "Nom", quickBirthLabel: "Date naissance", quickDeathLabel: "Date décès", quickLocationLabel: "📍 Position GPS", quickCemLabel: "Cimetière / Gouvernorat", quickCancelBtn: "Annuler", quickSaveBtn: "💾 Enregistrer",
-    detectionLoadingText: "Analyse de la photo en cours...",
-    bnMap: "Carte", bnList: "Liste", bnServices: "Services", bnQuickAdd: "Rapide", bnAdd: "Ajouter",
-    serviceCleaning: "🧹 Nettoyer ce tombeau", servicePainting: "🎨 Peindre ce tombeau", serviceMarble: "🪨 Rénover le marbre", serviceFlowers: "🌹 Fleurs pour ce tombeau", serviceFind: "🔍 Retrouver ce tombeau"
+    svcScreenTitle: "Services Funéraires",
+    bnMap: "Carte", bnList: "Liste", bnServices: "Services", bnDashboard: "Dashboard", bnQuickAdd: "Rapide",
+    quickAddTitle: "Ajout rapide par photo", quickFirstnameLabel: "Prénom", quickLastnameLabel: "Nom", quickBirthLabel: "Naissance", quickDeathLabel: "Décès", quickLocationLabel: "Position GPS", quickCemLabel: "Cimetière", quickCancelBtn: "Annuler", quickSaveBtn: "Enregistrer",
+    detectionLoadingText: "Analyse de la photo...",
+    svcReqTitle: "Demander ce service", reqNameLabel: "Votre nom", reqPhoneLabel: "Téléphone", reqLocLabel: "Lieu", reqDateLabel: "Date", reqMsgLabel: "Message", reqCancelBtn: "Annuler", reqSendBtn: "Envoyer",
+    dashboardTitle: "📊 Tableau de bord", requestsTitle: "📋 Demandes des clients",
+    totalRequests: "Total demandes", pendingStatus: "En attente", progressStatus: "En cours", doneStatus: "Terminé",
+    btnProgress: "En cours", btnDone: "Terminé", btnDelete: "Supprimer"
   },
   ar: {
-    authTitle: "مقابر", authSubtitle: "سجل الدخول لإضافة قبر",
+    authTitle: "مقابر", authSubtitle: "سجل الدخول للوصول إلى لوحة التحكم",
     authTabLogin: "تسجيل الدخول", authTabReg: "إنشاء حساب",
     loginEmailLabel: "البريد الإلكتروني", loginPwdLabel: "كلمة المرور", loginBtn: "تسجيل الدخول",
-    regNameLabel: "الاسم الكامل", regEmailLabel: "البريد الإلكتروني", regPwdLabel: "كلمة المرور (6 أحرف)", regBtn: "إنشاء حساب",
-    navTitle: "مقابر", servicesBtn: "🛠 الخدمات", addNavBtn: "➕ إضافة", logoutBtn: "🚪 تسجيل خروج",
-    heroTitle: "ابحث عن أحبائك،<br>احفظ ذكراهم", heroSubtitle: "حدّد موقع القبر، أضف الصور، واحتفظ بمعلومات المتوفى في تونس.", allGovs: "كل الولايات",
-    statTombsLabel: "قبور", statCemsLabel: "مقابر", statPhotosLabel: "صور",
+    regNameLabel: "الاسم الكامل", regEmailLabel: "البريد الإلكتروني", regPwdLabel: "كلمة المرور", regBtn: "إنشاء حساب",
+    navTitle: "مقابر", servicesBtn: "الخدمات", dashboardBtn: "لوحة التحكم", addNavBtn: "إضافة", logoutBtn: "تسجيل خروج",
+    heroTitle: "ابحث عن أحبائك،<br>احفظ ذكراهم", heroSubtitle: "حدّد موقع القبر، أضف الصور.", allGovs: "كل الولايات",
+    statTombsLabel: "قبور", statCemsLabel: "مقابر", statPhotosLabel: "صور", statMembersLabel: "أعضاء",
     filterTitle: "تصفية", cemFilterLabel: "المقبرة", allCems: "الكل", privFilterLabel: "الخصوصية", allVis: "الكل", publicOpt: "عامة", privateOpt: "خاصة", applyBtn: "تطبيق", resultsTitle: "النتائج",
-    gpsLabel: "الإحداثيات الجغرافية", copyGpsBtn: "نسخ", dirText: "الاتجاهات على خرائط جوجل",
-    svcScreenTitle: "الخدمات الجنائزية", svcTabAllText: "🌟 الكل", svcTabPart1Text: "🕊 قبل الدفن", svcTabPart2Text: "🪦 صيانة القبر", svcTabFullText: "⭐ حزمة كاملة",
-    chipAll1Text: "✨ الكل", chipDocsText: "📋 توثيق", chipTransportText: "🚗 نقل", chipKafanText: "🤍 كفن", chipQuranText: "📖 تلاوة قرآن", chipConstructionText: "🏗 بناء", chipDuaText: "🤲 دعاء",
-    chipAll2Text: "✨ الكل", chipCleaningText: "🧹 تنظيف", chipPaintingText: "🎨 طلاء", chipMarbleText: "🪨 رخام", chipFlowersText: "🌹 زهور", chipFindTombText: "🔍 بحث عن قبر",
-    svcReqTitle: "📋 طلب هذه الخدمة", reqNameLabel: "اسمك", reqPhoneLabel: "رقم الهاتف", reqLocLabel: "الولاية / المقبرة", reqDateLabel: "التاريخ المطلوب", reqMsgLabel: "رسالة", reqCancelBtn: "إلغاء", reqSendBtn: "📨 إرسال",
-    quickAddTitle: "📸 إضافة سريعة بالصورة", quickFirstnameLabel: "الاسم الأول", quickLastnameLabel: "اسم العائلة", quickBirthLabel: "تاريخ الميلاد", quickDeathLabel: "تاريخ الوفاة", quickLocationLabel: "📍 الموقع الجغرافي", quickCemLabel: "المقبرة / الولاية", quickCancelBtn: "إلغاء", quickSaveBtn: "💾 حفظ",
+    gpsLabel: "الإحداثيات", copyGpsBtn: "نسخ", dirText: "الاتجاهات",
+    svcScreenTitle: "الخدمات الجنائزية",
+    bnMap: "خريطة", bnList: "قائمة", bnServices: "خدمات", bnDashboard: "لوحة التحكم", bnQuickAdd: "سريع",
+    quickAddTitle: "إضافة سريعة بالصورة", quickFirstnameLabel: "الاسم الأول", quickLastnameLabel: "اسم العائلة", quickBirthLabel: "الميلاد", quickDeathLabel: "الوفاة", quickLocationLabel: "الموقع", quickCemLabel: "المقبرة", quickCancelBtn: "إلغاء", quickSaveBtn: "حفظ",
     detectionLoadingText: "جاري تحليل الصورة...",
-    bnMap: "خريطة", bnList: "قائمة", bnServices: "خدمات", bnQuickAdd: "سريع", bnAdd: "إضافة",
-    serviceCleaning: "🧹 تنظيف هذا القبر", servicePainting: "🎨 طلاء هذا القبر", serviceMarble: "🪨 تجديد الرخام", serviceFlowers: "🌹 زهور لهذا القبر", serviceFind: "🔍 العثور على هذا القبر"
+    svcReqTitle: "طلب هذه الخدمة", reqNameLabel: "اسمك", reqPhoneLabel: "الهاتف", reqLocLabel: "الموقع", reqDateLabel: "التاريخ", reqMsgLabel: "رسالة", reqCancelBtn: "إلغاء", reqSendBtn: "إرسال",
+    dashboardTitle: "📊 لوحة التحكم", requestsTitle: "📋 طلبات العملاء",
+    totalRequests: "إجمالي الطلبات", pendingStatus: "قيد الانتظار", progressStatus: "قيد التنفيذ", doneStatus: "مكتمل",
+    btnProgress: "قيد التنفيذ", btnDone: "مكتمل", btnDelete: "حذف"
   }
 };
 
-// ==================== DONNÉES TOMBEAUX ====================
+// ==================== DONNÉES ====================
 let tombs = [
   { id: "t1", name: "Mohamed Ben Salah", firstname: "Mohamed", lastname: "Ben Salah", birth: "15 mars 1928", death: "2 novembre 1995", cem: "Djellaz", gov: "Tunis", location: "Section B, Rangée 14", lat: 36.8212, lng: 10.1732, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
   { id: "t2", name: "Fatma Bouzid", firstname: "Fatma", lastname: "Bouzid", birth: "8 juin 1935", death: "14 avril 2010", cem: "Sidi Bou Saïd", gov: "Tunis", location: "Section A, Tombe 7", lat: 36.87005, lng: 10.34105, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
   { id: "t3", name: "Ali Haddad", firstname: "Ali", lastname: "Haddad", birth: "3 janvier 1950", death: "27 septembre 2018", cem: "El Gorjani", gov: "Tunis", location: "Allée C, Tombe 22", lat: 36.7914, lng: 10.1748, photos: [], privacy: "public", owner: null, ownerName: "Admin" }
 ];
 
-// ==================== DONNÉES SERVICES ====================
-const CATS_P1 = {
-  docs: { fr: 'Documentation & démarches', ar: 'التوثيق والإجراءات', icon: '📋', bg: '#e3f2fd' },
-  transport: { fr: 'Transport du défunt', ar: 'نقل الجثمان', icon: '🚗', bg: '#fce4ec' },
-  kafan: { fr: 'Kafan & préparation', ar: 'الكفن والتجهيز', icon: '🤍', bg: '#f5f5f5' },
-  quran: { fr: 'Lecture du Coran & doua', ar: 'تلاوة القرآن والدعاء', icon: '📖', bg: '#f3e5f5' },
-  construction: { fr: 'Construction du tombeau', ar: 'بناء القبر', icon: '🏗', bg: '#fff3e0' },
-  dua: { fr: "Doua durant l'enterrement", ar: 'الدعاء أثناء الدفن', icon: '🤲', bg: '#e8f5e9' }
-};
-
-const CATS_P2 = {
-  cleaning: { fr: 'Nettoyage de tombe', ar: 'تنظيف القبر', icon: '🧹', bg: '#e8f5e9' },
-  painting: { fr: 'Peinture & rénovation', ar: 'طلاء وتجديد', icon: '🎨', bg: '#e3f2fd' },
-  marble: { fr: 'Refaire le marbre', ar: 'تجديد الرخام', icon: '🪨', bg: '#fafafa' },
-  flowers: { fr: 'Fleurs & entretien', ar: 'زهور وزينة', icon: '🌹', bg: '#fff0f3' },
-  findtomb: { fr: 'Trouver un tombeau', ar: 'البحث عن قبر', icon: '🔍', bg: '#fffde7' }
-};
+const CATS_P1 = { docs: { fr: 'Documentation', ar: 'توثيق', icon: '📋' }, transport: { fr: 'Transport', ar: 'نقل', icon: '🚗' }, kafan: { fr: 'Kafan', ar: 'كفن', icon: '🤍' }, quran: { fr: 'Coran', ar: 'قرآن', icon: '📖' }, construction: { fr: 'Construction', ar: 'بناء', icon: '🏗' }, dua: { fr: 'Doua', ar: 'دعاء', icon: '🤲' } };
+const CATS_P2 = { cleaning: { fr: 'Nettoyage', ar: 'تنظيف', icon: '🧹' }, painting: { fr: 'Peinture', ar: 'طلاء', icon: '🎨' }, marble: { fr: 'Marbre', ar: 'رخام', icon: '🪨' }, flowers: { fr: 'Fleurs', ar: 'زهور', icon: '🌹' }, findtomb: { fr: 'Localisation', ar: 'بحث', icon: '🔍' } };
 
 let services = [
-  { id: 's1', part: 'part1', cat: 'docs', type: 'pro', name: 'Bureau Administratif Baraka', gov: 'Tunis', price: '150–300', phone: '+21692639366', desc: "Aide complète pour les démarches : acte de décès, autorisation d'inhumation.", avail: 'weekdays', rating: 4.8, reviews: 34 },
-  { id: 's2', part: 'part1', cat: 'transport', type: 'pro', name: 'Transport Funèbre El Rahma', gov: 'Tunis', price: '200–500', phone: '+21692639366', desc: "Transport du défunt 24h/24.", avail: 'always', rating: 4.9, reviews: 87 },
+  { id: 's1', part: 'part1', cat: 'docs', type: 'pro', name: 'Bureau Administratif', gov: 'Tunis', price: '150–300', phone: '+21692639366', desc: "Aide pour les démarches.", avail: 'weekdays', rating: 4.8, reviews: 34 },
+  { id: 's2', part: 'part1', cat: 'transport', type: 'pro', name: 'Transport Funèbre', gov: 'Tunis', price: '200–500', phone: '+21692639366', desc: "Transport 24h/24.", avail: 'always', rating: 4.9, reviews: 87 },
   { id: 's3', part: 'part1', cat: 'kafan', type: 'pro', name: 'Maison du Kafan', gov: 'Tunis', price: '80–200', phone: '+21692639366', desc: 'Vente et pose du kafan.', avail: 'always', rating: 4.7, reviews: 52 },
-  { id: 's4', part: 'part1', cat: 'quran', type: 'volunteer', name: 'Sheikh Karim El Hafidh', gov: 'Sfax', price: 'Gratuit', phone: '+21692639366', desc: 'Lecture du Saint Coran.', avail: 'oncall', rating: 5.0, reviews: 141 },
-  { id: 's5', part: 'part1', cat: 'construction', type: 'pro', name: 'Entreprise Bâti-Maqbara', gov: 'Sousse', price: '800–3000', phone: '+21692639366', desc: 'Construction de tombeaux.', avail: 'weekdays', rating: 4.6, reviews: 29 },
-  { id: 's6', part: 'part1', cat: 'dua', type: 'volunteer', name: 'Association El Rahma', gov: 'Bizerte', price: 'Gratuit', phone: '+21692639366', desc: "Prière et doua durant l'enterrement.", avail: 'oncall', rating: 4.9, reviews: 63 },
-  { id: 's7', part: 'part2', cat: 'cleaning', type: 'pro', name: 'Nettoyage de tombe Pro', gov: 'Tunis', price: '80', phone: '+21692639366', desc: 'Nettoyage complet : mauvaises herbes, lavage de la pierre tombale.', avail: 'always', rating: 4.8, reviews: 23 },
-  { id: 's8', part: 'part2', cat: 'painting', type: 'pro', name: 'Peinture Tombeaux', gov: 'Tunis', price: '200', phone: '+21692639366', desc: 'Peinture complète et rénovation.', avail: 'weekdays', rating: 4.6, reviews: 18 },
-  { id: 's9', part: 'part2', cat: 'marble', type: 'pro', name: 'Rénovation Marbre', gov: 'Sfax', price: '500', phone: '+21692639366', desc: 'Remplacement ou rénovation de la dalle en marbre.', avail: 'weekdays', rating: 4.9, reviews: 37 },
-  { id: 's10', part: 'part2', cat: 'flowers', type: 'pro', name: 'Fleurs & Entretien', gov: 'Sousse', price: '50', phone: '+21692639366', desc: 'Compositions florales et entretien périodique.', avail: 'always', rating: 4.7, reviews: 19 },
-  { id: 's11', part: 'part2', cat: 'findtomb', type: 'pro', name: 'Localisation de tombeau', gov: 'Tunis', price: '100', phone: '+21692639366', desc: 'Aide pour retrouver un tombeau perdu.', avail: 'weekdays', rating: 4.5, reviews: 11 }
+  { id: 's4', part: 'part1', cat: 'quran', type: 'volunteer', name: 'Sheikh Karim', gov: 'Sfax', price: 'Gratuit', phone: '+21692639366', desc: 'Lecture du Coran.', avail: 'oncall', rating: 5.0, reviews: 141 },
+  { id: 's5', part: 'part1', cat: 'construction', type: 'pro', name: 'Bâti-Maqbara', gov: 'Sousse', price: '800–3000', phone: '+21692639366', desc: 'Construction tombeau.', avail: 'weekdays', rating: 4.6, reviews: 29 },
+  { id: 's6', part: 'part1', cat: 'dua', type: 'volunteer', name: 'Association El Rahma', gov: 'Bizerte', price: 'Gratuit', phone: '+21692639366', desc: "Prière et doua.", avail: 'oncall', rating: 4.9, reviews: 63 },
+  { id: 's7', part: 'part2', cat: 'cleaning', type: 'pro', name: 'Nettoyage Pro', gov: 'Tunis', price: '80', phone: '+21692639366', desc: 'Nettoyage complet.', avail: 'always', rating: 4.8, reviews: 23 },
+  { id: 's8', part: 'part2', cat: 'painting', type: 'pro', name: 'Peinture Tombeaux', gov: 'Tunis', price: '200', phone: '+21692639366', desc: 'Peinture complète.', avail: 'weekdays', rating: 4.6, reviews: 18 },
+  { id: 's9', part: 'part2', cat: 'marble', type: 'pro', name: 'Marbre & Granit', gov: 'Sfax', price: '500', phone: '+21692639366', desc: 'Rénovation marbre.', avail: 'weekdays', rating: 4.9, reviews: 37 },
+  { id: 's10', part: 'part2', cat: 'flowers', type: 'pro', name: 'Jardin du Souvenir', gov: 'Sousse', price: '50', phone: '+21692639366', desc: 'Fleurs et entretien.', avail: 'always', rating: 4.7, reviews: 19 },
+  { id: 's11', part: 'part2', cat: 'findtomb', type: 'pro', name: 'Localisation', gov: 'Tunis', price: '100', phone: '+21692639366', desc: 'Retrouver un tombeau.', avail: 'weekdays', rating: 4.5, reviews: 11 }
 ];
+
+// Demandes clients
+let requests = JSON.parse(localStorage.getItem('maqabir_requests') || '[]');
 
 // ==================== ÉTAT GLOBAL ====================
 let currentUser = null;
@@ -450,38 +360,43 @@ let currentLocation = null;
 let svcPackFilter = 'all';
 let svcChipFilter = 'all1';
 let currentServiceForRequest = null;
-let requests = JSON.parse(localStorage.getItem('maqabir_requests') || '[]');
+let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+// ==================== DARK MODE ====================
+function toggleDarkMode() {
+  isDarkMode = !isDarkMode;
+  localStorage.setItem('darkMode', isDarkMode);
+  if (isDarkMode) document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isDarkMode ? '☀️' : '🌙';
+}
+if (isDarkMode) document.documentElement.classList.add('dark');
 
 // ==================== FONCTIONS LANGUE ====================
 function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('maqabir_lang', lang);
-  const htmlRoot = document.getElementById('htmlRoot');
-  if (lang === 'ar') { htmlRoot.dir = 'rtl'; htmlRoot.lang = 'ar'; }
-  else { htmlRoot.dir = 'ltr'; htmlRoot.lang = 'fr'; }
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if ((lang === 'fr' && btn.textContent === 'FR') || (lang === 'ar' && btn.textContent === 'ع')) btn.classList.add('active');
-  });
   const t = translations[lang];
   for (let key in t) {
     let el = document.getElementById(key);
-    if (el) el.textContent = t[key];
+    if (el) el.innerHTML = t[key];
   }
   renderServices();
   renderTombList();
   updateMarkers();
   if (selectedTombId) displayTombServices(selectedTombId);
+  renderDashboard();
 }
 
-// ==================== FONCTIONS AUTH ====================
 function showToast(msg) {
   const toast = document.getElementById('toastMsg');
   toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
+// ==================== AUTH ====================
 function updateUserUI() {
   if (currentUser) {
     document.getElementById('userName').textContent = currentUser.name.split(' ')[0];
@@ -496,23 +411,22 @@ function updateUserUI() {
   }
 }
 
-function toggleMenu() { document.getElementById('userMenu').classList.toggle('open'); }
-function closeMenu() { document.getElementById('userMenu').classList.remove('open'); }
-function openAuthModal() { document.getElementById('authModal').classList.add('open'); }
-function closeAuthModal() { document.getElementById('authModal').classList.remove('open'); }
+function toggleMenu() { document.getElementById('userMenu').classList.toggle('hidden'); }
+function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); document.getElementById('authModal').style.display = 'flex'; }
+function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); document.getElementById('authModal').style.display = 'none'; }
 
 function switchAuthTab(tab) {
   const isLogin = tab === 'login';
   document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
   document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
-  document.querySelectorAll('.auth-tab').forEach((btn, i) => { btn.classList.toggle('active', (i === 0 && isLogin) || (i === 1 && !isLogin)); });
+  document.querySelectorAll('.auth-tab').forEach((btn, i) => { btn.classList.toggle('border-amber-500', (i === 0 && isLogin) || (i === 1 && !isLogin)); });
 }
 
 function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pwd = document.getElementById('loginPwd').value;
   const user = localUsers.find(u => u.email === email);
-  if (!user) { document.getElementById('loginErr').textContent = 'Email ou mot de passe incorrect'; document.getElementById('loginErr').classList.add('show'); return; }
+  if (!user) { document.getElementById('loginErr').classList.remove('hidden'); return; }
   currentUser = { uid: user.uid, name: user.name, email: user.email };
   localStorage.setItem('maqabir_currentUser', JSON.stringify(currentUser));
   updateUserUI();
@@ -520,6 +434,7 @@ function handleLogin() {
   showToast(`Bonjour ${user.name} !`);
   renderTombList();
   updateMarkers();
+  renderDashboard();
 }
 
 async function handleRegisterWithCaptcha() {
@@ -527,9 +442,9 @@ async function handleRegisterWithCaptcha() {
   const email = document.getElementById('regEmail').value.trim();
   const pwd = document.getElementById('regPwd').value;
   if (!name || !email || !pwd) { showToast('Tous les champs sont requis'); return; }
-  if (pwd.length < 6) { showToast('Le mot de passe doit faire au moins 6 caractères'); return; }
-  if (localUsers.find(u => u.email === email)) { showToast('Cet email est déjà utilisé'); return; }
-  showToast('Vérification anti-spam...');
+  if (pwd.length < 6) { showToast('Mot de passe trop court'); return; }
+  if (localUsers.find(u => u.email === email)) { showToast('Email déjà utilisé'); return; }
+  showToast('Vérification...');
   try {
     await grecaptcha.execute('6LdE9LgsAAAAAFN8T2rYcqNpB_5UzaHxlVxeD_-K', { action: 'register' });
     const newUser = { uid: 'user_' + Date.now(), name: name, email: email };
@@ -542,14 +457,64 @@ async function handleRegisterWithCaptcha() {
     showToast(`Bienvenue ${name} !`);
     renderTombList();
     updateMarkers();
-  } catch (err) { showToast("Erreur de vérification"); }
+    renderDashboard();
+  } catch (err) { showToast("Erreur"); }
 }
 
 function guestLogin() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); closeAuthModal(); showToast('Mode invité'); }
-function logout() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); closeMenu(); showToast('Déconnecté'); }
+function logout() { currentUser = null; localStorage.removeItem('maqabir_currentUser'); updateUserUI(); showToast('Déconnecté'); }
 function requireAuth() { if (currentUser) openQuickAddModal(); else openAuthModal(); }
 
-// ==================== FONCTIONS CARTE ====================
+// ==================== DASHBOARD ====================
+function showDashboardScreen() {
+  if (!currentUser) { openAuthModal(); return; }
+  document.getElementById('dashboardScreen').classList.remove('hidden');
+  renderDashboard();
+}
+function hideDashboardScreen() { document.getElementById('dashboardScreen').classList.add('hidden'); }
+
+function renderDashboard() {
+  const statsDiv = document.getElementById('dashboardStats');
+  const pending = requests.filter(r => r.status === 'pending').length;
+  const progress = requests.filter(r => r.status === 'progress').length;
+  const done = requests.filter(r => r.status === 'done').length;
+  const t = translations[currentLang];
+  statsDiv.innerHTML = `
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-amber-600 dark:text-amber-400">${requests.length}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.totalRequests || 'Total demandes'}</div></div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">${pending}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.pendingStatus || 'En attente'}</div></div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${progress}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.progressStatus || 'En cours'}</div></div>
+    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-green-600 dark:text-green-400">${done}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.doneStatus || 'Terminé'}</div></div>
+  `;
+  const listDiv = document.getElementById('requestsList');
+  if (requests.length === 0) { listDiv.innerHTML = `<div class="p-8 text-center text-stone-500 dark:text-stone-400">📭 ${currentLang === 'ar' ? 'لا توجد طلبات بعد' : 'Aucune demande pour le moment'}</div>`; return; }
+  listDiv.innerHTML = requests.map(r => `
+    <div class="p-4 hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" data-id="${r.id}">
+      <div class="flex justify-between items-start flex-wrap gap-2 mb-2">
+        <div><span class="font-semibold text-stone-800 dark:text-stone-200">${r.service}</span> - <span class="text-amber-600 dark:text-amber-400 font-medium">${r.price} TND</span></div>
+        <span class="text-xs text-stone-500 dark:text-stone-400">${new Date(r.createdAt).toLocaleDateString(currentLang === 'ar' ? 'ar-TN' : 'fr-FR')}</span>
+      </div>
+      <div class="text-sm text-stone-600 dark:text-stone-400 mb-2">👤 ${r.clientName} | 📞 ${r.clientPhone}</div>
+      <div class="text-xs text-stone-500 dark:text-stone-500 mb-2">📍 ${r.location} | 📅 ${r.date}</div>
+      ${r.message ? `<div class="text-xs text-stone-500 dark:text-stone-500 mb-3 bg-stone-100 dark:bg-stone-700 p-2 rounded-lg">📝 ${r.message.substring(0, 100)}${r.message.length > 100 ? '...' : ''}</div>` : ''}
+      <div class="flex justify-between items-center flex-wrap gap-2">
+        <span class="px-2 py-1 rounded-full text-xs font-medium ${r.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : (r.status === 'progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400')}">${r.status === 'pending' ? (currentLang === 'ar' ? 'قيد الانتظار' : 'En attente') : (r.status === 'progress' ? (currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours') : (currentLang === 'ar' ? 'مكتمل' : 'Terminé'))}</span>
+        <div class="flex gap-2">
+          ${r.status !== 'progress' ? `<button class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-all" onclick="updateRequestStatus('${r.id}', 'progress')">${currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours'}</button>` : ''}
+          ${r.status !== 'done' ? `<button class="px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-all" onclick="updateRequestStatus('${r.id}', 'done')">${currentLang === 'ar' ? 'مكتمل' : 'Terminé'}</button>` : ''}
+          <button class="px-3 py-1 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-all" onclick="deleteRequest('${r.id}')">${currentLang === 'ar' ? 'حذف' : 'Supprimer'}</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateRequestStatus(id, status) {
+  const request = requests.find(r => r.id == id);
+  if (request) { request.status = status; localStorage.setItem('maqabir_requests', JSON.stringify(requests)); renderDashboard(); showToast(`Statut mis à jour : ${status}`); }
+}
+function deleteRequest(id) { requests = requests.filter(r => r.id != id); localStorage.setItem('maqabir_requests', JSON.stringify(requests)); renderDashboard(); showToast(currentLang === 'ar' ? 'تم حذف الطلب' : 'Demande supprimée'); }
+
+// ==================== CARTE ====================
 function initMap() {
   map = L.map('map').setView([36.4, 9.8], 7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
@@ -572,7 +537,7 @@ function updateMarkers() {
     if (markers[tomb.id]) { map.removeLayer(markers[tomb.id]); delete markers[tomb.id]; }
     if (canSeeTomb(tomb)) {
       const marker = L.marker([tomb.lat, tomb.lng], { icon: getMarkerIcon(tomb.privacy === 'private', selectedTombId === tomb.id) }).addTo(map);
-      marker.bindPopup(`<div style="padding:8px"><strong>${tomb.name}</strong><br>${tomb.cem}<br><button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">${currentLang === 'ar' ? 'عرض' : 'Voir'}</button></div>`);
+      marker.bindPopup(`<div style="padding:8px"><strong>${tomb.name}</strong><br>${tomb.cem}<br><button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">Voir</button></div>`);
       markers[tomb.id] = marker;
     }
   });
@@ -588,58 +553,38 @@ function selectTomb(id) {
   document.getElementById('detailMeta').textContent = `${tomb.birth} – ${tomb.death} · ${tomb.cem}, ${tomb.gov}`;
   document.getElementById('detailGPS').textContent = `${tomb.lat.toFixed(5)}°, ${tomb.lng.toFixed(5)}°`;
   document.getElementById('dirLink').href = `https://www.google.com/maps/dir/?api=1&destination=${tomb.lat},${tomb.lng}`;
-  document.getElementById('detailContent').innerHTML = `<div><p>📍 ${tomb.location}</p><p>🔒 ${tomb.privacy === 'public' ? 'Public' : 'Privé'}</p></div>`;
-  document.getElementById('detailPanel').classList.add('vis');
-  
-  // Afficher les boutons de services pour ce tombeau
+  document.getElementById('detailContent').innerHTML = `<p>📍 ${tomb.location}</p><p>🔒 ${tomb.privacy === 'public' ? 'Public' : 'Privé'}</p>`;
+  document.getElementById('detailPanel').classList.remove('hidden');
   displayTombServices(id);
 }
 
 function displayTombServices(tombId) {
   const tomb = tombs.find(t => t.id === tombId);
   if (!tomb) return;
-  
   const container = document.getElementById('detailServicesActions');
-  const t = translations[currentLang];
-  
-  container.innerHTML = `
-    <h4 style="margin: 10px 0 5px; color: var(--brown);">${currentLang === 'ar' ? 'خدمات لهذا القبر' : 'Services pour ce tombeau'}</h4>
-    <div class="services-actions">
-      <button class="svc-action-btn svc-action-cleaning" onclick="requestServiceForTomb('${tombId}', 'cleaning')">🧹 ${t.serviceCleaning || 'Nettoyer'}</button>
-      <button class="svc-action-btn svc-action-painting" onclick="requestServiceForTomb('${tombId}', 'painting')">🎨 ${t.servicePainting || 'Peindre'}</button>
-      <button class="svc-action-btn svc-action-marble" onclick="requestServiceForTomb('${tombId}', 'marble')">🪨 ${t.serviceMarble || 'Marbre'}</button>
-      <button class="svc-action-btn svc-action-flowers" onclick="requestServiceForTomb('${tombId}', 'flowers')">🌹 ${t.serviceFlowers || 'Fleurs'}</button>
-      <button class="svc-action-btn svc-action-find" onclick="requestServiceForTomb('${tombId}', 'findtomb')">🔍 ${t.serviceFind || 'Retrouver'}</button>
-    </div>
-  `;
+  container.innerHTML = `<h4 class="font-semibold text-stone-700 dark:text-stone-300 mb-2">Services pour ce tombeau</h4><div class="grid grid-cols-2 gap-2"><button class="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'cleaning')">🧹 Nettoyer</button><button class="px-3 py-2 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'painting')">🎨 Peindre</button><button class="px-3 py-2 bg-stone-500 text-white rounded-lg text-sm hover:bg-stone-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'marble')">🪨 Marbre</button><button class="px-3 py-2 bg-pink-500 text-white rounded-lg text-sm hover:bg-pink-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'flowers')">🌹 Fleurs</button><button class="px-3 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'findtomb')">🔍 Retrouver</button></div>`;
 }
 
 function requestServiceForTomb(tombId, serviceCat) {
   const tomb = tombs.find(t => t.id === tombId);
   if (!tomb) return;
-  
-  // Trouver le service correspondant
   const service = services.find(s => s.cat === serviceCat);
   if (!service) return;
-  
   currentServiceForRequest = service;
-  
   const allCats = { ...CATS_P1, ...CATS_P2 };
   const cat = allCats[serviceCat];
   const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : serviceCat;
-  
-  // Pré-remplir le formulaire avec les infos du tombeau
-  document.getElementById('reqSvcInfo').innerHTML = `<span style="font-size:24px;">${cat?.icon || '🛠'}</span> <strong>${catName}</strong><br><small>Pour le tombeau de ${tomb.name} à ${tomb.cem}, ${tomb.gov}</small>`;
+  document.getElementById('reqSvcInfo').innerHTML = `<span class="text-2xl">${cat?.icon || '🛠'}</span> <strong>${catName}</strong><br><small>Tombeau de ${tomb.name} à ${tomb.cem}</small>`;
   document.getElementById('reqLoc').value = `${tomb.cem}, ${tomb.gov}`;
-  document.getElementById('reqMsg').value = `Tombeau de ${tomb.name} (${tomb.birth} - ${tomb.death}) à ${tomb.location}`;
-  
-  document.getElementById('svcReqModal').classList.add('open');
+  document.getElementById('reqMsg').value = `Tombeau de ${tomb.name} (${tomb.birth} - ${tomb.death})`;
+  document.getElementById('svcReqModal').classList.remove('hidden');
+  document.getElementById('svcReqModal').style.display = 'flex';
 }
 
-function closeDetail() { document.getElementById('detailPanel').classList.remove('vis'); selectedTombId = null; updateMarkers(); }
+function closeDetail() { document.getElementById('detailPanel').classList.add('hidden'); selectedTombId = null; updateMarkers(); }
 function copyGPS() { const tomb = tombs.find(t => t.id === selectedTombId); if (tomb) { navigator.clipboard.writeText(`${tomb.lat}, ${tomb.lng}`); showToast('Copié !'); } }
 
-// ==================== LISTE TOMBEAUX ====================
+// ==================== LISTE ====================
 function renderTombList(filteredList = null) {
   const list = filteredList || tombs.filter(t => canSeeTomb(t));
   const container = document.getElementById('tombList');
@@ -647,8 +592,8 @@ function renderTombList(filteredList = null) {
   container.innerHTML = '';
   list.forEach(tomb => {
     const div = document.createElement('div');
-    div.className = 'tc';
-    div.innerHTML = `<h4>${tomb.name}</h4><div class="dt">${tomb.birth} – ${tomb.death}</div><div class="dt">${tomb.cem}, ${tomb.gov}</div>`;
+    div.className = 'p-4 hover:bg-stone-50 dark:hover:bg-stone-700 cursor-pointer transition-all';
+    div.innerHTML = `<h4 class="font-semibold text-stone-800 dark:text-stone-200">${tomb.name}</h4><div class="text-sm text-stone-500 dark:text-stone-400">${tomb.birth} – ${tomb.death}</div><div class="text-xs text-stone-400 dark:text-stone-500">${tomb.cem}, ${tomb.gov}</div>`;
     div.onclick = () => selectTomb(tomb.id);
     container.appendChild(div);
   });
@@ -674,20 +619,19 @@ function filterTombs() {
 }
 
 function syncSearch() { const heroVal = document.getElementById('heroSearch').value; document.getElementById('searchInput').value = heroVal; filterTombs(); }
-function showTab(tab) { const sidebar = document.getElementById('sidebar'); if (tab === 'map') sidebar.style.display = 'none'; else if (tab === 'list') sidebar.style.display = 'none'; else if (tab === 'filter') sidebar.style.display = 'block'; document.querySelectorAll('.bbn').forEach(btn => btn.classList.remove('active')); if (event && event.target) event.target.closest('.bbn').classList.add('active'); }
+function showTab(tab) { const sidebar = document.getElementById('sidebar'); if (tab === 'map') sidebar.style.display = 'none'; else if (tab === 'list') sidebar.style.display = 'none'; else sidebar.style.display = 'block'; }
 
 // ==================== QUICK ADD ====================
 async function openQuickAddModal() {
   if (!currentUser) { openAuthModal(); return; }
-  document.getElementById('quickAddModal').classList.add('open');
+  document.getElementById('quickAddModal').classList.remove('hidden');
+  document.getElementById('quickAddModal').style.display = 'flex';
   document.getElementById('cameraSection').style.display = 'block';
   document.getElementById('detectionSection').style.display = 'none';
   document.getElementById('quickSaveBtn').style.display = 'none';
   startCamera();
 }
-
-function closeQuickAddModal() { document.getElementById('quickAddModal').classList.remove('open'); stopCamera(); }
-
+function closeQuickAddModal() { document.getElementById('quickAddModal').classList.add('hidden'); document.getElementById('quickAddModal').style.display = 'none'; stopCamera(); }
 async function startCamera() {
   try {
     if (currentStream) currentStream.getTracks().forEach(track => track.stop());
@@ -696,9 +640,7 @@ async function startCamera() {
     document.getElementById('cameraVideo').srcObject = stream;
   } catch (err) { showToast("Caméra inaccessible"); }
 }
-
 function stopCamera() { if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); currentStream = null; } }
-
 async function capturePhoto() {
   const video = document.getElementById('cameraVideo');
   const canvas = document.getElementById('cameraCanvas');
@@ -708,7 +650,6 @@ async function capturePhoto() {
   stopCamera();
   await analyzeImage(canvas.toDataURL('image/png'));
 }
-
 async function uploadPhoto(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
@@ -716,7 +657,6 @@ async function uploadPhoto(input) {
     reader.readAsDataURL(input.files[0]);
   }
 }
-
 async function analyzeImage(imageDataUrl) {
   document.getElementById('cameraSection').style.display = 'none';
   document.getElementById('detectionSection').style.display = 'block';
@@ -733,37 +673,33 @@ async function analyzeImage(imageDataUrl) {
     const extracted = extractInfoFromText(text);
     document.getElementById('detectionLoading').style.display = 'none';
     document.getElementById('detectionResult').style.display = 'block';
-    document.getElementById('detectionResult').innerHTML = `<div class="detection-result"><div class="detected-field">🔍 ${text.substring(0, 200)}${text.length > 200 ? '...' : ''}</div><div class="detected-field">👤 ${extracted.firstname || '?'} ${extracted.lastname || '?'}</div><div class="detected-field">📅 ${extracted.birth || '?'} → ${extracted.death || '?'}</div></div>`;
+    document.getElementById('detectionResult').innerHTML = `<div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg"><p class="text-sm">🔍 ${text.substring(0, 150)}...</p><p class="text-sm mt-2">👤 ${extracted.firstname || '?'} ${extracted.lastname || '?'}</p><p class="text-sm">📅 ${extracted.birth || '?'} → ${extracted.death || '?'}</p></div>`;
     document.getElementById('quickFirstname').value = extracted.firstname || '';
     document.getElementById('quickLastname').value = extracted.lastname || '';
     document.getElementById('quickBirth').value = extracted.birth || '';
     document.getElementById('quickDeath').value = extracted.death || '';
     document.getElementById('quickSaveBtn').style.display = 'block';
     getCurrentLocation();
-  } catch (err) { document.getElementById('detectionLoading').style.display = 'none'; document.getElementById('detectionResult').style.display = 'block'; document.getElementById('detectionResult').innerHTML = `<div class="detection-result" style="color:var(--danger)">❌ Erreur</div>`; document.getElementById('quickSaveBtn').style.display = 'block'; }
+  } catch (err) { document.getElementById('detectionLoading').style.display = 'none'; document.getElementById('quickSaveBtn').style.display = 'block'; }
 }
-
 function extractInfoFromText(text) {
   const result = { firstname: "", lastname: "", birth: "", death: "" };
   const namePattern = /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/g;
   const names = text.match(namePattern) || [];
   if (names.length >= 1) result.firstname = names[0];
   if (names.length >= 2) result.lastname = names[1];
-  const datePatterns = [/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/gi, /(\d{1,2})\/(\d{1,2})\/(\d{4})/g, /(\d{4})-(\d{2})-(\d{2})/g];
+  const datePatterns = [/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/gi, /(\d{1,2})\/(\d{1,2})\/(\d{4})/g];
   let dates = [];
   for (const pattern of datePatterns) { const matches = [...text.matchAll(pattern)]; for (const match of matches) { if (match[0].match(/\d{4}/)) dates.push(match[0]); } }
   if (dates.length >= 1) result.birth = dates[0];
   if (dates.length >= 2) result.death = dates[1];
-  else if (dates.length === 1) result.death = dates[0];
   return result;
 }
-
 function getCurrentLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => { currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; document.getElementById('quickGps').value = `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`; showToast("📍 GPS obtenu !"); }, err => { document.getElementById('quickGps').value = "Non disponible"; });
   } else { document.getElementById('quickGps').value = "Non supporté"; }
 }
-
 function saveQuickTomb() {
   const firstname = document.getElementById('quickFirstname').value.trim();
   const lastname = document.getElementById('quickLastname').value.trim();
@@ -779,76 +715,56 @@ function saveQuickTomb() {
 }
 
 // ==================== SERVICES ====================
-function showServicesScreen() { document.getElementById('servicesScreen').style.display = 'block'; renderServices(); }
-function hideServicesScreen() { document.getElementById('servicesScreen').style.display = 'none'; }
-
+function showServicesScreen() { document.getElementById('servicesScreen').classList.remove('hidden'); renderServices(); }
+function hideServicesScreen() { document.getElementById('servicesScreen').classList.add('hidden'); }
 function switchSvcPack(pack) {
   svcPackFilter = pack;
   svcChipFilter = pack === 'part2' ? 'all2' : 'all1';
-  document.querySelectorAll('.svc-tab').forEach(tab => tab.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('svcChips1').style.display = (pack === 'part1' || pack === 'all') ? 'block' : 'none';
-  document.getElementById('svcChips2').style.display = (pack === 'part2' || pack === 'all') ? 'block' : 'none';
+  document.querySelectorAll('.svc-tab').forEach(tab => tab.classList.remove('border-amber-500', 'text-amber-600'));
+  event.target.classList.add('border-amber-500', 'text-amber-600');
+  document.getElementById('svcChips1').style.display = (pack === 'part1' || pack === 'all') ? 'flex' : 'none';
+  document.getElementById('svcChips2').style.display = (pack === 'part2' || pack === 'all') ? 'flex' : 'none';
   const banner = document.getElementById('svcBanner');
-  if (pack === 'part1') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack1'; banner.innerHTML = `<div style="font-weight:bold;">🕊 ${currentLang === 'ar' ? 'قبل الدفن' : 'Avant l\'enterrement'}</div><div>Documentation · Transport · Kafan · Coran · Construction · Doua</div>`; }
-  else if (pack === 'part2') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack2'; banner.innerHTML = `<div style="font-weight:bold;">🪦 ${currentLang === 'ar' ? 'صيانة القبر' : 'Entretien'}</div><div>Nettoyage · Peinture · Marbre · Fleurs · Localisation</div>`; }
-  else if (pack === 'full') { banner.style.display = 'block'; banner.className = 'svc-banner svc-pack-full'; banner.innerHTML = `<div style="font-weight:bold;">⭐ ${currentLang === 'ar' ? 'حزمة كاملة' : 'Pack complet'}</div><div>Tous les services réunis</div>`; }
+  if (pack === 'part1') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20'; banner.innerHTML = '<div class="font-bold">🕊 Partie 1 — Avant l\'enterrement</div><div class="text-sm">Documentation · Transport · Kafan · Coran · Construction · Doua</div>'; }
+  else if (pack === 'part2') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20'; banner.innerHTML = '<div class="font-bold">🪦 Partie 2 — Entretien du tombeau</div><div class="text-sm">Nettoyage · Peinture · Marbre · Fleurs · Localisation</div>'; }
+  else if (pack === 'full') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-100 dark:from-amber-900/30 dark:to-emerald-900/30'; banner.innerHTML = '<div class="font-bold">⭐ Pack complet — De la vie au repos</div><div class="text-sm">Tous les services réunis</div>'; }
   else banner.style.display = 'none';
   renderServices();
 }
-
 function filterSvcChip(el, cat) {
-  el.closest('.svc-chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
   svcChipFilter = cat;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('bg-amber-500', 'text-white', 'border-amber-500'));
+  el.classList.add('bg-amber-500', 'text-white', 'border-amber-500');
   renderServices();
 }
-
 function renderServices() {
   const q = document.getElementById('svcSearch')?.value.toLowerCase() || '';
   let list = services.filter(s => {
     const matchPack = svcPackFilter === 'all' || svcPackFilter === 'full' || s.part === svcPackFilter;
     const matchChip = svcChipFilter === 'all1' || svcChipFilter === 'all2' || s.cat === svcChipFilter;
-    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q) || s.gov.toLowerCase().includes(q);
+    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q);
     return matchPack && matchChip && matchSearch;
   });
   const grid = document.getElementById('svcGrid');
   if (!grid) return;
-  if (list.length === 0) { grid.innerHTML = '<div class="svc-empty">🔍 Aucun service trouvé</div>'; return; }
-  let html = '';
-  if (svcPackFilter === 'all' || svcPackFilter === 'full') {
-    const p1 = list.filter(s => s.part === 'part1');
-    const p2 = list.filter(s => s.part === 'part2');
-    if (p1.length) html += `<div class="svc-section-title">🕊 ${currentLang === 'ar' ? 'قبل الدفن' : 'Avant l\'enterrement'}</div>` + p1.map(s => svcCardHTML(s)).join('');
-    if (p2.length) html += `<div class="svc-section-title">🪦 ${currentLang === 'ar' ? 'صيانة القبر' : 'Entretien du tombeau'}</div>` + p2.map(s => svcCardHTML(s)).join('');
-  } else { html = list.map(s => svcCardHTML(s)).join(''); }
-  grid.innerHTML = html;
+  if (list.length === 0) { grid.innerHTML = '<div class="text-center py-8 text-stone-500">🔍 Aucun service trouvé</div>'; return; }
+  grid.innerHTML = list.map(s => {
+    const cat = { ...CATS_P1, ...CATS_P2 }[s.cat] || { icon: '🛠', fr: s.cat };
+    const stars = '★'.repeat(Math.floor(s.rating)) + '☆'.repeat(5 - Math.ceil(s.rating));
+    return `<div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden hover:shadow-lg transition-all"><div class="p-4 flex gap-3"><div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xl">${cat.icon}</div><div class="flex-1"><h3 class="font-bold text-stone-800 dark:text-stone-200">${s.name}</h3><div class="text-sm text-stone-500">📍 ${s.gov}</div><div class="text-xs text-stone-400 mt-1">${s.desc.substring(0, 80)}...</div><div class="flex flex-wrap gap-2 mt-2"><span class="text-xs bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded-full">${stars} ${s.rating}</span><span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-full">🟢 ${s.avail === 'always' ? '24/7' : 'Disponible'}</span></div></div><div class="text-right"><strong class="text-amber-600 dark:text-amber-400">${s.price}</strong><span class="text-xs"> TND</span></div></div><div class="flex border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="callProvider('${s.phone}')">📞 Appeler</button><button class="flex-1 py-2 text-blue-600 dark:text-blue-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button><button class="flex-1 py-2 text-amber-600 dark:text-amber-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="openSvcReqModal('${s.id}')">📋 Demander</button></div></div>`;
+  }).join('');
 }
-
-function svcCardHTML(s) {
-  const allCats = { ...CATS_P1, ...CATS_P2 };
-  const cat = allCats[s.cat];
-  const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : s.cat;
-  const stars = '★'.repeat(Math.floor(s.rating)) + '☆'.repeat(5 - Math.ceil(s.rating));
-  const pBadge = s.part === 'part1' ? `<span class="svc-badge badge-p1">🕊 ${currentLang === 'ar' ? 'قبل الدفن' : 'Av. enterrement'}</span>` : `<span class="svc-badge badge-p2">🪦 ${currentLang === 'ar' ? 'صيانة' : 'Entretien'}</span>`;
-  const tBadge = s.type === 'pro' ? `<span class="svc-badge badge-pro">💼 ${currentLang === 'ar' ? 'محترف' : 'Professionnel'}</span>` : `<span class="svc-badge badge-vol">🤝 ${currentLang === 'ar' ? 'متطوع' : 'Bénévole'}</span>`;
-  const availText = { always: '24h/24', weekdays: 'Jours ouvrables', weekend: 'Week-end', oncall: 'Sur appel' }[s.avail] || s.avail;
-  return `<div class="svc-card"><div class="svc-card-hd"><div class="svc-icon" style="background:${cat?.bg || '#f5f0e8'}">${cat?.icon || '🛠'}</div><div class="svc-info"><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px;">${pBadge}${tBadge}</div><h3>${s.name}</h3><div class="svc-gov">📍 ${s.gov} · ${catName}</div></div><div class="svc-price-block"><strong>${s.price}</strong><span>TND</span></div></div><div class="svc-card-body"><div class="svc-desc">${s.desc}</div><div class="svc-tags"><span class="svc-avail">🟢 ${availText}</span><span class="svc-rating">${stars} ${s.rating} (${s.reviews})</span></div></div><div class="svc-btns"><button class="svc-btn-call" onclick="callProvider('${s.phone}')">📞 ${currentLang === 'ar' ? 'اتصال' : 'Appeler'}</button><button class="svc-btn-wa" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button><button class="svc-btn-req" onclick="openSvcReqModal('${s.id}')">📋 ${currentLang === 'ar' ? 'طلب' : 'Demander'}</button></div></div>`;
-}
-
 function callProvider(phone) { window.open('tel:' + phone.replace(/\s/g, '')); }
-function whatsappProvider(phone, name) { const msg = currentLang === 'ar' ? `مرحباً، أود الاستفسار عن خدمة "${name}"` : `Bonjour, je souhaite des informations sur "${name}"`; window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + `?text=${encodeURIComponent(msg)}`); }
-
+function whatsappProvider(phone, name) { const msg = `Bonjour, je souhaite des informations sur "${name}"`; window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + `?text=${encodeURIComponent(msg)}`); }
 function openSvcReqModal(id) {
   currentServiceForRequest = services.find(s => s.id === id);
   if (!currentServiceForRequest) return;
-  const allCats = { ...CATS_P1, ...CATS_P2 };
-  const cat = allCats[currentServiceForRequest.cat];
-  const catName = cat ? (currentLang === 'ar' ? cat.ar : cat.fr) : currentServiceForRequest.cat;
-  document.getElementById('reqSvcInfo').innerHTML = `<span style="font-size:24px;">${cat?.icon || '🛠'}</span> <strong>${catName}</strong><br><small>${currentServiceForRequest.name} · ${currentServiceForRequest.price} TND</small>`;
-  document.getElementById('svcReqModal').classList.add('open');
+  const cat = { ...CATS_P1, ...CATS_P2 }[currentServiceForRequest.cat] || { icon: '🛠', fr: currentServiceForRequest.cat };
+  document.getElementById('reqSvcInfo').innerHTML = `<span class="text-2xl">${cat.icon}</span> <strong>${cat.fr}</strong><br><small>${currentServiceForRequest.name} · ${currentServiceForRequest.price} TND</small>`;
+  document.getElementById('svcReqModal').classList.remove('hidden');
+  document.getElementById('svcReqModal').style.display = 'flex';
 }
-function closeSvcReqModal() { document.getElementById('svcReqModal').classList.remove('open'); currentServiceForRequest = null; }
+function closeSvcReqModal() { document.getElementById('svcReqModal').classList.add('hidden'); document.getElementById('svcReqModal').style.display = 'none'; currentServiceForRequest = null; }
 function submitServiceRequest() {
   const name = document.getElementById('reqName').value.trim();
   const phone = document.getElementById('reqPhone').value.trim();
@@ -858,31 +774,30 @@ function submitServiceRequest() {
     const date = document.getElementById('reqDate').value;
     const msg = document.getElementById('reqMsg').value;
     const txt = `Nouvelle demande:\nService: ${currentServiceForRequest.name}\nClient: ${name}\nTél: ${phone}\nLieu: ${loc || '—'}\nDate: ${date || '—'}\nMessage: ${msg || '—'}`;
-    const request = { id: Date.now(), service: currentServiceForRequest.name, price: currentServiceForRequest.price, clientName: name, clientPhone: phone, location: loc || '—', date: date || '—', message: msg || '', status: 'pending', createdAt: new Date().toISOString() };
-    requests.unshift(request);
+    const newRequest = { id: Date.now(), service: currentServiceForRequest.name, price: currentServiceForRequest.price, clientName: name, clientPhone: phone, location: loc || '—', date: date || '—', message: msg || '', status: 'pending', createdAt: new Date().toISOString() };
+    requests.unshift(newRequest);
     localStorage.setItem('maqabir_requests', JSON.stringify(requests));
     window.open('https://wa.me/21692639366?text=' + encodeURIComponent(txt));
   }
   closeSvcReqModal();
   showToast('Demande envoyée !');
   ['reqName', 'reqPhone', 'reqLoc', 'reqDate', 'reqMsg'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  if (!document.getElementById('dashboardScreen').classList.contains('hidden')) renderDashboard();
 }
 
-// ==================== INITIALISATION ====================
+// ==================== INIT ====================
 function loadStoredData() {
   const storedTombs = localStorage.getItem('maqabir_tombs');
   if (storedTombs) tombs = JSON.parse(storedTombs);
   const savedUser = localStorage.getItem('maqabir_currentUser');
   if (savedUser) { currentUser = JSON.parse(savedUser); updateUserUI(); }
 }
-
 loadStoredData();
 initMap();
 renderTombList();
 updateMarkers();
 setLanguage(currentLang);
 
-// Expose global functions
 window.selectTomb = selectTomb; window.closeDetail = closeDetail; window.copyGPS = copyGPS;
 window.filterTombs = filterTombs; window.syncSearch = syncSearch; window.requireAuth = requireAuth;
 window.handleLogin = handleLogin; window.handleRegisterWithCaptcha = handleRegisterWithCaptcha;
@@ -894,8 +809,10 @@ window.callProvider = callProvider; window.whatsappProvider = whatsappProvider;
 window.openSvcReqModal = openSvcReqModal; window.closeSvcReqModal = closeSvcReqModal; window.submitServiceRequest = submitServiceRequest;
 window.openQuickAddModal = openQuickAddModal; window.closeQuickAddModal = closeQuickAddModal;
 window.capturePhoto = capturePhoto; window.uploadPhoto = uploadPhoto; window.getCurrentLocation = getCurrentLocation; window.saveQuickTomb = saveQuickTomb;
-window.setLanguage = setLanguage;
+window.setLanguage = setLanguage; window.toggleDarkMode = toggleDarkMode;
 window.requestServiceForTomb = requestServiceForTomb;
+window.showDashboardScreen = showDashboardScreen; window.hideDashboardScreen = hideDashboardScreen;
+window.updateRequestStatus = updateRequestStatus; window.deleteRequest = deleteRequest; window.renderDashboard = renderDashboard;
 </script>
 </body>
 </html>
