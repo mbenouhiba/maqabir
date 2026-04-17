@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>مقابر — Maqabir Tunisie</title>
 <!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <!-- Tailwind CSS CDN -->
@@ -17,59 +17,170 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  @layer utilities {
-    .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
-    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-    .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-    .dark .glass { background: rgba(30, 30, 40, 0.9); border: 1px solid rgba(255, 255, 255, 0.05); }
-    .card-hover { transition: all 0.3s ease; }
-    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02); }
+  /* ==================== CHARTE GRAPHIQUE MAQABIR ==================== */
+  :root {
+    /* Couleurs primaires - du logo */
+    --maqabir-green: #1a4d3a;
+    --maqabir-green-light: #2a6d4a;
+    --maqabir-green-dark: #0e3326;
+    --maqabir-gold: #c9a84c;
+    --maqabir-gold-light: #e0c070;
+    --maqabir-gold-dark: #a88830;
+    --maqabir-cream: #f5f0e1;
+    --maqabir-cream-dark: #e8dfcc;
+    --maqabir-red: #8b3a2a;
+    --maqabir-red-light: #a85540;
+    --maqabir-dark: #2c2418;
+    --maqabir-dark-light: #4a3d2c;
+    --maqabir-white: #ffffff;
+    --maqabir-white-dark: #f8f5f0;
+    
+    /* Ombres */
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    --shadow-gold: 0 4px 16px rgba(201,168,76,0.2);
+    
+    /* Transitions */
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-slow: all 0.5s ease;
+    
+    /* Typographie */
+    --font-arabic: 'Amiri', serif;
+    --font-latin: 'Playfair Display', serif;
+    --font-sans: 'Tajawal', sans-serif;
   }
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  [dir="rtl"] {
+    --font-arabic: 'Amiri', serif;
+    --font-latin: 'Playfair Display', serif;
+  }
+  
+  /* Animations personnalisées */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes pulseGold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
+  }
+  
+  .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+  .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+  .animate-slide-in { animation: slideIn 0.5s ease-out; }
+  .animate-pulse-gold { animation: pulseGold 2s infinite; }
+  
+  /* Scrollbar personnalisée */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-  ::-webkit-scrollbar-thumb { background: #c9a84c; border-radius: 10px; }
-  .dark ::-webkit-scrollbar-track { background: #2d2d3d; }
-  .dark ::-webkit-scrollbar-thumb { background: #c9a84c; }
-  .dark .leaflet-container { filter: brightness(0.9) contrast(1.1); }
-  * { transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
-  /* Map toggle button */
-  .map-toggle-btn { transition: all 0.3s ease; }
-  .map-toggle-btn:hover { transform: scale(1.02); }
+  ::-webkit-scrollbar-track { background: var(--maqabir-cream); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--maqabir-gold); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--maqabir-gold-dark); }
+  
+  .dark ::-webkit-scrollbar-track { background: var(--maqabir-dark); }
+  .dark ::-webkit-scrollbar-thumb { background: var(--maqabir-gold); }
+  
+  /* Style pour la carte Leaflet en mode sombre */
+  .dark .leaflet-container { filter: brightness(0.85) contrast(1.1) saturate(0.9); }
+  
+  /* Transition globale */
+  * { transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease; }
+  
+  /* Effet de verre (glassmorphism) */
+  .glass {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .dark .glass {
+    background: rgba(26, 77, 58, 0.9);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+  }
+  
+  /* Carte tombeau */
+  .tomb-card {
+    transition: var(--transition-normal);
+    border-left: 3px solid transparent;
+  }
+  .tomb-card:hover {
+    transform: translateX(4px);
+    border-left-color: var(--maqabir-gold);
+    background: linear-gradient(90deg, rgba(201,168,76,0.05), transparent);
+  }
+  
+  /* Boutons */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--maqabir-green), var(--maqabir-green-dark));
+    color: var(--maqabir-white);
+    transition: var(--transition-normal);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+  }
+  
+  .btn-gold {
+    background: linear-gradient(135deg, var(--maqabir-gold), var(--maqabir-gold-dark));
+    color: var(--maqabir-dark);
+    transition: var(--transition-normal);
+  }
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+  }
+  
+  /* Badges de statut */
+  .status-pending { background: #fef3c7; color: #d97706; }
+  .status-progress { background: #dbeafe; color: #2563eb; }
+  .status-done { background: #d1fae5; color: #059669; }
+  .dark .status-pending { background: rgba(245,158,11,0.2); color: #fbbf24; }
+  .dark .status-progress { background: rgba(59,130,246,0.2); color: #60a5fa; }
+  .dark .status-done { background: rgba(16,185,129,0.2); color: #34d399; }
 </style>
 </head>
-<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-stone-100 dark:from-stone-900 dark:via-stone-800 dark:to-stone-900 transition-colors duration-300 font-['Inter']">
+<body class="bg-gradient-to-br from-[var(--maqabir-cream)] to-[var(--maqabir-cream-dark)] dark:from-[var(--maqabir-green-dark)] dark:to-[var(--maqabir-dark)] transition-colors duration-300 font-[var(--font-sans)]">
 
 <!-- AUTH MODAL -->
 <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] hidden items-center justify-center">
-  <div class="bg-white dark:bg-stone-800 rounded-2xl w-full max-w-md mx-4 overflow-hidden shadow-2xl animate-fade-in-up">
-    <div class="relative bg-gradient-to-r from-amber-800 to-emerald-800 p-6 text-center">
+  <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-2xl w-full max-w-md mx-4 overflow-hidden shadow-2xl animate-fade-in-up">
+    <div class="relative bg-gradient-to-r from-[var(--maqabir-green)] to-[var(--maqabir-green-dark)] p-6 text-center">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-white/70 hover:text-white text-xl">&times;</button>
-      <div class="text-4xl mb-2">🕌</div>
-      <h2 class="text-2xl font-bold text-white font-['Amiri']" id="authTitle">Maqabir</h2>
-      <p class="text-amber-200 text-sm mt-1" id="authSubtitle">Connectez-vous pour ajouter un tombeau</p>
+      <div class="w-16 h-16 mx-auto mb-3 bg-[var(--maqabir-gold)] rounded-full flex items-center justify-center text-3xl shadow-lg">🕌</div>
+      <h2 class="text-2xl font-bold text-white font-[var(--font-arabic)]" id="authTitle">مقابر</h2>
+      <p class="text-[var(--maqabir-gold-light)] text-sm mt-1" id="authSubtitle">Maqabir · Préservation de la mémoire</p>
     </div>
-    <div class="flex border-b border-stone-200 dark:border-stone-700">
-      <button class="auth-tab flex-1 py-3 text-center font-semibold text-stone-600 dark:text-stone-400 border-b-2 border-transparent active" onclick="switchAuthTab('login')" id="authTabLogin">Connexion</button>
-      <button class="auth-tab flex-1 py-3 text-center font-semibold text-stone-600 dark:text-stone-400 border-b-2 border-transparent" onclick="switchAuthTab('register')" id="authTabReg">Inscription</button>
+    <div class="flex border-b border-stone-200 dark:border-[var(--maqabir-green-light)]">
+      <button class="auth-tab flex-1 py-3 text-center font-semibold text-stone-600 dark:text-stone-300 border-b-2 border-transparent active" onclick="switchAuthTab('login')" id="authTabLogin">Connexion</button>
+      <button class="auth-tab flex-1 py-3 text-center font-semibold text-stone-600 dark:text-stone-300 border-b-2 border-transparent" onclick="switchAuthTab('register')" id="authTabReg">Inscription</button>
     </div>
     <div class="p-6">
       <div id="loginForm">
         <div class="auth-err hidden bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-600 dark:text-red-400 mb-4" id="loginErr"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginEmailLabel">Email</label><input type="email" id="loginEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="exemple@email.com"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginPwdLabel">Mot de passe</label><input type="password" id="loginPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="••••••"></div>
-        <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all" onclick="handleLogin()" id="loginBtn">Se connecter</button>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginEmailLabel">Email</label><input type="email" id="loginEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)] focus:ring-2 focus:ring-[var(--maqabir-gold)] focus:border-transparent" placeholder="exemple@email.com"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="loginPwdLabel">Mot de passe</label><input type="password" id="loginPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)] focus:ring-2 focus:ring-[var(--maqabir-gold)] focus:border-transparent" placeholder="••••••"></div>
+        <button class="w-full py-2 btn-gold rounded-lg font-semibold" onclick="handleLogin()" id="loginBtn">Se connecter</button>
       </div>
       <div id="registerForm" style="display:none;">
         <div class="auth-err hidden bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-600 dark:text-red-400 mb-4" id="regErr"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regNameLabel">Nom complet</label><input type="text" id="regName" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="Mohamed Ben Ali"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regEmailLabel">Email</label><input type="email" id="regEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="exemple@email.com"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regPwdLabel">Mot de passe (min 6)</label><input type="password" id="regPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="••••••"></div>
-        <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all" onclick="handleRegisterWithCaptcha()" id="regBtn">Créer mon compte</button>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regNameLabel">Nom complet</label><input type="text" id="regName" class="w-full px-4 py-2 border border-stone-300 dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)] focus:ring-2 focus:ring-[var(--maqabir-gold)] focus:border-transparent" placeholder="Mohamed Ben Ali"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regEmailLabel">Email</label><input type="email" id="regEmail" class="w-full px-4 py-2 border border-stone-300 dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)] focus:ring-2 focus:ring-[var(--maqabir-gold)] focus:border-transparent" placeholder="exemple@email.com"></div>
+        <div class="mb-4"><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="regPwdLabel">Mot de passe (min 6)</label><input type="password" id="regPwd" class="w-full px-4 py-2 border border-stone-300 dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)] focus:ring-2 focus:ring-[var(--maqabir-gold)] focus:border-transparent" placeholder="••••••"></div>
+        <button class="w-full py-2 btn-gold rounded-lg font-semibold" onclick="handleRegisterWithCaptcha()" id="regBtn">Créer mon compte</button>
       </div>
       <div class="text-center text-sm text-stone-500 dark:text-stone-400 mt-4">ou</div>
-      <button class="w-full mt-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="guestLogin()" id="guestBtn">Continuer sans compte</button>
+      <button class="w-full mt-3 py-2 border border-stone-300 dark:border-[var(--maqabir-green-light)] rounded-lg text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="guestLogin()" id="guestBtn">Continuer sans compte</button>
     </div>
   </div>
 </div>
@@ -77,34 +188,37 @@
 <!-- APP MAIN -->
 <div id="appScreen" class="min-h-screen">
   <!-- Navigation -->
-  <nav class="sticky top-0 z-50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 shadow-sm">
+  <nav class="sticky top-0 z-50 bg-white/95 dark:bg-[var(--maqabir-green)]/95 backdrop-blur-md border-b border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-gradient-to-br from-amber-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md">🕌</div>
-          <h1 class="text-xl font-bold bg-gradient-to-r from-amber-700 to-emerald-700 dark:from-amber-400 dark:to-emerald-400 bg-clip-text text-transparent font-['Amiri']" id="navTitle">Maqabir</h1>
+          <div class="w-10 h-10 bg-gradient-to-br from-[var(--maqabir-gold)] to-[var(--maqabir-gold-dark)] rounded-full flex items-center justify-center shadow-md text-xl">🕌</div>
+          <div>
+            <h1 class="text-xl font-bold text-[var(--maqabir-green)] dark:text-[var(--maqabir-gold)] font-[var(--font-arabic)]" id="navTitle">مقابر</h1>
+            <p class="text-[10px] text-[var(--maqabir-green-dark)] dark:text-[var(--maqabir-gold-light)] -mt-1">Maqabir Tunisie</p>
+          </div>
         </div>
         <div class="hidden md:block flex-1 max-w-md mx-4">
-          <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">🔍</span><input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 border border-stone-200 dark:border-stone-700 rounded-xl bg-stone-50 dark:bg-stone-800 focus:ring-2 focus:ring-amber-500 focus:border-transparent" placeholder="Rechercher un défunt..." oninput="filterTombs()"></div>
+          <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--maqabir-gold)]">🔍</span><input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-xl bg-[var(--maqabir-cream)]/50 dark:bg-[var(--maqabir-green-dark)] focus:ring-2 focus:ring-[var(--maqabir-gold)] focus:border-transparent" placeholder="Rechercher un défunt..." oninput="filterTombs()"></div>
         </div>
         <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 rounded-full p-1">
-            <button class="lang-btn w-8 h-8 rounded-full text-sm font-semibold transition-all flex items-center justify-center bg-amber-500 text-white" onclick="setLanguage('fr')">FR</button>
-            <button class="lang-btn w-8 h-8 rounded-full text-sm font-semibold transition-all flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700" onclick="setLanguage('ar')">ع</button>
+          <div class="flex items-center gap-1 bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] rounded-full p-1">
+            <button class="lang-btn w-8 h-8 rounded-full text-sm font-semibold transition-all flex items-center justify-center bg-[var(--maqabir-gold)] text-white" onclick="setLanguage('fr')">FR</button>
+            <button class="lang-btn w-8 h-8 rounded-full text-sm font-semibold transition-all flex items-center justify-center text-[var(--maqabir-green)] dark:text-stone-300 hover:bg-[var(--maqabir-gold)]/20" onclick="setLanguage('ar')">ع</button>
           </div>
-          <button class="theme-toggle w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-all" onclick="toggleDarkMode()">🌙</button>
-          <button class="hidden md:flex px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" onclick="showServicesScreen()" id="servicesBtn">🛠 Services</button>
-          <button id="dashboardNavBtn" class="hidden md:flex px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors" onclick="showDashboardScreen()">📊 Dashboard</button>
-          <button class="hidden md:flex px-4 py-2 text-sm font-medium bg-gradient-to-r from-amber-500 to-emerald-500 text-white rounded-xl hover:shadow-md transition-all" onclick="openQuickAddModal()" id="quickAddBtn">📸 Ajout rapide</button>
-          <button class="hidden md:flex px-4 py-2 text-sm font-medium border border-stone-300 dark:border-stone-600 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800 transition-all" onclick="requireAuth()" id="addNavBtn">➕ Ajouter</button>
+          <button class="theme-toggle w-9 h-9 rounded-full bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] flex items-center justify-center text-[var(--maqabir-gold)] hover:bg-[var(--maqabir-gold)]/20 transition-all" onclick="toggleDarkMode()">🌙</button>
+          <button class="hidden md:flex px-4 py-2 text-sm font-medium text-[var(--maqabir-green)] dark:text-stone-300 hover:text-[var(--maqabir-gold)] dark:hover:text-[var(--maqabir-gold)] transition-colors" onclick="showServicesScreen()" id="servicesBtn">🛠 Services</button>
+          <button id="dashboardNavBtn" class="hidden md:flex px-4 py-2 text-sm font-medium text-[var(--maqabir-green)] dark:text-stone-300 hover:text-[var(--maqabir-gold)] dark:hover:text-[var(--maqabir-gold)] transition-colors" onclick="showDashboardScreen()">📊 Dashboard</button>
+          <button class="hidden md:flex px-4 py-2 text-sm font-medium btn-gold rounded-xl" onclick="openQuickAddModal()" id="quickAddBtn">📸 Ajout rapide</button>
+          <button class="hidden md:flex px-4 py-2 text-sm font-medium border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-xl hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="requireAuth()" id="addNavBtn">➕ Ajouter</button>
           <div class="relative">
-            <div class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-all" onclick="toggleMenu()">
-              <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-sm" id="userAvatar">👤</div>
-              <span class="text-sm font-medium text-stone-700 dark:text-stone-300" id="userName">Invité</span>
+            <div class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-xl hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="toggleMenu()">
+              <div class="w-8 h-8 bg-gradient-to-br from-[var(--maqabir-gold)] to-[var(--maqabir-gold-dark)] rounded-full flex items-center justify-center text-white font-bold text-sm" id="userAvatar">👤</div>
+              <span class="text-sm font-medium text-[var(--maqabir-green)] dark:text-stone-300" id="userName">Invité</span>
             </div>
-            <div class="absolute right-0 mt-2 w-56 bg-white dark:bg-stone-800 rounded-xl shadow-lg border border-stone-200 dark:border-stone-700 hidden z-50" id="userMenu">
-              <div class="p-3 border-b border-stone-200 dark:border-stone-700"><strong class="block text-stone-800 dark:text-stone-200" id="menuName">Invité</strong><span class="text-xs text-stone-500 dark:text-stone-400" id="menuEmail">Mode visite</span></div>
-              <button class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors" onclick="logout()" id="logoutBtn">🚪 Déconnexion</button>
+            <div class="absolute right-0 mt-2 w-56 bg-white dark:bg-[var(--maqabir-green)] rounded-xl shadow-lg border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] hidden z-50" id="userMenu">
+              <div class="p-3 border-b border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><strong class="block text-[var(--maqabir-green)] dark:text-stone-200" id="menuName">Invité</strong><span class="text-xs text-stone-500 dark:text-stone-400" id="menuEmail">Mode visite</span></div>
+              <button class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-colors" onclick="logout()" id="logoutBtn">🚪 Déconnexion</button>
             </div>
           </div>
         </div>
@@ -112,20 +226,21 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <div class="relative overflow-hidden bg-gradient-to-br from-amber-900 via-stone-800 to-emerald-900 text-white py-16">
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23c9a84c" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+  <!-- Hero Section avec le logo intégré -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-[var(--maqabir-green)] via-[var(--maqabir-green-dark)] to-[var(--maqabir-dark)] text-white py-16">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23c9a84c" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
     <div class="relative max-w-4xl mx-auto text-center px-4">
-      <h2 class="text-3xl md:text-4xl font-bold font-['Amiri'] mb-3" id="heroTitle">Retrouvez vos proches,<br>préservez la mémoire</h2>
+      <div class="w-24 h-24 mx-auto mb-6 bg-[var(--maqabir-gold)] rounded-full flex items-center justify-center text-4xl shadow-xl animate-pulse-gold">🕌</div>
+      <h2 class="text-3xl md:text-4xl font-bold font-[var(--font-arabic)] mb-3" id="heroTitle">مقابر<br><span class="text-[var(--maqabir-gold-light)] text-xl">Préservez la mémoire de vos proches</span></h2>
       <p class="text-amber-100/80 mb-6" id="heroSubtitle">Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.</p>
       
       <!-- Recherche avancée -->
       <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <input type="text" id="searchNom" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Nom du défunt..." oninput="filterTombs()">
-          <input type="text" id="searchPrenom" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Prénom..." oninput="filterTombs()">
-          <input type="text" id="searchCimetiere" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="Cimetière..." oninput="filterTombs()">
-          <select id="searchGov" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="filterTombs()">
+          <input type="text" id="searchNom" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--maqabir-gold)]" placeholder="Nom du défunt..." oninput="filterTombs()">
+          <input type="text" id="searchPrenom" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--maqabir-gold)]" placeholder="Prénom..." oninput="filterTombs()">
+          <input type="text" id="searchCimetiere" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--maqabir-gold)]" placeholder="Cimetière..." oninput="filterTombs()">
+          <select id="searchGov" class="px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-[var(--maqabir-gold)]" onchange="filterTombs()">
             <option value="" class="text-stone-900">Tous les gouvernorats</option>
             <option value="Tunis" class="text-stone-900">Tunis</option>
             <option value="Sfax" class="text-stone-900">Sfax</option>
@@ -135,27 +250,27 @@
             <option value="Kairouan" class="text-stone-900">Kairouan</option>
           </select>
         </div>
-        <button class="mt-3 px-6 py-2 bg-amber-500 text-stone-900 font-semibold rounded-lg hover:bg-amber-400 transition-all" onclick="filterTombs()">🔍 Rechercher</button>
+        <button class="mt-3 px-6 py-2 btn-gold rounded-lg font-semibold" onclick="filterTombs()">🔍 Rechercher</button>
       </div>
     </div>
   </div>
 
   <!-- Stats Bar -->
   <div class="grid grid-cols-4 gap-4 max-w-4xl mx-auto px-4 -mt-8 relative z-10">
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
-      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="statCount">4</strong>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow-lg border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]">
+      <strong class="text-2xl font-bold text-[var(--maqabir-gold)]" id="statCount">4</strong>
       <span class="block text-sm text-stone-600 dark:text-stone-400" id="statTombsLabel">Tombeaux</span>
     </div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
-      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400">4</strong>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow-lg border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]">
+      <strong class="text-2xl font-bold text-[var(--maqabir-gold)]">4</strong>
       <span class="block text-sm text-stone-600 dark:text-stone-400" id="statCemsLabel">Cimetières</span>
     </div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
-      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="statPhotos">9</strong>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow-lg border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]">
+      <strong class="text-2xl font-bold text-[var(--maqabir-gold)]" id="statPhotos">9</strong>
       <span class="block text-sm text-stone-600 dark:text-stone-400" id="statPhotosLabel">Photos</span>
     </div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow-lg">
-      <strong class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="statUsers">1</strong>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow-lg border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]">
+      <strong class="text-2xl font-bold text-[var(--maqabir-gold)]" id="statUsers">1</strong>
       <span class="block text-sm text-stone-600 dark:text-stone-400" id="statMembersLabel">Membres</span>
     </div>
   </div>
@@ -165,12 +280,12 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Sidebar Filters -->
       <aside class="lg:col-span-3" id="sidebar">
-        <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden sticky top-24">
-          <div class="bg-gradient-to-r from-amber-700 to-emerald-700 px-4 py-3"><h3 class="text-white font-semibold" id="filterTitle">Filtres</h3></div>
+        <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] overflow-hidden sticky top-24 shadow-md">
+          <div class="bg-gradient-to-r from-[var(--maqabir-green)] to-[var(--maqabir-green-dark)] px-4 py-3"><h3 class="text-white font-semibold" id="filterTitle">Filtres</h3></div>
           <div class="p-4 space-y-4">
-            <div><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="cemFilterLabel">Cimetière</label><select id="cemFilter" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" onchange="filterTombs()"><option value="" id="allCems">Tous</option><option>Djellaz</option><option>Sidi Bou Saïd</option><option>El Gorjani</option></select></div>
-            <div><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="privFilterLabel">Visibilité</label><select id="privFilter" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" onchange="filterTombs()"><option value="" id="allVis">Tous</option><option value="public" id="publicOpt">Publics</option><option value="private" id="privateOpt">Privés</option></select></div>
-            <button class="w-full py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-md transition-all" onclick="filterTombs()" id="applyBtn">Appliquer</button>
+            <div><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="cemFilterLabel">Cimetière</label><select id="cemFilter" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" onchange="filterTombs()"><option value="" id="allCems">Tous</option><option>Djellaz</option><option>Sidi Bou Saïd</option><option>El Gorjani</option></select></div>
+            <div><label class="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" id="privFilterLabel">Visibilité</label><select id="privFilter" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" onchange="filterTombs()"><option value="" id="allVis">Tous</option><option value="public" id="publicOpt">Publics</option><option value="private" id="privateOpt">Privés</option></select></div>
+            <button class="w-full py-2 btn-primary rounded-lg font-semibold" onclick="filterTombs()" id="applyBtn">Appliquer</button>
           </div>
         </div>
       </aside>
@@ -178,36 +293,36 @@
       <!-- Main Content Area -->
       <div class="lg:col-span-9 space-y-6">
         <!-- Tomb List -->
-        <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
-          <div class="flex justify-between items-center bg-gradient-to-r from-amber-50 to-stone-50 dark:from-stone-700 dark:to-stone-800 px-4 py-3 border-b border-stone-200 dark:border-stone-700">
-            <h3 class="font-semibold text-stone-800 dark:text-stone-200" id="resultsTitle">Résultats</h3>
-            <span class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold px-2 py-1 rounded-full" id="resultCount">4</span>
+        <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] overflow-hidden shadow-md">
+          <div class="flex justify-between items-center bg-gradient-to-r from-[var(--maqabir-cream)] to-white dark:from-[var(--maqabir-green-dark)] dark:to-[var(--maqabir-green)] px-4 py-3 border-b border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]">
+            <h3 class="font-semibold text-[var(--maqabir-green)] dark:text-stone-200" id="resultsTitle">Résultats</h3>
+            <span class="bg-[var(--maqabir-gold)]/20 text-[var(--maqabir-gold-dark)] dark:text-[var(--maqabir-gold)] text-xs font-semibold px-2 py-1 rounded-full" id="resultCount">4</span>
           </div>
-          <div class="divide-y divide-stone-200 dark:divide-stone-700 max-h-[400px] overflow-y-auto" id="tombList"></div>
+          <div class="divide-y divide-[var(--maqabir-cream)] dark:divide-[var(--maqabir-green-light)] max-h-[400px] overflow-y-auto" id="tombList"></div>
         </div>
 
         <!-- Map Toggle Button -->
-        <button id="toggleMapBtn" class="map-toggle-btn w-full py-3 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2" onclick="toggleMap()">
+        <button id="toggleMapBtn" class="w-full py-3 btn-gold rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-lg" onclick="toggleMap()">
           <span id="mapToggleIcon">🗺️</span> <span id="mapToggleText">Afficher la carte</span>
         </button>
 
         <!-- Map (hidden by default) -->
         <div id="mapContainer" class="hidden">
-          <div id="map" class="h-[300px] rounded-xl overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700"></div>
+          <div id="map" class="h-[300px] rounded-xl overflow-hidden shadow-lg border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"></div>
         </div>
 
         <!-- Detail Panel -->
-        <div id="detailPanel" class="hidden bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden animate-fade-in-up">
-          <div class="bg-gradient-to-r from-amber-800 to-emerald-800 px-5 py-4 flex justify-between items-center">
-            <div><h2 class="text-xl font-bold text-white font-['Amiri']" id="detailName">—</h2><div class="text-amber-200 text-sm" id="detailMeta">—</div></div>
+        <div id="detailPanel" class="hidden bg-white dark:bg-[var(--maqabir-green)] rounded-xl border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] overflow-hidden animate-fade-in-up shadow-md">
+          <div class="bg-gradient-to-r from-[var(--maqabir-green)] to-[var(--maqabir-green-dark)] px-5 py-4 flex justify-between items-center">
+            <div><h2 class="text-xl font-bold text-white font-[var(--font-arabic)]" id="detailName">—</h2><div class="text-[var(--maqabir-gold-light)] text-sm" id="detailMeta">—</div></div>
             <button class="w-8 h-8 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all" onclick="closeDetail()">✕</button>
           </div>
           <div class="p-5">
-            <div class="flex items-center justify-between bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 mb-4">
-              <div><div class="text-xs text-stone-500 dark:text-stone-400 uppercase" id="gpsLabel">Coordonnées GPS</div><div class="font-mono text-sm text-stone-700 dark:text-stone-300" id="detailGPS">—</div></div>
-              <button class="px-3 py-1.5 bg-amber-500 text-white text-sm rounded-lg hover:bg-amber-600 transition-all" onclick="copyGPS()" id="copyGpsBtn">Copier</button>
+            <div class="flex items-center justify-between bg-[var(--maqabir-cream)]/50 dark:bg-[var(--maqabir-green-dark)]/50 rounded-lg p-3 mb-4">
+              <div><div class="text-xs text-stone-500 dark:text-stone-400 uppercase" id="gpsLabel">Coordonnées GPS</div><div class="font-mono text-sm text-[var(--maqabir-green)] dark:text-stone-300" id="detailGPS">—</div></div>
+              <button class="px-3 py-1.5 btn-gold text-sm rounded-lg" onclick="copyGPS()" id="copyGpsBtn">Copier</button>
             </div>
-            <a id="dirLink" class="flex items-center justify-center gap-2 w-full py-2.5 bg-stone-800 dark:bg-stone-700 text-white rounded-lg hover:bg-stone-700 transition-all mb-4" href="#" target="_blank"><span id="dirIcon">🧭</span> <span id="dirText">Itinéraire Google Maps</span></a>
+            <a id="dirLink" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[var(--maqabir-green)] dark:bg-[var(--maqabir-green-dark)] text-white rounded-lg hover:bg-[var(--maqabir-green-light)] transition-all mb-4" href="#" target="_blank"><span id="dirIcon">🧭</span> <span id="dirText">Itinéraire Google Maps</span></a>
             <div id="detailContent" class="text-stone-600 dark:text-stone-400"></div>
             <div id="detailServicesActions" class="mt-4"></div>
           </div>
@@ -217,103 +332,103 @@
   </div>
 
   <!-- Bottom Navigation Mobile -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md border-t border-stone-200 dark:border-stone-700 md:hidden z-40">
+  <nav class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[var(--maqabir-green)]/95 backdrop-blur-md border-t border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] md:hidden z-40">
     <div class="flex justify-around py-2">
-      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400 active:text-amber-600" onclick="showTab('map')"><span class="text-xl">🗺</span><span class="text-xs" id="bnMap">Carte</span></button>
-      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showTab('list')"><span class="text-xl">📋</span><span class="text-xs" id="bnList">Liste</span></button>
-      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="showServicesScreen()"><span class="text-xl">🛠</span><span class="text-xs" id="bnServices">Services</span></button>
-      <button id="dashboardMobileBtn" class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400 hidden" onclick="showDashboardScreen()"><span class="text-xl">📊</span><span class="text-xs" id="bnDashboard">Dashboard</span></button>
-      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-stone-600 dark:text-stone-400" onclick="openQuickAddModal()"><span class="text-xl">📸</span><span class="text-xs" id="bnQuickAdd">Rapide</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-[var(--maqabir-green)] dark:text-stone-400 active:text-[var(--maqabir-gold)]" onclick="showTab('map')"><span class="text-xl">🗺</span><span class="text-xs" id="bnMap">Carte</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-[var(--maqabir-green)] dark:text-stone-400" onclick="showTab('list')"><span class="text-xl">📋</span><span class="text-xs" id="bnList">Liste</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-[var(--maqabir-green)] dark:text-stone-400" onclick="showServicesScreen()"><span class="text-xl">🛠</span><span class="text-xs" id="bnServices">Services</span></button>
+      <button id="dashboardMobileBtn" class="bbn flex flex-col items-center gap-1 px-4 py-2 text-[var(--maqabir-green)] dark:text-stone-400 hidden" onclick="showDashboardScreen()"><span class="text-xl">📊</span><span class="text-xs" id="bnDashboard">Dashboard</span></button>
+      <button class="bbn flex flex-col items-center gap-1 px-4 py-2 text-[var(--maqabir-green)] dark:text-stone-400" onclick="openQuickAddModal()"><span class="text-xl">📸</span><span class="text-xs" id="bnQuickAdd">Rapide</span></button>
     </div>
   </nav>
 
   <!-- FAB Button -->
-  <button class="fixed bottom-20 right-4 md:bottom-8 w-14 h-14 bg-gradient-to-r from-amber-500 to-emerald-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-2xl z-30 md:hidden" onclick="openQuickAddModal()">📸</button>
+  <button class="fixed bottom-20 right-4 md:bottom-8 w-14 h-14 btn-gold rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-2xl z-30 md:hidden" onclick="openQuickAddModal()">📸</button>
 </div>
 
 <!-- DASHBOARD SCREEN -->
-<div id="dashboardScreen" class="fixed inset-0 bg-stone-100 dark:bg-stone-900 z-[900] overflow-y-auto hidden">
-  <div class="sticky top-0 bg-gradient-to-r from-amber-800 to-emerald-800 px-5 py-4 flex items-center gap-3">
+<div id="dashboardScreen" class="fixed inset-0 bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] z-[900] overflow-y-auto hidden">
+  <div class="sticky top-0 bg-gradient-to-r from-[var(--maqabir-green)] to-[var(--maqabir-green-dark)] px-5 py-4 flex items-center gap-3">
     <button class="w-9 h-9 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="hideDashboardScreen()">←</button>
-    <h2 class="flex-1 text-white font-bold text-xl font-['Amiri']" id="dashboardTitle">📊 Tableau de bord</h2>
+    <h2 class="flex-1 text-white font-bold text-xl font-[var(--font-arabic)]" id="dashboardTitle">📊 لوحة التحكم</h2>
   </div>
   <div class="p-5">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="dashboardStats"></div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
-      <div class="bg-gradient-to-r from-amber-50 to-stone-50 dark:from-stone-700 dark:to-stone-800 px-5 py-3 border-b border-stone-200 dark:border-stone-700">
-        <h3 class="font-semibold text-stone-800 dark:text-stone-200" id="requestsTitle">📋 Demandes des clients</h3>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] overflow-hidden shadow-md">
+      <div class="bg-gradient-to-r from-[var(--maqabir-cream)] to-white dark:from-[var(--maqabir-green-dark)] dark:to-[var(--maqabir-green)] px-5 py-3 border-b border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]">
+        <h3 class="font-semibold text-[var(--maqabir-green)] dark:text-stone-200" id="requestsTitle">📋 Demandes des clients</h3>
       </div>
-      <div id="requestsList" class="divide-y divide-stone-200 dark:divide-stone-700 max-h-[calc(100vh-200px)] overflow-y-auto"></div>
+      <div id="requestsList" class="divide-y divide-[var(--maqabir-cream)] dark:divide-[var(--maqabir-green-light)] max-h-[calc(100vh-200px)] overflow-y-auto"></div>
     </div>
   </div>
 </div>
 
 <!-- QUICK ADD MODAL -->
 <div id="quickAddModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4">
-  <div class="bg-white dark:bg-stone-800 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-    <div class="sticky top-0 bg-gradient-to-r from-amber-700 to-emerald-700 px-5 py-4 flex justify-between items-center">
+  <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="sticky top-0 bg-gradient-to-r from-[var(--maqabir-green)] to-[var(--maqabir-green-dark)] px-5 py-4 flex justify-between items-center">
       <h3 class="text-white font-semibold" id="quickAddTitle">📸 Ajout rapide par photo</h3>
       <button class="w-8 h-8 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="closeQuickAddModal()">✕</button>
     </div>
     <div class="p-5">
       <div id="cameraSection">
         <div class="relative bg-black rounded-xl overflow-hidden"><video id="cameraVideo" class="w-full" autoplay playsinline></video><canvas id="cameraCanvas" class="hidden"></canvas></div>
-        <div class="flex gap-3 mt-4"><button class="flex-1 py-2 bg-amber-500 text-stone-900 font-semibold rounded-lg hover:bg-amber-400 transition-all" onclick="capturePhoto()">📸 Prendre une photo</button><input type="file" id="uploadInput" accept="image/*" class="hidden" onchange="uploadPhoto(this)"><button class="flex-1 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-500 transition-all" onclick="document.getElementById('uploadInput').click()">📁 Choisir une photo</button></div>
+        <div class="flex gap-3 mt-4"><button class="flex-1 py-2 btn-gold rounded-lg font-semibold" onclick="capturePhoto()">📸 Prendre une photo</button><input type="file" id="uploadInput" accept="image/*" class="hidden" onchange="uploadPhoto(this)"><button class="flex-1 py-2 btn-primary rounded-lg font-semibold" onclick="document.getElementById('uploadInput').click()">📁 Choisir une photo</button></div>
       </div>
       <div id="detectionSection" class="hidden">
-        <div id="detectionLoading" class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div><p class="mt-2 text-stone-600 dark:text-stone-400" id="detectionLoadingText">Analyse de la photo en cours...</p></div>
-        <div id="detectionResult" class="hidden bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 mb-4"></div>
-        <div class="grid grid-cols-2 gap-3 mb-3"><input type="text" id="quickFirstname" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Prénom"><input type="text" id="quickLastname" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Nom"></div>
-        <div class="grid grid-cols-2 gap-3 mb-3"><input type="text" id="quickBirth" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Date naissance"><input type="text" id="quickDeath" class="px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Date décès"></div>
-        <div class="mb-3"><label class="block text-sm font-medium mb-1">📍 Position GPS</label><div class="flex gap-2"><input type="text" id="quickGps" class="flex-1 px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" readonly placeholder="En attente..."><button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onclick="getCurrentLocation()">📍 Obtenir</button></div></div>
-        <div class="mb-3"><select id="quickGov" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select><input type="text" id="quickCem" class="w-full mt-2 px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Nom du cimetière"></div>
-        <button id="quickSaveBtn" class="hidden w-full py-3 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-md transition-all" onclick="saveQuickTomb()">💾 Enregistrer le tombeau</button>
+        <div id="detectionLoading" class="text-center py-8"><div class="inline-block w-8 h-8 border-4 border-[var(--maqabir-gold)] border-t-transparent rounded-full animate-spin"></div><p class="mt-2 text-stone-600 dark:text-stone-400" id="detectionLoadingText">Analyse de la photo en cours...</p></div>
+        <div id="detectionResult" class="hidden bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] rounded-lg p-4 mb-4"></div>
+        <div class="grid grid-cols-2 gap-3 mb-3"><input type="text" id="quickFirstname" class="px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Prénom"><input type="text" id="quickLastname" class="px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Nom"></div>
+        <div class="grid grid-cols-2 gap-3 mb-3"><input type="text" id="quickBirth" class="px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Date naissance"><input type="text" id="quickDeath" class="px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Date décès"></div>
+        <div class="mb-3"><label class="block text-sm font-medium mb-1">📍 Position GPS</label><div class="flex gap-2"><input type="text" id="quickGps" class="flex-1 px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" readonly placeholder="En attente..."><button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onclick="getCurrentLocation()">📍 Obtenir</button></div></div>
+        <div class="mb-3"><select id="quickGov" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]"><option>Tunis</option><option>Sfax</option><option>Sousse</option><option>Nabeul</option><option>Bizerte</option><option>Kairouan</option></select><input type="text" id="quickCem" class="w-full mt-2 px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Nom du cimetière"></div>
+        <button id="quickSaveBtn" class="hidden w-full py-3 btn-gold rounded-lg font-semibold" onclick="saveQuickTomb()">💾 Enregistrer le tombeau</button>
       </div>
     </div>
-    <div class="flex gap-3 p-5 border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 border border-stone-300 dark:border-stone-600 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="closeQuickAddModal()">Annuler</button></div>
+    <div class="flex gap-3 p-5 border-t border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><button class="flex-1 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="closeQuickAddModal()">Annuler</button></div>
   </div>
 </div>
 
 <!-- SERVICES SCREEN -->
-<div id="servicesScreen" class="fixed inset-0 bg-stone-100 dark:bg-stone-900 z-[900] overflow-y-auto hidden">
-  <div class="sticky top-0 bg-gradient-to-r from-amber-800 to-emerald-800 px-5 py-4 flex items-center gap-3">
+<div id="servicesScreen" class="fixed inset-0 bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] z-[900] overflow-y-auto hidden">
+  <div class="sticky top-0 bg-gradient-to-r from-[var(--maqabir-green)] to-[var(--maqabir-green-dark)] px-5 py-4 flex items-center gap-3">
     <button class="w-9 h-9 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="hideServicesScreen()">←</button>
-    <h2 class="flex-1 text-white font-bold text-xl font-['Amiri']" id="svcScreenTitle">Services Funéraires</h2>
+    <h2 class="flex-1 text-white font-bold text-xl font-[var(--font-arabic)]" id="svcScreenTitle">Services Funéraires</h2>
   </div>
-  <div class="flex overflow-x-auto bg-white dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700">
-    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent active" onclick="switchSvcPack('all')">🌟 Tous</button>
-    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent" onclick="switchSvcPack('part1')">🕊 Avant l'enterrement</button>
-    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent" onclick="switchSvcPack('part2')">🪦 Entretien</button>
-    <button class="svc-tab px-5 py-3 text-stone-600 dark:text-stone-400 font-medium border-b-2 border-transparent" onclick="switchSvcPack('full')">⭐ Pack complet</button>
+  <div class="flex overflow-x-auto bg-white dark:bg-[var(--maqabir-green)] border-b border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]">
+    <button class="svc-tab px-5 py-3 text-[var(--maqabir-green)] dark:text-stone-300 font-medium border-b-2 border-transparent active" onclick="switchSvcPack('all')">🌟 Tous</button>
+    <button class="svc-tab px-5 py-3 text-[var(--maqabir-green)] dark:text-stone-300 font-medium border-b-2 border-transparent" onclick="switchSvcPack('part1')">🕊 Avant l'enterrement</button>
+    <button class="svc-tab px-5 py-3 text-[var(--maqabir-green)] dark:text-stone-300 font-medium border-b-2 border-transparent" onclick="switchSvcPack('part2')">🪦 Entretien</button>
+    <button class="svc-tab px-5 py-3 text-[var(--maqabir-green)] dark:text-stone-300 font-medium border-b-2 border-transparent" onclick="switchSvcPack('full')">⭐ Pack complet</button>
   </div>
   <div id="svcBanner" class="hidden mx-4 mt-4 p-4 rounded-xl"></div>
-  <div class="p-4"><input type="text" id="svcSearch" class="w-full px-4 py-3 border border-stone-200 dark:border-stone-700 rounded-xl bg-white dark:bg-stone-800" placeholder="Rechercher un service..." oninput="renderServices()"></div>
-  <div id="svcChips1" class="flex overflow-x-auto gap-2 px-4 pb-2 hidden"><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 active:bg-amber-500 active:text-white" onclick="filterSvcChip(this, 'all1')">✨ Tous</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'docs')">📋 Documentation</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'transport')">🚗 Transport</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'kafan')">🤍 Kafan</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'quran')">📖 Coran</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'construction')">🏗 Construction</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'dua')">🤲 Doua</button></div>
-  <div id="svcChips2" class="flex overflow-x-auto gap-2 px-4 pb-2 hidden"><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 active:bg-amber-500 active:text-white" onclick="filterSvcChip(this, 'all2')">✨ Tous</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'cleaning')">🧹 Nettoyage</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'painting')">🎨 Peinture</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'marble')">🪨 Marbre</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'flowers')">🌹 Fleurs</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700" onclick="filterSvcChip(this, 'findtomb')">🔍 Trouver</button></div>
+  <div class="p-4"><input type="text" id="svcSearch" class="w-full px-4 py-3 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-xl bg-white dark:bg-[var(--maqabir-green)]" placeholder="Rechercher un service..." oninput="renderServices()"></div>
+  <div id="svcChips1" class="flex overflow-x-auto gap-2 px-4 pb-2 hidden"><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] active:bg-[var(--maqabir-gold)] active:text-white" onclick="filterSvcChip(this, 'all1')">✨ Tous</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'docs')">📋 Documentation</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'transport')">🚗 Transport</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'kafan')">🤍 Kafan</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'quran')">📖 Coran</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'construction')">🏗 Construction</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'dua')">🤲 Doua</button></div>
+  <div id="svcChips2" class="flex overflow-x-auto gap-2 px-4 pb-2 hidden"><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] active:bg-[var(--maqabir-gold)] active:text-white" onclick="filterSvcChip(this, 'all2')">✨ Tous</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'cleaning')">🧹 Nettoyage</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'painting')">🎨 Peinture</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'marble')">🪨 Marbre</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'flowers')">🌹 Fleurs</button><button class="chip px-4 py-1.5 rounded-full text-sm bg-white dark:bg-[var(--maqabir-green)] border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]" onclick="filterSvcChip(this, 'findtomb')">🔍 Trouver</button></div>
   <div id="svcGrid" class="p-4 space-y-4"></div>
 </div>
 
 <!-- SERVICE REQUEST MODAL -->
 <div id="svcReqModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4">
-  <div class="bg-white dark:bg-stone-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-    <div class="sticky top-0 bg-gradient-to-r from-amber-700 to-emerald-700 px-5 py-4 flex justify-between items-center"><h3 class="text-white font-semibold" id="svcReqTitle">📋 Demander ce service</h3><button class="w-8 h-8 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="closeSvcReqModal()">✕</button></div>
-    <div class="p-5"><div id="reqSvcInfo" class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 mb-4"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqNameLabel">Votre nom</label><input type="text" id="reqName" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Mohamed Ben Ali"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqPhoneLabel">Téléphone</label><input type="tel" id="reqPhone" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="+216 XX XXX XXX"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqLocLabel">Gouvernorat / Cimetière</label><input type="text" id="reqLoc" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Ex: Djellaz, Tunis"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqDateLabel">Date souhaitée</label><input type="date" id="reqDate" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqMsgLabel">Message</label><textarea id="reqMsg" rows="3" class="w-full px-3 py-2 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700" placeholder="Précisions..."></textarea></div></div>
-    <div class="flex gap-3 p-5 border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 border border-stone-300 dark:border-stone-600 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="closeSvcReqModal()">Annuler</button><button class="flex-1 py-2 bg-gradient-to-r from-amber-600 to-emerald-600 text-white font-semibold rounded-lg hover:shadow-md" onclick="submitServiceRequest()">📨 Envoyer</button></div>
+  <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="sticky top-0 bg-gradient-to-r from-[var(--maqabir-green)] to-[var(--maqabir-green-dark)] px-5 py-4 flex justify-between items-center"><h3 class="text-white font-semibold" id="svcReqTitle">📋 Demander ce service</h3><button class="w-8 h-8 rounded-full bg-white/20 text-white hover:bg-white/30" onclick="closeSvcReqModal()">✕</button></div>
+    <div class="p-5"><div id="reqSvcInfo" class="bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] rounded-lg p-4 mb-4"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqNameLabel">Votre nom</label><input type="text" id="reqName" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Mohamed Ben Ali"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqPhoneLabel">Téléphone</label><input type="tel" id="reqPhone" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="+216 XX XXX XXX"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqLocLabel">Gouvernorat / Cimetière</label><input type="text" id="reqLoc" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Ex: Djellaz, Tunis"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqDateLabel">Date souhaitée</label><input type="date" id="reqDate" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]"></div><div class="mb-3"><label class="block text-sm font-medium mb-1" id="reqMsgLabel">Message</label><textarea id="reqMsg" rows="3" class="w-full px-3 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg bg-white dark:bg-[var(--maqabir-green-dark)]" placeholder="Précisions..."></textarea></div></div>
+    <div class="flex gap-3 p-5 border-t border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><button class="flex-1 py-2 border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] rounded-lg hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="closeSvcReqModal()">Annuler</button><button class="flex-1 py-2 btn-gold rounded-lg font-semibold" onclick="submitServiceRequest()">📨 Envoyer</button></div>
   </div>
 </div>
 
-<div id="toastMsg" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-stone-800 dark:bg-stone-700 text-white px-5 py-2.5 rounded-full text-sm shadow-lg hidden z-[1100]"></div>
+<div id="toastMsg" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[var(--maqabir-green)] text-white px-5 py-2.5 rounded-full text-sm shadow-lg hidden z-[1100]"></div>
 
 <script>
-// ==================== TRADUCTIONS COMPLÈTES ====================
+// ==================== TRADUCTIONS ====================
 const translations = {
   fr: {
-    authTitle: "Maqabir", authSubtitle: "Connectez-vous pour ajouter un tombeau",
+    authTitle: "مقابر", authSubtitle: "Maqabir · Préservation de la mémoire",
     authTabLogin: "Connexion", authTabReg: "Inscription",
     loginEmailLabel: "Email", loginPwdLabel: "Mot de passe", loginBtn: "Se connecter",
     regNameLabel: "Nom complet", regEmailLabel: "Email", regPwdLabel: "Mot de passe (min 6)", regBtn: "Créer mon compte",
-    navTitle: "Maqabir", servicesBtn: "🛠 Services", dashboardBtn: "📊 Dashboard", addNavBtn: "➕ Ajouter", logoutBtn: "🚪 Déconnexion",
-    heroTitle: "Retrouvez vos proches,<br>préservez la mémoire", heroSubtitle: "Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.",
+    navTitle: "مقابر", servicesBtn: "🛠 Services", dashboardBtn: "📊 Dashboard", addNavBtn: "➕ Ajouter", logoutBtn: "🚪 Déconnexion",
+    heroTitle: "مقابر<br><span class='text-[var(--maqabir-gold-light)] text-xl'>Préservez la mémoire de vos proches</span>", heroSubtitle: "Localisez, photographiez et partagez les tombeaux de vos proches en Tunisie.",
     statTombsLabel: "Tombeaux", statCemsLabel: "Cimetières", statPhotosLabel: "Photos", statMembersLabel: "Membres",
     filterTitle: "Filtres", cemFilterLabel: "Cimetière", allCems: "Tous", privFilterLabel: "Visibilité", allVis: "Tous", publicOpt: "Publics", privateOpt: "Privés", applyBtn: "Appliquer", resultsTitle: "Résultats",
     gpsLabel: "Coordonnées GPS", copyGpsBtn: "Copier", dirText: "Itinéraire Google Maps",
@@ -328,12 +443,12 @@ const translations = {
     mapToggleShow: "Afficher la carte", mapToggleHide: "Masquer la carte"
   },
   ar: {
-    authTitle: "مقابر", authSubtitle: "سجل الدخول لإضافة قبر",
+    authTitle: "مقابر", authSubtitle: "مقابر · الحفاظ على الذكرى",
     authTabLogin: "تسجيل الدخول", authTabReg: "إنشاء حساب",
     loginEmailLabel: "البريد الإلكتروني", loginPwdLabel: "كلمة المرور", loginBtn: "تسجيل الدخول",
     regNameLabel: "الاسم الكامل", regEmailLabel: "البريد الإلكتروني", regPwdLabel: "كلمة المرور", regBtn: "إنشاء حساب",
     navTitle: "مقابر", servicesBtn: "الخدمات", dashboardBtn: "لوحة التحكم", addNavBtn: "إضافة", logoutBtn: "تسجيل خروج",
-    heroTitle: "ابحث عن أحبائك،<br>احفظ ذكراهم", heroSubtitle: "حدّد موقع القبر، أضف الصور.",
+    heroTitle: "مقابر<br><span class='text-[var(--maqabir-gold-light)] text-xl'>الحفاظ على ذكرى أحبائك</span>", heroSubtitle: "حدّد موقع القبر، أضف الصور، واحتفظ بمعلومات المتوفى في تونس.",
     statTombsLabel: "قبور", statCemsLabel: "مقابر", statPhotosLabel: "صور", statMembersLabel: "أعضاء",
     filterTitle: "تصفية", cemFilterLabel: "المقبرة", allCems: "الكل", privFilterLabel: "الخصوصية", allVis: "الكل", publicOpt: "عامة", privateOpt: "خاصة", applyBtn: "تطبيق", resultsTitle: "النتائج",
     gpsLabel: "الإحداثيات", copyGpsBtn: "نسخ", dirText: "الاتجاهات",
@@ -351,32 +466,30 @@ const translations = {
 
 // ==================== DONNÉES ====================
 let tombs = [
-  { id: "t1", name: "Mohamed Ben Salah", firstname: "Mohamed", lastname: "Ben Salah", birth: "15 mars 1928", death: "2 novembre 1995", cem: "Djellaz", gov: "Tunis", location: "Section B, Rangée 14", lat: 36.8212, lng: 10.1732, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
-  { id: "t2", name: "Fatma Bouzid", firstname: "Fatma", lastname: "Bouzid", birth: "8 juin 1935", death: "14 avril 2010", cem: "Sidi Bou Saïd", gov: "Tunis", location: "Section A, Tombe 7", lat: 36.87005, lng: 10.34105, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
-  { id: "t3", name: "Ali Haddad", firstname: "Ali", lastname: "Haddad", birth: "3 janvier 1950", death: "27 septembre 2018", cem: "El Gorjani", gov: "Tunis", location: "Allée C, Tombe 22", lat: 36.7914, lng: 10.1748, photos: [], privacy: "public", owner: null, ownerName: "Admin" }
+  { id: "t1", name: "محمد بن صالح", firstname: "محمد", lastname: "بن صالح", birth: "15 مارس 1928", death: "2 نوفمبر 1995", cem: "الجلاز", gov: "Tunis", location: "Section B, Rangée 14", lat: 36.8212, lng: 10.1732, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
+  { id: "t2", name: "فاطمة بوزيد", firstname: "فاطمة", lastname: "بوزيد", birth: "8 جوان 1935", death: "14 أفريل 2010", cem: "سيدي بوسعيد", gov: "Tunis", location: "Section A, Tombe 7", lat: 36.87005, lng: 10.34105, photos: [], privacy: "public", owner: null, ownerName: "Admin" },
+  { id: "t3", name: "علي حداد", firstname: "علي", lastname: "حداد", birth: "3 جانفي 1950", death: "27 سبتمبر 2018", cem: "الكرجاني", gov: "Tunis", location: "Allée C, Tombe 22", lat: 36.7914, lng: 10.1748, photos: [], privacy: "public", owner: null, ownerName: "Admin" }
 ];
 
 const CATS_P1 = { docs: { fr: 'Documentation', ar: 'توثيق', icon: '📋' }, transport: { fr: 'Transport', ar: 'نقل', icon: '🚗' }, kafan: { fr: 'Kafan', ar: 'كفن', icon: '🤍' }, quran: { fr: 'Coran', ar: 'قرآن', icon: '📖' }, construction: { fr: 'Construction', ar: 'بناء', icon: '🏗' }, dua: { fr: 'Doua', ar: 'دعاء', icon: '🤲' } };
 const CATS_P2 = { cleaning: { fr: 'Nettoyage', ar: 'تنظيف', icon: '🧹' }, painting: { fr: 'Peinture', ar: 'طلاء', icon: '🎨' }, marble: { fr: 'Marbre', ar: 'رخام', icon: '🪨' }, flowers: { fr: 'Fleurs', ar: 'زهور', icon: '🌹' }, findtomb: { fr: 'Localisation', ar: 'بحث', icon: '🔍' } };
 
 let services = [
-  { id: 's1', part: 'part1', cat: 'docs', type: 'pro', name: 'Bureau Administratif', gov: 'Tunis', price: '150–300', phone: '+21692639366', desc: "Aide pour les démarches.", avail: 'weekdays', rating: 4.8, reviews: 34 },
-  { id: 's2', part: 'part1', cat: 'transport', type: 'pro', name: 'Transport Funèbre', gov: 'Tunis', price: '200–500', phone: '+21692639366', desc: "Transport 24h/24.", avail: 'always', rating: 4.9, reviews: 87 },
+  { id: 's1', part: 'part1', cat: 'docs', type: 'pro', name: 'Bureau Administratif Baraka', gov: 'Tunis', price: '150–300', phone: '+21692639366', desc: "Aide complète pour les démarches : acte de décès, autorisation d'inhumation.", avail: 'weekdays', rating: 4.8, reviews: 34 },
+  { id: 's2', part: 'part1', cat: 'transport', type: 'pro', name: 'Transport Funèbre El Rahma', gov: 'Tunis', price: '200–500', phone: '+21692639366', desc: "Transport du défunt 24h/24.", avail: 'always', rating: 4.9, reviews: 87 },
   { id: 's3', part: 'part1', cat: 'kafan', type: 'pro', name: 'Maison du Kafan', gov: 'Tunis', price: '80–200', phone: '+21692639366', desc: 'Vente et pose du kafan.', avail: 'always', rating: 4.7, reviews: 52 },
-  { id: 's4', part: 'part1', cat: 'quran', type: 'volunteer', name: 'Sheikh Karim', gov: 'Sfax', price: 'Gratuit', phone: '+21692639366', desc: 'Lecture du Coran.', avail: 'oncall', rating: 5.0, reviews: 141 },
-  { id: 's5', part: 'part1', cat: 'construction', type: 'pro', name: 'Bâti-Maqbara', gov: 'Sousse', price: '800–3000', phone: '+21692639366', desc: 'Construction tombeau.', avail: 'weekdays', rating: 4.6, reviews: 29 },
-  { id: 's6', part: 'part1', cat: 'dua', type: 'volunteer', name: 'Association El Rahma', gov: 'Bizerte', price: 'Gratuit', phone: '+21692639366', desc: "Prière et doua.", avail: 'oncall', rating: 4.9, reviews: 63 },
-  { id: 's7', part: 'part2', cat: 'cleaning', type: 'pro', name: 'Nettoyage Pro', gov: 'Tunis', price: '80', phone: '+21692639366', desc: 'Nettoyage complet.', avail: 'always', rating: 4.8, reviews: 23 },
-  { id: 's8', part: 'part2', cat: 'painting', type: 'pro', name: 'Peinture Tombeaux', gov: 'Tunis', price: '200', phone: '+21692639366', desc: 'Peinture complète.', avail: 'weekdays', rating: 4.6, reviews: 18 },
-  { id: 's9', part: 'part2', cat: 'marble', type: 'pro', name: 'Marbre & Granit', gov: 'Sfax', price: '500', phone: '+21692639366', desc: 'Rénovation marbre.', avail: 'weekdays', rating: 4.9, reviews: 37 },
-  { id: 's10', part: 'part2', cat: 'flowers', type: 'pro', name: 'Jardin du Souvenir', gov: 'Sousse', price: '50', phone: '+21692639366', desc: 'Fleurs et entretien.', avail: 'always', rating: 4.7, reviews: 19 },
-  { id: 's11', part: 'part2', cat: 'findtomb', type: 'pro', name: 'Localisation', gov: 'Tunis', price: '100', phone: '+21692639366', desc: 'Retrouver un tombeau.', avail: 'weekdays', rating: 4.5, reviews: 11 }
+  { id: 's4', part: 'part1', cat: 'quran', type: 'volunteer', name: 'Sheikh Karim El Hafidh', gov: 'Sfax', price: 'Gratuit', phone: '+21692639366', desc: 'Lecture du Saint Coran.', avail: 'oncall', rating: 5.0, reviews: 141 },
+  { id: 's5', part: 'part1', cat: 'construction', type: 'pro', name: 'Entreprise Bâti-Maqbara', gov: 'Sousse', price: '800–3000', phone: '+21692639366', desc: 'Construction de tombeaux.', avail: 'weekdays', rating: 4.6, reviews: 29 },
+  { id: 's6', part: 'part1', cat: 'dua', type: 'volunteer', name: 'Association El Rahma', gov: 'Bizerte', price: 'Gratuit', phone: '+21692639366', desc: "Prière et doua durant l'enterrement.", avail: 'oncall', rating: 4.9, reviews: 63 },
+  { id: 's7', part: 'part2', cat: 'cleaning', type: 'pro', name: 'Nettoyage de tombe Pro', gov: 'Tunis', price: '80', phone: '+21692639366', desc: 'Nettoyage complet : mauvaises herbes, lavage de la pierre tombale.', avail: 'always', rating: 4.8, reviews: 23 },
+  { id: 's8', part: 'part2', cat: 'painting', type: 'pro', name: 'Peinture Tombeaux', gov: 'Tunis', price: '200', phone: '+21692639366', desc: 'Peinture complète et rénovation.', avail: 'weekdays', rating: 4.6, reviews: 18 },
+  { id: 's9', part: 'part2', cat: 'marble', type: 'pro', name: 'Marbre & Granit Élite', gov: 'Sfax', price: '500', phone: '+21692639366', desc: 'Remplacement ou rénovation de la dalle en marbre.', avail: 'weekdays', rating: 4.9, reviews: 37 },
+  { id: 's10', part: 'part2', cat: 'flowers', type: 'pro', name: 'Jardin du Souvenir', gov: 'Sousse', price: '50', phone: '+21692639366', desc: 'Compositions florales et entretien périodique.', avail: 'always', rating: 4.7, reviews: 19 },
+  { id: 's11', part: 'part2', cat: 'findtomb', type: 'pro', name: 'Service Localisation Maqabir', gov: 'Tunis', price: '100', phone: '+21692639366', desc: 'Aide pour retrouver un tombeau perdu.', avail: 'weekdays', rating: 4.5, reviews: 11 }
 ];
 
-// Demandes clients
 let requests = JSON.parse(localStorage.getItem('maqabir_requests') || '[]');
 
-// Admins emails
 const adminEmails = ['mbenouhiba@globalnet.tn', 'mbenouhiba2012@gmail.com'];
 const adminPassword = '12345678';
 
@@ -412,20 +525,18 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('maqabir_lang', lang);
   const t = translations[lang];
-  // Mettre à jour les boutons de langue
   document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.remove('bg-amber-500', 'text-white');
-    btn.classList.add('text-stone-600', 'dark:text-stone-300');
+    btn.classList.remove('bg-[var(--maqabir-gold)]', 'text-white');
+    btn.classList.add('text-[var(--maqabir-green)]', 'dark:text-stone-300');
     if ((lang === 'fr' && btn.textContent === 'FR') || (lang === 'ar' && btn.textContent === 'ع')) {
-      btn.classList.add('bg-amber-500', 'text-white');
-      btn.classList.remove('text-stone-600', 'dark:text-stone-300');
+      btn.classList.add('bg-[var(--maqabir-gold)]', 'text-white');
+      btn.classList.remove('text-[var(--maqabir-green)]', 'dark:text-stone-300');
     }
   });
   for (let key in t) {
     let el = document.getElementById(key);
     if (el) el.innerHTML = t[key];
   }
-  // Mettre à jour les placeholders
   document.getElementById('searchNom').placeholder = lang === 'ar' ? 'اسم المتوفى...' : 'Nom du défunt...';
   document.getElementById('searchPrenom').placeholder = lang === 'ar' ? 'الاسم الأول...' : 'Prénom...';
   document.getElementById('searchCimetiere').placeholder = lang === 'ar' ? 'المقبرة...' : 'Cimetière...';
@@ -477,14 +588,13 @@ function switchAuthTab(tab) {
   const isLogin = tab === 'login';
   document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
   document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
-  document.querySelectorAll('.auth-tab').forEach((btn, i) => { btn.classList.toggle('border-amber-500', (i === 0 && isLogin) || (i === 1 && !isLogin)); });
+  document.querySelectorAll('.auth-tab').forEach((btn, i) => { btn.classList.toggle('border-[var(--maqabir-gold)]', (i === 0 && isLogin) || (i === 1 && !isLogin)); });
 }
 
 function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pwd = document.getElementById('loginPwd').value;
   
-  // Vérifier si c'est un admin
   if (adminEmails.includes(email) && pwd === adminPassword) {
     currentUser = { uid: 'admin_' + Date.now(), name: 'Admin', email: email };
     localStorage.setItem('maqabir_currentUser', JSON.stringify(currentUser));
@@ -571,7 +681,7 @@ function canSeeTomb(tomb) {
 }
 
 function getMarkerIcon(isPrivate, isSelected) {
-  const color = isSelected ? '#c9a84c' : (isPrivate ? '#8b3a2a' : '#5a6b3c');
+  const color = isSelected ? 'var(--maqabir-gold)' : (isPrivate ? 'var(--maqabir-red)' : 'var(--maqabir-green)');
   return L.divIcon({ html: `<div style="width:28px;height:28px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:12px">${isPrivate ? '🔒' : '🪦'}</span></div>`, iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -32] });
 }
 
@@ -581,7 +691,7 @@ function updateMarkers() {
     if (markers[tomb.id]) { map.removeLayer(markers[tomb.id]); delete markers[tomb.id]; }
     if (canSeeTomb(tomb)) {
       const marker = L.marker([tomb.lat, tomb.lng], { icon: getMarkerIcon(tomb.privacy === 'private', selectedTombId === tomb.id) }).addTo(map);
-      marker.bindPopup(`<div style="padding:8px"><strong>${tomb.name}</strong><br>${tomb.cem}<br><button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:#5a6b3c;color:white;border:none;border-radius:5px;cursor:pointer">Voir</button></div>`);
+      marker.bindPopup(`<div style="padding:8px"><strong>${tomb.name}</strong><br>${tomb.cem}<br><button onclick="selectTomb('${tomb.id}')" style="margin-top:5px;padding:5px 10px;background:var(--maqabir-green);color:white;border:none;border-radius:5px;cursor:pointer">Voir</button></div>`);
       markers[tomb.id] = marker;
     }
   });
@@ -606,7 +716,7 @@ function displayTombServices(tombId) {
   const tomb = tombs.find(t => t.id === tombId);
   if (!tomb) return;
   const container = document.getElementById('detailServicesActions');
-  container.innerHTML = `<h4 class="font-semibold text-stone-700 dark:text-stone-300 mb-2">${currentLang === 'ar' ? 'خدمات لهذا القبر' : 'Services pour ce tombeau'}</h4><div class="grid grid-cols-2 gap-2"><button class="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'cleaning')">🧹 ${currentLang === 'ar' ? 'تنظيف' : 'Nettoyer'}</button><button class="px-3 py-2 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'painting')">🎨 ${currentLang === 'ar' ? 'طلاء' : 'Peindre'}</button><button class="px-3 py-2 bg-stone-500 text-white rounded-lg text-sm hover:bg-stone-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'marble')">🪨 ${currentLang === 'ar' ? 'رخام' : 'Marbre'}</button><button class="px-3 py-2 bg-pink-500 text-white rounded-lg text-sm hover:bg-pink-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'flowers')">🌹 ${currentLang === 'ar' ? 'زهور' : 'Fleurs'}</button><button class="px-3 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'findtomb')">🔍 ${currentLang === 'ar' ? 'بحث' : 'Retrouver'}</button></div>`;
+  container.innerHTML = `<h4 class="font-semibold text-[var(--maqabir-green)] dark:text-stone-300 mb-2">${currentLang === 'ar' ? 'خدمات لهذا القبر' : 'Services pour ce tombeau'}</h4><div class="grid grid-cols-2 gap-2"><button class="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'cleaning')">🧹 ${currentLang === 'ar' ? 'تنظيف' : 'Nettoyer'}</button><button class="px-3 py-2 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'painting')">🎨 ${currentLang === 'ar' ? 'طلاء' : 'Peindre'}</button><button class="px-3 py-2 bg-stone-500 text-white rounded-lg text-sm hover:bg-stone-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'marble')">🪨 ${currentLang === 'ar' ? 'رخام' : 'Marbre'}</button><button class="px-3 py-2 bg-pink-500 text-white rounded-lg text-sm hover:bg-pink-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'flowers')">🌹 ${currentLang === 'ar' ? 'زهور' : 'Fleurs'}</button><button class="px-3 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-all" onclick="requestServiceForTomb('${tombId}', 'findtomb')">🔍 ${currentLang === 'ar' ? 'بحث' : 'Retrouver'}</button></div>`;
 }
 
 function requestServiceForTomb(tombId, serviceCat) {
@@ -660,8 +770,8 @@ function renderTombList(filteredList = null) {
   container.innerHTML = '';
   list.forEach(tomb => {
     const div = document.createElement('div');
-    div.className = 'p-4 hover:bg-stone-50 dark:hover:bg-stone-700 cursor-pointer transition-all';
-    div.innerHTML = `<h4 class="font-semibold text-stone-800 dark:text-stone-200">${tomb.name}</h4><div class="text-sm text-stone-500 dark:text-stone-400">${tomb.birth} – ${tomb.death}</div><div class="text-xs text-stone-400 dark:text-stone-500">${tomb.cem}, ${tomb.gov}</div>`;
+    div.className = 'tomb-card p-4 hover:bg-[var(--maqabir-cream)]/50 dark:hover:bg-[var(--maqabir-green-dark)]/50 cursor-pointer transition-all border-l-3 border-transparent';
+    div.innerHTML = `<h4 class="font-semibold text-[var(--maqabir-green)] dark:text-stone-200">${tomb.name}</h4><div class="text-sm text-stone-500 dark:text-stone-400">${tomb.birth} – ${tomb.death}</div><div class="text-xs text-stone-400 dark:text-stone-500">${tomb.cem}, ${tomb.gov}</div>`;
     div.onclick = () => selectTomb(tomb.id);
     container.appendChild(div);
   });
@@ -724,7 +834,7 @@ async function analyzeImage(imageDataUrl) {
     const extracted = extractInfoFromText(text);
     document.getElementById('detectionLoading').style.display = 'none';
     document.getElementById('detectionResult').style.display = 'block';
-    document.getElementById('detectionResult').innerHTML = `<div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg"><p class="text-sm">🔍 ${text.substring(0, 150)}...</p><p class="text-sm mt-2">👤 ${extracted.firstname || '?'} ${extracted.lastname || '?'}</p><p class="text-sm">📅 ${extracted.birth || '?'} → ${extracted.death || '?'}</p></div>`;
+    document.getElementById('detectionResult').innerHTML = `<div class="p-3 bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] rounded-lg"><p class="text-sm">🔍 ${text.substring(0, 150)}...</p><p class="text-sm mt-2">👤 ${extracted.firstname || '?'} ${extracted.lastname || '?'}</p><p class="text-sm">📅 ${extracted.birth || '?'} → ${extracted.death || '?'}</p></div>`;
     document.getElementById('quickFirstname').value = extracted.firstname || '';
     document.getElementById('quickLastname').value = extracted.lastname || '';
     document.getElementById('quickBirth').value = extracted.birth || '';
@@ -771,21 +881,21 @@ function hideServicesScreen() { document.getElementById('servicesScreen').classL
 function switchSvcPack(pack) {
   svcPackFilter = pack;
   svcChipFilter = pack === 'part2' ? 'all2' : 'all1';
-  document.querySelectorAll('.svc-tab').forEach(tab => tab.classList.remove('border-amber-500', 'text-amber-600'));
-  event.target.classList.add('border-amber-500', 'text-amber-600');
+  document.querySelectorAll('.svc-tab').forEach(tab => tab.classList.remove('border-[var(--maqabir-gold)]', 'text-[var(--maqabir-gold)]'));
+  event.target.classList.add('border-[var(--maqabir-gold)]', 'text-[var(--maqabir-gold)]');
   document.getElementById('svcChips1').style.display = (pack === 'part1' || pack === 'all') ? 'flex' : 'none';
   document.getElementById('svcChips2').style.display = (pack === 'part2' || pack === 'all') ? 'flex' : 'none';
   const banner = document.getElementById('svcBanner');
-  if (pack === 'part1') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20'; banner.innerHTML = '<div class="font-bold">🕊 Partie 1 — Avant l\'enterrement</div><div class="text-sm">Documentation · Transport · Kafan · Coran · Construction · Doua</div>'; }
-  else if (pack === 'part2') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20'; banner.innerHTML = '<div class="font-bold">🪦 Partie 2 — Entretien du tombeau</div><div class="text-sm">Nettoyage · Peinture · Marbre · Fleurs · Localisation</div>'; }
-  else if (pack === 'full') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-gradient-to-r from-amber-100 to-emerald-100 dark:from-amber-900/30 dark:to-emerald-900/30'; banner.innerHTML = '<div class="font-bold">⭐ Pack complet — De la vie au repos</div><div class="text-sm">Tous les services réunis</div>'; }
+  if (pack === 'part1') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)]'; banner.innerHTML = '<div class="font-bold text-[var(--maqabir-green)] dark:text-[var(--maqabir-gold)]">🕊 Partie 1 — Avant l\'enterrement</div><div class="text-sm text-stone-600 dark:text-stone-400">Documentation · Transport · Kafan · Coran · Construction · Doua</div>'; }
+  else if (pack === 'part2') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)]'; banner.innerHTML = '<div class="font-bold text-[var(--maqabir-green)] dark:text-[var(--maqabir-gold)]">🪦 Partie 2 — Entretien du tombeau</div><div class="text-sm text-stone-600 dark:text-stone-400">Nettoyage · Peinture · Marbre · Fleurs · Localisation</div>'; }
+  else if (pack === 'full') { banner.style.display = 'block'; banner.className = 'mx-4 mt-4 p-4 rounded-xl bg-gradient-to-r from-[var(--maqabir-gold)]/20 to-[var(--maqabir-green)]/20'; banner.innerHTML = '<div class="font-bold text-[var(--maqabir-green)] dark:text-[var(--maqabir-gold)]">⭐ Pack complet — De la vie au repos</div><div class="text-sm text-stone-600 dark:text-stone-400">Tous les services réunis</div>'; }
   else banner.style.display = 'none';
   renderServices();
 }
 function filterSvcChip(el, cat) {
   svcChipFilter = cat;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('bg-amber-500', 'text-white', 'border-amber-500'));
-  el.classList.add('bg-amber-500', 'text-white', 'border-amber-500');
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('bg-[var(--maqabir-gold)]', 'text-white', 'border-[var(--maqabir-gold)]'));
+  el.classList.add('bg-[var(--maqabir-gold)]', 'text-white', 'border-[var(--maqabir-gold)]');
   renderServices();
 }
 function renderServices() {
@@ -802,7 +912,7 @@ function renderServices() {
   grid.innerHTML = list.map(s => {
     const cat = { ...CATS_P1, ...CATS_P2 }[s.cat] || { icon: '🛠', fr: s.cat };
     const stars = '★'.repeat(Math.floor(s.rating)) + '☆'.repeat(5 - Math.ceil(s.rating));
-    return `<div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden hover:shadow-lg transition-all"><div class="p-4 flex gap-3"><div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xl">${cat.icon}</div><div class="flex-1"><h3 class="font-bold text-stone-800 dark:text-stone-200">${s.name}</h3><div class="text-sm text-stone-500">📍 ${s.gov}</div><div class="text-xs text-stone-400 mt-1">${s.desc.substring(0, 80)}...</div><div class="flex flex-wrap gap-2 mt-2"><span class="text-xs bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded-full">${stars} ${s.rating}</span><span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-full">🟢 ${s.avail === 'always' ? '24/7' : 'Disponible'}</span></div></div><div class="text-right"><strong class="text-amber-600 dark:text-amber-400">${s.price}</strong><span class="text-xs"> TND</span></div></div><div class="flex border-t border-stone-200 dark:border-stone-700"><button class="flex-1 py-2 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="callProvider('${s.phone}')">📞 ${currentLang === 'ar' ? 'اتصال' : 'Appeler'}</button><button class="flex-1 py-2 text-blue-600 dark:text-blue-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button><button class="flex-1 py-2 text-amber-600 dark:text-amber-400 font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" onclick="openSvcReqModal('${s.id}')">📋 ${currentLang === 'ar' ? 'طلب' : 'Demander'}</button></div></div>`;
+    return `<div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)] overflow-hidden hover:shadow-lg transition-all"><div class="p-4 flex gap-3"><div class="w-12 h-12 rounded-xl bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] flex items-center justify-center text-xl">${cat.icon}</div><div class="flex-1"><h3 class="font-bold text-[var(--maqabir-green)] dark:text-stone-200">${s.name}</h3><div class="text-sm text-stone-500">📍 ${s.gov}</div><div class="text-xs text-stone-400 mt-1">${s.desc.substring(0, 80)}...</div><div class="flex flex-wrap gap-2 mt-2"><span class="text-xs bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] px-2 py-1 rounded-full">${stars} ${s.rating}</span><span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-full">🟢 ${s.avail === 'always' ? '24/7' : 'Disponible'}</span></div></div><div class="text-right"><strong class="text-[var(--maqabir-gold)]">${s.price}</strong><span class="text-xs"> TND</span></div></div><div class="flex border-t border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><button class="flex-1 py-2 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="callProvider('${s.phone}')">📞 ${currentLang === 'ar' ? 'اتصال' : 'Appeler'}</button><button class="flex-1 py-2 text-blue-600 dark:text-blue-400 font-medium hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="whatsappProvider('${s.phone}','${s.name}')">💬 WhatsApp</button><button class="flex-1 py-2 text-[var(--maqabir-gold)] font-medium hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" onclick="openSvcReqModal('${s.id}')">📋 ${currentLang === 'ar' ? 'طلب' : 'Demander'}</button></div></div>`;
   }).join('');
 }
 function callProvider(phone) { window.open('tel:' + phone.replace(/\s/g, '')); }
@@ -850,24 +960,24 @@ function renderDashboard() {
   const done = requests.filter(r => r.status === 'done').length;
   const t = translations[currentLang];
   statsDiv.innerHTML = `
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-amber-600 dark:text-amber-400">${requests.length}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.totalRequests || 'Total demandes'}</div></div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">${pending}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.pendingStatus || 'En attente'}</div></div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${progress}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.progressStatus || 'En cours'}</div></div>
-    <div class="bg-white dark:bg-stone-800 rounded-xl p-4 text-center shadow border border-stone-200 dark:border-stone-700"><div class="text-2xl font-bold text-green-600 dark:text-green-400">${done}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.doneStatus || 'Terminé'}</div></div>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><div class="text-2xl font-bold text-[var(--maqabir-gold)]">${requests.length}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.totalRequests || 'Total demandes'}</div></div>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">${pending}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.pendingStatus || 'En attente'}</div></div>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${progress}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.progressStatus || 'En cours'}</div></div>
+    <div class="bg-white dark:bg-[var(--maqabir-green)] rounded-xl p-4 text-center shadow border border-[var(--maqabir-cream)] dark:border-[var(--maqabir-green-light)]"><div class="text-2xl font-bold text-green-600 dark:text-green-400">${done}</div><div class="text-sm text-stone-600 dark:text-stone-400">${t.doneStatus || 'Terminé'}</div></div>
   `;
   const listDiv = document.getElementById('requestsList');
   if (requests.length === 0) { listDiv.innerHTML = `<div class="p-8 text-center text-stone-500 dark:text-stone-400">📭 ${currentLang === 'ar' ? 'لا توجد طلبات بعد' : 'Aucune demande pour le moment'}</div>`; return; }
   listDiv.innerHTML = requests.map(r => `
-    <div class="p-4 hover:bg-stone-50 dark:hover:bg-stone-700 transition-all" data-id="${r.id}">
+    <div class="p-4 hover:bg-[var(--maqabir-cream)] dark:hover:bg-[var(--maqabir-green-dark)] transition-all" data-id="${r.id}">
       <div class="flex justify-between items-start flex-wrap gap-2 mb-2">
-        <div><span class="font-semibold text-stone-800 dark:text-stone-200">${r.service}</span> - <span class="text-amber-600 dark:text-amber-400 font-medium">${r.price} TND</span></div>
+        <div><span class="font-semibold text-[var(--maqabir-green)] dark:text-stone-200">${r.service}</span> - <span class="text-[var(--maqabir-gold)] font-medium">${r.price} TND</span></div>
         <span class="text-xs text-stone-500 dark:text-stone-400">${new Date(r.createdAt).toLocaleDateString(currentLang === 'ar' ? 'ar-TN' : 'fr-FR')}</span>
       </div>
       <div class="text-sm text-stone-600 dark:text-stone-400 mb-2">👤 ${r.clientName} | 📞 ${r.clientPhone}</div>
       <div class="text-xs text-stone-500 dark:text-stone-500 mb-2">📍 ${r.location} | 📅 ${r.date}</div>
-      ${r.message ? `<div class="text-xs text-stone-500 dark:text-stone-500 mb-3 bg-stone-100 dark:bg-stone-700 p-2 rounded-lg">📝 ${r.message.substring(0, 100)}${r.message.length > 100 ? '...' : ''}</div>` : ''}
+      ${r.message ? `<div class="text-xs text-stone-500 dark:text-stone-500 mb-3 bg-[var(--maqabir-cream)] dark:bg-[var(--maqabir-green-dark)] p-2 rounded-lg">📝 ${r.message.substring(0, 100)}${r.message.length > 100 ? '...' : ''}</div>` : ''}
       <div class="flex justify-between items-center flex-wrap gap-2">
-        <span class="px-2 py-1 rounded-full text-xs font-medium ${r.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : (r.status === 'progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400')}">${r.status === 'pending' ? (currentLang === 'ar' ? 'قيد الانتظار' : 'En attente') : (r.status === 'progress' ? (currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours') : (currentLang === 'ar' ? 'مكتمل' : 'Terminé'))}</span>
+        <span class="px-2 py-1 rounded-full text-xs font-medium ${r.status === 'pending' ? 'status-pending' : (r.status === 'progress' ? 'status-progress' : 'status-done')}">${r.status === 'pending' ? (currentLang === 'ar' ? 'قيد الانتظار' : 'En attente') : (r.status === 'progress' ? (currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours') : (currentLang === 'ar' ? 'مكتمل' : 'Terminé'))}</span>
         <div class="flex gap-2">
           ${r.status !== 'progress' ? `<button class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-all" onclick="updateRequestStatus('${r.id}', 'progress')">${currentLang === 'ar' ? 'قيد التنفيذ' : 'En cours'}</button>` : ''}
           ${r.status !== 'done' ? `<button class="px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-all" onclick="updateRequestStatus('${r.id}', 'done')">${currentLang === 'ar' ? 'مكتمل' : 'Terminé'}</button>` : ''}
